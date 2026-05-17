@@ -1,0 +1,4 @@
+interface:
+  display_name: "Compose Multiplatform Rules"
+  short_description: "KMP + Compose structure and coding rules"
+  default_prompt: "Apply repository-specific Kotlin Multiplatform and Compose architecture, module, and coding standards for this task."
