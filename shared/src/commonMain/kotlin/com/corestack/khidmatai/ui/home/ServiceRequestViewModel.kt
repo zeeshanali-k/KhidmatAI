@@ -2,6 +2,7 @@ package com.corestack.khidmatai.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.corestack.khidmatai.data.location.LocationPreferences
 import com.corestack.khidmatai.domain.model.RequestState
 import com.corestack.khidmatai.domain.repository.ServiceRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,10 +14,13 @@ import org.koin.core.annotation.KoinViewModel
 
 @KoinViewModel
 class ServiceRequestViewModel(
-    private val repository: ServiceRepository
+    private val repository: ServiceRepository,
+    private val locationPreferences: LocationPreferences
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(ServiceRequestState())
+    private val _uiState = MutableStateFlow(
+        ServiceRequestState(location = locationPreferences.detectedLocation)
+    )
     val uiState: StateFlow<ServiceRequestState> = _uiState.asStateFlow()
 
     fun onAction(action: ServiceRequestIntent) {
@@ -33,7 +37,7 @@ class ServiceRequestViewModel(
     private fun submitRequest() {
         val currentState = _uiState.value
         if (currentState.query.isBlank()) return
-        
+
         viewModelScope.launch {
             repository.submitRequest(
                 query = currentState.query,

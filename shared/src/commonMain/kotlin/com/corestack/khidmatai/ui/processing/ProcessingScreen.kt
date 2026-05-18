@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
@@ -37,16 +38,24 @@ fun ProcessingScreen(
     var showFlash by remember { mutableStateOf(false) }
 
     LaunchedEffect(requestState) {
-        if (requestState is RequestState.Success) {
-            showFlash = true
-            delay(600)
-            onNavigateToSuccess()
-        } else if (requestState is RequestState.Unavailable) {
-            onNavigateToUnavailable()
-        }
+//        if (requestState is RequestState.Success) {
+//            showFlash = true
+//            delay(600)
+//            onNavigateToSuccess()
+//        } else if (requestState is RequestState.Unavailable) {
+//            onNavigateToUnavailable()
+//        }
+        //TODO: uncomment above and remove below code after complete implementation
+
+        delay(2000)
+        onNavigateToSuccess()
     }
 
-    Box(modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.systemBars)) {
+    Scaffold(
+        modifier = Modifier
+            .fillMaxSize()
+            .windowInsetsPadding(WindowInsets.systemBars)
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -73,12 +82,17 @@ fun ProcessingScreen(
 
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.extraLarge))
 
-            val traces = if (requestState is RequestState.Processing) requestState.traces else emptyList()
+            val traces =
+                if (requestState is RequestState.Processing) requestState.traces else emptyList()
             val completedCount = traces.count { it.status == "completed" }
             val totalCount = traces.size
-            val progress = if (totalCount > 0) completedCount.toFloat() / totalCount.toFloat() else 0f
+            val progress =
+                if (totalCount > 0) completedCount.toFloat() / totalCount.toFloat() else 0f
 
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
                 Text("Stage $completedCount of $totalCount", style = AppTypography.bodySmall)
                 Text("${(progress * 100).toInt()}%", style = AppTypography.bodySmall)
             }

@@ -9,13 +9,13 @@ data object Onboarding
 data object Home
 
 @Serializable
-data object Processing
+data object ServiceRequestProcessing
 
 @Serializable
-data object ResultSuccess
+data object ServiceResultSuccess
 
 @Serializable
-data object ResultUnavailable
+data object ServiceResultUnavailable
 
 @Serializable
 data class BookingDetail(val bookingId: String)
@@ -28,3 +28,6 @@ data object VoiceInput
 
 @Serializable
 data object Profile
+
+@Serializable
+data object LocationPicker

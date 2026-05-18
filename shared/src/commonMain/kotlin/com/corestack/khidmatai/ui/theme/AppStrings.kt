@@ -128,6 +128,18 @@ data class AppStrings(
     val traceSelection: String,
     val traceExecution: String,
     val traceFollowup: String,
+    // Location Picker
+    val locationPickerTitle: String,
+    val locationPickerSearchHint: String,
+    val locationPickerDetect: String,
+    val locationPickerDetecting: String,
+    val locationPickerPopularAreas: String,
+    val locationPickerMajorCities: String,
+    val locationPickerNoResults: String,
+    // Onboarding permission states
+    val onboardingDetectingLocation: String,
+    val onboardingPermissionDenied: String,
+    val locationPermissionRequired: String,
 )
 
 val EnglishStrings = AppStrings(
@@ -240,6 +252,16 @@ val EnglishStrings = AppStrings(
     traceSelection = "Selecting provider",
     traceExecution = "Confirming booking",
     traceFollowup = "Setting reminders",
+    locationPickerTitle = "Select Location",
+    locationPickerSearchHint = "Search locations...",
+    locationPickerDetect = "Detect My Location",
+    locationPickerDetecting = "Detecting...",
+    locationPickerPopularAreas = "Popular Areas",
+    locationPickerMajorCities = "Major Cities",
+    locationPickerNoResults = "No results found",
+    onboardingDetectingLocation = "Getting your location...",
+    onboardingPermissionDenied = "Location permission denied. Please enable in Settings.",
+    locationPermissionRequired = "Grant Location Permission",
 )
 
 val UrduStrings = AppStrings(
@@ -352,6 +374,16 @@ val UrduStrings = AppStrings(
     traceSelection = "پرووائیڈر کو منتخب کیا",
     traceExecution = "بکنگ کنفرم کی",
     traceFollowup = "ریمائنڈر سیٹ کیے",
+    locationPickerTitle = "لوکیشن منتخب کریں",
+    locationPickerSearchHint = "لوکیشن تلاش کریں...",
+    locationPickerDetect = "میری لوکیشن معلوم کریں",
+    locationPickerDetecting = "معلوم ہو رہی ہے...",
+    locationPickerPopularAreas = "مشہور علاقے",
+    locationPickerMajorCities = "بڑے شہر",
+    locationPickerNoResults = "کوئی نتیجہ نہیں ملا",
+    onboardingDetectingLocation = "آپ کی لوکیشن معلوم ہو رہی ہے...",
+    onboardingPermissionDenied = "لوکیشن کی اجازت نہیں ملی۔ سیٹنگز میں جا کر فعال کریں۔",
+    locationPermissionRequired = "لوکیشن کی اجازت دیں",
 )
 
 val LocalAppStrings = compositionLocalOf { EnglishStrings }

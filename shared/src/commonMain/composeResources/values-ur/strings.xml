@@ -129,4 +129,14 @@
     <string name="trace_selection">پرووائیڈر کو منتخب کیا</string>
     <string name="trace_execution">بکنگ کنفرم کی</string>
     <string name="trace_followup">ریمائنڈر سیٹ کیے</string>
+    <string name="location_picker_title">لوکیشن منتخب کریں</string>
+    <string name="location_picker_search_hint">لوکیشن تلاش کریں...</string>
+    <string name="location_picker_detect">میری لوکیشن معلوم کریں</string>
+    <string name="location_picker_detecting">معلوم ہو رہی ہے...</string>
+    <string name="location_picker_popular_areas">مشہور علاقے</string>
+    <string name="location_picker_major_cities">بڑے شہر</string>
+    <string name="location_picker_no_results">کوئی نتیجہ نہیں ملا</string>
+    <string name="onboarding_detecting_location">آپ کی لوکیشن معلوم ہو رہی ہے...</string>
+    <string name="onboarding_permission_denied">لوکیشن کی اجازت نہیں ملی۔ سیٹنگز میں جا کر فعال کریں۔</string>
+    <string name="location_permission_required">لوکیشن کی اجازت دیں</string>
 </resources>
