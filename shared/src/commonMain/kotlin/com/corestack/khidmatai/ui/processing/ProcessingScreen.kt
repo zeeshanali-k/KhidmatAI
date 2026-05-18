@@ -38,17 +38,13 @@ fun ProcessingScreen(
     var showFlash by remember { mutableStateOf(false) }
 
     LaunchedEffect(requestState) {
-//        if (requestState is RequestState.Success) {
-//            showFlash = true
-//            delay(600)
-//            onNavigateToSuccess()
-//        } else if (requestState is RequestState.Unavailable) {
-//            onNavigateToUnavailable()
-//        }
-        //TODO: uncomment above and remove below code after complete implementation
-
-        delay(2000)
-        onNavigateToSuccess()
+        if (requestState is RequestState.Success) {
+            showFlash = true
+            delay(600)
+            onNavigateToSuccess()
+        } else if (requestState is RequestState.Unavailable) {
+            onNavigateToUnavailable()
+        }
     }
 
     Scaffold(

@@ -126,7 +126,12 @@ fun App() {
                 }
 
                 composable<ServiceRequestProcessing> {
+                    val homeEntry = remember(navController) {
+                        navController.getBackStackEntry<Home>()
+                    }
+                    val homeViewModel: ServiceRequestViewModel = koinViewModel(viewModelStoreOwner = homeEntry)
                     ProcessingScreen(
+                        viewModel = homeViewModel,
                         onNavigateToSuccess = {
                             navController.navigate(ServiceResultSuccess) {
                                 popUpTo(Home) { inclusive = false }
@@ -141,7 +146,12 @@ fun App() {
                 }
 
                 composable<ServiceResultSuccess> {
+                    val homeEntry = remember(navController) {
+                        navController.getBackStackEntry<Home>()
+                    }
+                    val homeViewModel: ServiceRequestViewModel = koinViewModel(viewModelStoreOwner = homeEntry)
                     ResultSuccessScreen(
+                        viewModel = homeViewModel,
                         onViewBookingDetails = { bookingId ->
                             navController.navigate(BookingDetail(bookingId))
                         },
@@ -154,7 +164,12 @@ fun App() {
                 }
 
                 composable<ServiceResultUnavailable> {
+                    val homeEntry = remember(navController) {
+                        navController.getBackStackEntry<Home>()
+                    }
+                    val homeViewModel: ServiceRequestViewModel = koinViewModel(viewModelStoreOwner = homeEntry)
                     ResultUnavailableScreen(
+                        viewModel = homeViewModel,
                         onRetry = {
                             navController.navigate(ServiceRequestProcessing) {
                                 popUpTo(ServiceResultUnavailable) { inclusive = true }
