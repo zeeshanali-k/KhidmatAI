@@ -27,6 +27,9 @@ import com.corestack.khidmatai.domain.model.RequestState
 import com.corestack.khidmatai.ui.components.AiOrbView
 import com.corestack.khidmatai.ui.components.BottomNavBar
 import com.corestack.khidmatai.ui.theme.*
+import khidmatai.shared.generated.resources.Res
+import khidmatai.shared.generated.resources.app_name
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -279,7 +282,7 @@ fun HomeAppBar(selectedLanguage: String, onLanguageSelected: (String) -> Unit) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text("KaamKaro", style = AppTypography.titleLarge, color = Primary)
+        Text(stringResource(Res.string.app_name), style = AppTypography.titleLarge, color = Primary)
 
         Row(
             modifier = Modifier

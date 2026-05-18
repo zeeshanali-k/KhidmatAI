@@ -8,6 +8,8 @@
     <string name="onboarding_skip">ابھی کے لیے چھوڑ دیں</string>
 
     <!-- Home Screen -->
+
+    <string name="app_name">Khidmat AI</string>
     <string name="home_greeting">السلام علیکم!</string>
     <string name="home_prompt">آج کیا چاہیے آپ کو؟</string>
     <string name="home_search_hint">اپنی ضرورت لکھیں...</string>

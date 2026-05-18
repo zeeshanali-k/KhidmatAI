@@ -8,6 +8,7 @@
     <string name="onboarding_skip">Skip for now</string>
 
     <!-- Home Screen -->
+    <string name="app_name">Khidmat AI</string>
     <string name="home_greeting">Hello!</string>
     <string name="home_prompt">What do you need today?</string>
     <string name="home_search_hint">Write your requirement...</string>
