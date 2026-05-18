@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Onboarding Screen -->
+    <string name="onboarding_title">پہلے اپنی لوکیشن بتائیں</string>
+    <string name="onboarding_desc">تاکہ ہم آپ کے قریب کے بہترین سروس پرووائیڈرز تلاش کر سکیں</string>
+    <string name="onboarding_btn_location">📍 لوکیشن استعمال کرنے کی اجازت دیں</string>
+    <string name="onboarding_privacy">صرف سروس میچنگ کے لیے استعمال ہوگی۔\nکوئی ڈیٹا شیئر نہیں کیا جائے گا۔</string>
+    <string name="onboarding_skip">ابھی کے لیے چھوڑ دیں</string>
+
+    <!-- Home Screen -->
+    <string name="home_greeting">السلام علیکم!</string>
+    <string name="home_prompt">آج کیا چاہیے آپ کو؟</string>
+    <string name="home_search_hint">اپنی ضرورت لکھیں...</string>
+    <string name="home_change_location">تبدیل کریں</string>
+    <string name="home_urgency_title">کتنی ضرورت ہے؟</string>
+    <string name="home_quick_chips_title">کیا چاہیے؟</string>
+    <string name="home_btn_find_service">سروس تلاش کریں ←</string>
+    <string name="home_btn_find_emergency">ایمرجنسی سروس تلاش کریں 🚨</string>
+    <string name="home_processing">پروسیسنگ...</string>
+    <string name="home_clear">صاف کریں ✕</string>
+
+    <!-- Urgency Levels -->
+    <string name="urgency_low">🟢 کم</string>
+    <string name="urgency_medium">🟡 درمیانی</string>
+    <string name="urgency_high">🔴 زیادہ</string>
+    <string name="urgency_emergency">🚨 ایمرجنسی</string>
+
+    <!-- Quick Chips -->
+    <string name="quick_ac">❄️ اے سی ٹیکنیشن</string>
+    <string name="quick_ac_query">مجھے اے سی ٹیکنیشن چاہیے</string>
+    <string name="quick_plumber">🔧 پلمبر</string>
+    <string name="quick_plumber_query">مجھے پلمبر چاہیے، پائپ لیک ہے</string>
+    <string name="quick_electrician">⚡ الیکٹریشن</string>
+    <string name="quick_electrician_query">بجلی کا مسئلہ ہے، الیکٹریشن چاہیے</string>
+    <string name="quick_tutor">📚 ٹیوٹر</string>
+    <string name="quick_tutor_query">بچے کے لیے ریاضی کا ٹیوٹر چاہیے</string>
+
+    <!-- Emergency Banner -->
+    <string name="emergency_mode_title">ایمرجنسی موڈ ایکٹو</string>
+    <string name="emergency_mode_desc">صرف حقیقی ایمرجنسی کے لیے استعمال کریں۔</string>
+
+    <!-- Processing Screen -->
+    <string name="processing_title">ایجنٹ کام کر رہا ہے...</string>
+    <string name="processing_emergency_title">ایمرجنسی درخواست — فوری پروسیسنگ 🚨</string>
+    <string name="processing_desc">AI آپ کی درخواست پر کام کر رہا ہے</string>
+
+    <!-- Result Success Screen -->
+    <string name="result_success_emergency">ایمرجنسی بکنگ</string>
+    <string name="result_success_title">بکنگ کنفرم ہو گئی!</string>
+    <string name="result_success_ai_decision">🤖 کیوں چنا؟ (AI فیصلہ)</string>
+    <string name="result_success_ai_reasoning_fallback">AI نے بہترین پرووائیڈر کا انتخاب کیا۔</string>
+    <string name="result_success_call_now">📞 ابھی کال کریں</string>
+    <string name="result_success_whatsapp">💬 واٹس ایپ</string>
+    <string name="result_success_map_view">📍 نقشہ دیکھیں</string>
+    <string name="result_success_appointment_details">📅 اپوائنٹمنٹ کی تفصیلات</string>
+    <string name="result_success_next_steps">اگلے اقدامات</string>
+    <string name="result_success_view_details">بکنگ کی مکمل تفصیلات دیکھیں</string>
+    <string name="result_success_back_home">ہوم پر واپس جائیں</string>
+
+    <!-- Result Unavailable Screen -->
+    <string name="result_unavail_title">کوئی پرووائیڈر دستیاب نہیں</string>
+    <string name="result_unavail_desc">فی الحال اس علاقے میں سروس دستیاب نہیں ہے۔</string>
+    <string name="result_unavail_what_happened">کیا ہوا؟</string>
+    <string name="result_unavail_what_happened_desc">کوئی تصدیق شدہ پرووائیڈر نہیں ملا۔</string>
+    <string name="result_unavail_suggestion">مشورہ:</string>
+    <string name="result_unavail_suggestion_desc">کچھ دیر بعد دوبارہ کوشش کریں۔</string>
+    <string name="result_unavail_btn_retry">🔄 دوبارہ کوشش کریں</string>
+    <string name="result_unavail_btn_different">مختلف سروس کے لیے کوشش کریں</string>
+
+    <!-- Bookings Screen -->
+    <string name="bookings_title">میری بکنگز</string>
+    <string name="bookings_filter_all">تمام</string>
+    <string name="bookings_filter_upcoming">آنے والی</string>
+    <string name="bookings_filter_completed">مکمل</string>
+
+    <!-- Booking Detail Screen -->
+    <string name="booking_detail_title">بکنگ کی تفصیلات</string>
+    <string name="booking_detail_not_found">ڈیمو کے لیے بکنگ نہیں ملی</string>
+    <string name="booking_detail_go_back">واپس جائیں</string>
+    <string name="booking_detail_confirmed">کنفرم ہو گئی</string>
+    <string name="booking_detail_followup_info">🔔 فالو اپ کی معلومات</string>
+    <string name="booking_detail_reminder_set">ریمائنڈر سیٹ: ✅ ہاں</string>
+    <string name="booking_detail_reminder_time">ریمائنڈر کا وقت: 09:30 AM</string>
+    <string name="booking_detail_status_confirmed">سٹیٹس: بکنگ کنفرم ہو گئی</string>
+    <string name="booking_detail_agent_log">🤖 AI ایجنٹ کی لاگ</string>
+
+    <!-- Bottom Nav Bar -->
+    <string name="nav_home">ہوم</string>
+    <string name="nav_bookings">بکنگز</string>
+    <string name="nav_profile">پروفائل</string>
+
+    <!-- Status Badges -->
+    <string name="badge_completed">مکمل</string>
+    <string name="badge_pending">جاری ہے</string>
+    <string name="badge_failed">ناکام</string>
+    <string name="badge_upcoming">آنے والی</string>
+    <string name="badge_emergency">ایمرجنسی</string>
+
+    <!-- Trace Stages -->
+    <string name="trace_intent">آپ کی درخواست سمجھی جا رہی ہے</string>
+    <string name="trace_llm">AI تجزیہ</string>
+    <string name="trace_service">سروس کی شناخت</string>
+    <string name="trace_urgency">ارجنسی لیول کا تعین</string>
+    <string name="trace_discovery">پرووائیڈرز کی تلاش</string>
+    <string name="trace_ranking">بہترین کا انتخاب</string>
+    <string name="trace_selection">پرووائیڈر کو منتخب کیا</string>
+    <string name="trace_execution">بکنگ کنفرم کی</string>
+    <string name="trace_followup">ریمائنڈر سیٹ کیے</string>
+</resources>

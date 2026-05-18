@@ -12,6 +12,8 @@ import com.corestack.khidmatai.domain.model.AiOrbState
 import com.corestack.khidmatai.ui.components.AiOrbView
 import com.corestack.khidmatai.ui.home.ServiceRequestViewModel
 import com.corestack.khidmatai.ui.theme.*
+import khidmatai.shared.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -38,13 +40,13 @@ fun ResultUnavailableScreen(
                 AiOrbView(state = AiOrbState.IDLE, size = MaterialTheme.spacing.large)
                 Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
                 Text(
-                    text = "Koi Provider Available Nahi",
+                    text = stringResource(Res.string.result_unavail_title),
                     style = AppTypography.titleLarge,
                     color = Warning
                 )
                 Spacer(modifier = Modifier.height(MaterialTheme.spacing.extraSmall))
                 Text(
-                    text = "Filhal is area mein service available nahi hai.",
+                    text = stringResource(Res.string.result_unavail_desc),
                     style = AppTypography.bodyLarge,
                     color = TextPrimary,
                     textAlign = TextAlign.Center
@@ -62,12 +64,12 @@ fun ResultUnavailableScreen(
             modifier = Modifier.fillMaxWidth().padding(MaterialTheme.spacing.medium)
         ) {
             Column(modifier = Modifier.padding(MaterialTheme.spacing.medium)) {
-                Text("Kya hua?", style = AppTypography.titleLarge, color = TextPrimary)
+                Text(stringResource(Res.string.result_unavail_what_happened), style = AppTypography.titleLarge, color = TextPrimary)
                 Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
-                Text("Koi verified provider nahi mila.", style = AppTypography.bodyLarge, color = TextSecondary)
+                Text(stringResource(Res.string.result_unavail_what_happened_desc), style = AppTypography.bodyLarge, color = TextSecondary)
                 Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
-                Text("Mashwara:", style = AppTypography.titleLarge, color = TextPrimary)
-                Text("Kuch der baad dobara try karein.", style = AppTypography.bodyLarge, color = TextSecondary)
+                Text(stringResource(Res.string.result_unavail_suggestion), style = AppTypography.titleLarge, color = TextPrimary)
+                Text(stringResource(Res.string.result_unavail_suggestion_desc), style = AppTypography.bodyLarge, color = TextSecondary)
             }
         }
         
@@ -83,7 +85,7 @@ fun ResultUnavailableScreen(
                 shape = RoundedCornerShape(MaterialTheme.spacing.mediumSmall),
                 colors = ButtonDefaults.buttonColors(containerColor = Primary)
             ) {
-                Text("🔄 Retry Request", color = Surface, style = AppTypography.labelMedium)
+                Text(stringResource(Res.string.result_unavail_btn_retry), color = Surface, style = AppTypography.labelMedium)
             }
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.mediumSmall))
             OutlinedButton(
@@ -94,7 +96,7 @@ fun ResultUnavailableScreen(
                 modifier = Modifier.fillMaxWidth().height(MaterialTheme.spacing.extraLarge + MaterialTheme.spacing.medium),
                 shape = RoundedCornerShape(MaterialTheme.spacing.mediumSmall)
             ) {
-                Text("Try Different Service", color = TextPrimary, style = AppTypography.labelMedium)
+                Text(stringResource(Res.string.result_unavail_btn_different), color = TextPrimary, style = AppTypography.labelMedium)
             }
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.extraLarge))
         }

@@ -20,6 +20,8 @@ import com.corestack.khidmatai.domain.model.AiOrbState
 import com.corestack.khidmatai.domain.model.RequestState
 import com.corestack.khidmatai.ui.components.AiOrbView
 import com.corestack.khidmatai.ui.theme.*
+import khidmatai.shared.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -64,8 +66,8 @@ fun HomeScreen(
                 .padding(paddingValues)
                 .padding(MaterialTheme.spacing.medium)
         ) {
-            Text("Assalam o Alaikum!", style = AppTypography.titleLarge, color = TextPrimary)
-            Text("Aaj kya chahiye aapko?", style = AppTypography.bodyLarge, color = TextSecondary)
+            Text(stringResource(Res.string.home_greeting), style = AppTypography.titleLarge, color = TextPrimary)
+            Text(stringResource(Res.string.home_prompt), style = AppTypography.bodyLarge, color = TextSecondary)
 
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
 
@@ -90,7 +92,7 @@ fun HomeScreen(
                     TextField(
                         value = state.query,
                         onValueChange = { viewModel.onAction(ServiceRequestIntent.UpdateQuery(it)) },
-                        placeholder = { Text("Apni zaroorat likhen...\nUrdu, Roman Urdu ya English") },
+                        placeholder = { Text(stringResource(Res.string.home_search_hint)) },
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = Color.Transparent,
                             unfocusedContainerColor = Color.Transparent,
@@ -110,7 +112,7 @@ fun HomeScreen(
                         )
                         if (state.query.isNotEmpty()) {
                             Text(
-                                "Clear ✕",
+                                stringResource(Res.string.home_clear),
                                 modifier = Modifier.clickable {
                                     viewModel.onAction(ServiceRequestIntent.UpdateQuery(""))
                                 },
@@ -136,22 +138,22 @@ fun HomeScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text("📍 ${state.location}", style = AppTypography.bodyLarge)
-                Text("Change", color = Primary, style = AppTypography.labelMedium)
+                Text(stringResource(Res.string.home_change_location), color = Primary, style = AppTypography.labelMedium)
             }
 
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
 
             // Urgency
-            Text("Kitni zaroorat hai?", style = AppTypography.bodySmall, color = TextSecondary)
+            Text(stringResource(Res.string.home_urgency_title), style = AppTypography.bodySmall, color = TextSecondary)
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
             val urgencies = listOf(
-                "low" to "🟢 Low",
-                "medium" to "🟡 Medium",
-                "high" to "🔴 High",
-                "emergency" to "🚨 Emergency"
+                "low" to Res.string.urgency_low,
+                "medium" to Res.string.urgency_medium,
+                "high" to Res.string.urgency_high,
+                "emergency" to Res.string.urgency_emergency
             )
             LazyRow(horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small)) {
-                items(urgencies) { (key, label) ->
+                items(urgencies) { (key, labelRes) ->
                     val isSelected = state.urgency == key
                     val chipBgColor = if (isSelected) {
                         if (key == "emergency") Error else Primary
@@ -176,7 +178,7 @@ fun HomeScreen(
                             .padding(horizontal = MaterialTheme.spacing.medium),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(label, color = textColor, style = AppTypography.labelMedium)
+                        Text(stringResource(labelRes), color = textColor, style = AppTypography.labelMedium)
                     }
                 }
             }
@@ -184,16 +186,17 @@ fun HomeScreen(
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
 
             // Quick Chips
-            Text("Kya chahiye?", style = AppTypography.bodySmall, color = TextSecondary)
+            Text(stringResource(Res.string.home_quick_chips_title), style = AppTypography.bodySmall, color = TextSecondary)
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
             val quickChips = listOf(
-                "❄️ AC Tech" to "Mujhe AC technician chahiye",
-                "🔧 Plumber" to "Mujhe plumber chahiye, pipe leak hai",
-                "⚡ Electrician" to "Bijli ki problem hai, electrician chahiye",
-                "📚 Tutor" to "Bacche ko tutor chahiye math ke liye"
+                Res.string.quick_ac to Res.string.quick_ac_query,
+                Res.string.quick_plumber to Res.string.quick_plumber_query,
+                Res.string.quick_electrician to Res.string.quick_electrician_query,
+                Res.string.quick_tutor to Res.string.quick_tutor_query
             )
             LazyRow(horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small)) {
-                items(quickChips) { (label, query) ->
+                items(quickChips) { (labelRes, queryRes) ->
+                    val query = stringResource(queryRes)
                     Box(
                         modifier = Modifier
                             .height(MaterialTheme.spacing.extraLarge + MaterialTheme.spacing.small)
@@ -209,7 +212,7 @@ fun HomeScreen(
                             .padding(horizontal = MaterialTheme.spacing.mediumSmall),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(label, style = AppTypography.labelMedium)
+                        Text(stringResource(labelRes), style = AppTypography.labelMedium)
                     }
                 }
             }
@@ -232,10 +235,10 @@ fun HomeScreen(
                 if (isSubmitting) {
                     AiOrbView(AiOrbState.THINKING, MaterialTheme.spacing.large)
                     Spacer(modifier = Modifier.width(MaterialTheme.spacing.small))
-                    Text("Processing...", style = AppTypography.labelMedium)
+                    Text(stringResource(Res.string.home_processing), style = AppTypography.labelMedium)
                 } else {
                     Text(
-                        if (isEmergency) "Find Emergency Service 🚨" else "Find Service →",
+                        if (isEmergency) stringResource(Res.string.home_btn_find_emergency) else stringResource(Res.string.home_btn_find_service),
                         style = AppTypography.labelMedium
                     )
                 }
@@ -260,7 +263,7 @@ fun HomeAppBar(selectedLanguage: String, onLanguageSelected: (String) -> Unit) {
                 .background(Surface)
                 .border(MaterialTheme.spacing.extraSmall / 4, Border, RoundedCornerShape(MaterialTheme.spacing.xxl))
         ) {
-            listOf("EN", "RU", "اردو").forEach { lang ->
+            listOf("EN", "اردو").forEach { lang ->
                 val isSelected = selectedLanguage == lang
                 Box(
                     modifier = Modifier
@@ -293,9 +296,9 @@ fun EmergencyBanner() {
     ) {
         Text("⚠️", modifier = Modifier.padding(end = MaterialTheme.spacing.small))
         Column {
-            Text("Emergency Mode Active", style = AppTypography.labelMedium, color = Error)
+            Text(stringResource(Res.string.emergency_mode_title), style = AppTypography.labelMedium, color = Error)
             Text(
-                "Sirf genuine emergencies ke liye use karein.",
+                stringResource(Res.string.emergency_mode_desc),
                 style = AppTypography.bodySmall,
                 color = Error
             )

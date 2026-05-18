@@ -14,6 +14,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import com.corestack.khidmatai.domain.model.TraceItem
 import com.corestack.khidmatai.ui.theme.*
+import khidmatai.shared.generated.resources.*
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun TraceRowComponent(
@@ -53,8 +56,9 @@ fun TraceRowComponent(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                val stageText = translateStage(item.stage)
                 Text(
-                    text = translateStage(item.stage),
+                    text = stageText?.let { stringResource(it) } ?: item.stage,
                     style = AppTypography.labelMedium,
                     color = TextPrimary
                 )
@@ -134,15 +138,15 @@ fun StatusIcon(status: String) {
     }
 }
 
-fun translateStage(stage: String): String = when (stage) {
-    "intent_detection" -> "Apki request samjhi"
-    "llm_analysis" -> "AI analysis"
-    "service_classification" -> "Service identify ki"
-    "urgency_classification" -> "Urgency level set"
-    "provider_discovery" -> "Providers dhundhe"
-    "provider_ranking" -> "Best match chuna"
-    "provider_selection" -> "Provider select kiya"
-    "booking_execution" -> "Booking confirm ki"
-    "followup" -> "Reminders set kiye"
-    else -> stage
+fun translateStage(stage: String): StringResource? = when (stage) {
+    "intent_detection" -> Res.string.trace_intent
+    "llm_analysis" -> Res.string.trace_llm
+    "service_classification" -> Res.string.trace_service
+    "urgency_classification" -> Res.string.trace_urgency
+    "provider_discovery" -> Res.string.trace_discovery
+    "provider_ranking" -> Res.string.trace_ranking
+    "provider_selection" -> Res.string.trace_selection
+    "booking_execution" -> Res.string.trace_execution
+    "followup" -> Res.string.trace_followup
+    else -> null
 }

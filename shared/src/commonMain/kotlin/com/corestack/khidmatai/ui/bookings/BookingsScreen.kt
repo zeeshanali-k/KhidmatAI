@@ -16,6 +16,8 @@ import com.corestack.khidmatai.ui.components.BadgeVariant
 import com.corestack.khidmatai.ui.components.BottomNavBar
 import com.corestack.khidmatai.ui.components.StatusBadge
 import com.corestack.khidmatai.ui.theme.*
+import khidmatai.shared.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun BookingsScreen(
@@ -30,13 +32,13 @@ fun BookingsScreen(
         }
     ) { paddingValues ->
         Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
-            Text("My Bookings", style = AppTypography.displayLarge, modifier = Modifier.padding(MaterialTheme.spacing.medium))
+            Text(stringResource(Res.string.bookings_title), style = AppTypography.displayLarge, modifier = Modifier.padding(MaterialTheme.spacing.medium))
             
             // Filters
             Row(modifier = Modifier.fillMaxWidth().padding(horizontal = MaterialTheme.spacing.medium), horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium)) {
-                Text("All", color = Primary, style = AppTypography.labelMedium)
-                Text("Upcoming", color = TextSecondary, style = AppTypography.labelMedium)
-                Text("Completed", color = TextSecondary, style = AppTypography.labelMedium)
+                Text(stringResource(Res.string.bookings_filter_all), color = Primary, style = AppTypography.labelMedium)
+                Text(stringResource(Res.string.bookings_filter_upcoming), color = TextSecondary, style = AppTypography.labelMedium)
+                Text(stringResource(Res.string.bookings_filter_completed), color = TextSecondary, style = AppTypography.labelMedium)
             }
             
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))

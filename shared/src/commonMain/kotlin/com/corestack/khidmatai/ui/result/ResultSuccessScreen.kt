@@ -21,6 +21,8 @@ import com.corestack.khidmatai.ui.components.AiOrbView
 import com.corestack.khidmatai.ui.components.NextStepCard
 import com.corestack.khidmatai.ui.home.ServiceRequestViewModel
 import com.corestack.khidmatai.ui.theme.*
+import khidmatai.shared.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -54,7 +56,7 @@ fun ResultSuccessScreen(
                     AiOrbView(state = AiOrbState.DONE, size = MaterialTheme.spacing.large)
                     Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
                     Text(
-                        text = if (isEmergency) "EMERGENCY BOOKING" else "Booking Confirmed!",
+                        text = if (isEmergency) stringResource(Res.string.result_success_emergency) else stringResource(Res.string.result_success_title),
                         style = AppTypography.titleLarge,
                         color = if (isEmergency) Error else Success
                     )
@@ -87,10 +89,10 @@ fun ResultSuccessScreen(
                     Row(modifier = Modifier.height(IntrinsicSize.Min)) {
                         Box(modifier = Modifier.width(MaterialTheme.spacing.extraSmall).fillMaxHeight().background(Primary))
                         Column(modifier = Modifier.padding(MaterialTheme.spacing.medium)) {
-                            Text("🤖 Kyun chuna? (AI Decision)", style = AppTypography.labelMedium, color = Primary)
+                            Text(stringResource(Res.string.result_success_ai_decision), style = AppTypography.labelMedium, color = Primary)
                             Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
                             Text(
-                                text = result.provider?.reasoning ?: "AI selected the best provider.",
+                                text = result.provider?.reasoning ?: stringResource(Res.string.result_success_ai_reasoning_fallback),
                                 style = AppTypography.bodyLarge.copy(fontStyle = FontStyle.Italic),
                                 color = TextSecondary
                             )
@@ -148,7 +150,7 @@ fun ResultSuccessScreen(
                                 shape = RoundedCornerShape(MaterialTheme.spacing.small),
                                 border = BorderStroke(MaterialTheme.spacing.extraSmall / 4, Border)
                             ) {
-                                Text("📞 Call Now", color = TextPrimary)
+                                Text(stringResource(Res.string.result_success_call_now), color = TextPrimary)
                             }
                             OutlinedButton(
                                 onClick = { /* WhatsApp */ },
@@ -156,7 +158,7 @@ fun ResultSuccessScreen(
                                 shape = RoundedCornerShape(MaterialTheme.spacing.small),
                                 border = BorderStroke(MaterialTheme.spacing.extraSmall / 4, Border)
                             ) {
-                                Text("💬 WhatsApp", color = TextPrimary)
+                                Text(stringResource(Res.string.result_success_whatsapp), color = TextPrimary)
                             }
                         }
                     }
@@ -173,7 +175,7 @@ fun ResultSuccessScreen(
                         .background(Border),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("📍 Map View", color = TextSecondary)
+                    Text(stringResource(Res.string.result_success_map_view), color = TextSecondary)
                 }
                 
                 Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
@@ -186,7 +188,7 @@ fun ResultSuccessScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(modifier = Modifier.padding(MaterialTheme.spacing.medium)) {
-                        Text("📅 Appointment Details", style = AppTypography.titleLarge, color = TextPrimary)
+                        Text(stringResource(Res.string.result_success_appointment_details), style = AppTypography.titleLarge, color = TextPrimary)
                         Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
                         HorizontalDivider(color = Border)
                         Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
@@ -202,7 +204,7 @@ fun ResultSuccessScreen(
                 
                 Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
                 
-                Text("Agle Steps", style = AppTypography.titleLarge, color = TextPrimary)
+                Text(stringResource(Res.string.result_success_next_steps), style = AppTypography.titleLarge, color = TextPrimary)
                 Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
             }
         }
@@ -222,7 +224,7 @@ fun ResultSuccessScreen(
                     shape = RoundedCornerShape(MaterialTheme.spacing.mediumSmall),
                     border = BorderStroke(MaterialTheme.spacing.extraSmall / 4, Border)
                 ) {
-                    Text("View Full Booking Details", color = TextPrimary)
+                    Text(stringResource(Res.string.result_success_view_details), color = TextPrimary)
                 }
                 Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
                 TextButton(
@@ -232,7 +234,7 @@ fun ResultSuccessScreen(
                     },
                     modifier = Modifier.fillMaxWidth().height(MaterialTheme.spacing.extraLarge + MaterialTheme.spacing.medium)
                 ) {
-                    Text("Back to Home", color = TextSecondary)
+                    Text(stringResource(Res.string.result_success_back_home), color = TextSecondary)
                 }
                 Spacer(modifier = Modifier.height(MaterialTheme.spacing.extraLarge))
             }

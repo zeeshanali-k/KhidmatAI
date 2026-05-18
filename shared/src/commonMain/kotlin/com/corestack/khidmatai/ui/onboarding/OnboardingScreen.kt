@@ -9,6 +9,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import com.corestack.khidmatai.ui.theme.*
+import khidmatai.shared.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun OnboardingScreen(
@@ -47,14 +49,14 @@ fun OnboardingScreen(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Pehle apni location batayein",
+                text = stringResource(Res.string.onboarding_title),
                 style = AppTypography.displayLarge,
                 color = TextPrimary,
                 textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
             Text(
-                text = "Taake hum aapke qareeb ke\nbest service providers dhundh sakein",
+                text = stringResource(Res.string.onboarding_desc),
                 style = AppTypography.bodyLarge,
                 color = TextSecondary,
                 textAlign = TextAlign.Center
@@ -77,13 +79,13 @@ fun OnboardingScreen(
                 shape = RoundedCornerShape(MaterialTheme.spacing.mediumSmall),
                 colors = ButtonDefaults.buttonColors(containerColor = Primary)
             ) {
-                Text("📍 Location use karne ki ijazat dein", color = Surface, style = AppTypography.labelMedium)
+                Text(stringResource(Res.string.onboarding_btn_location), color = Surface, style = AppTypography.labelMedium)
             }
             
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
             
             Text(
-                text = "Sirf service matching ke liye use hogi.\nKoi data share nahi hoga.",
+                text = stringResource(Res.string.onboarding_privacy),
                 style = AppTypography.bodySmall,
                 color = TextSecondary,
                 textAlign = TextAlign.Center
@@ -92,7 +94,7 @@ fun OnboardingScreen(
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
             
             TextButton(onClick = onSkip) {
-                Text("Skip for now", color = TextSecondary, style = AppTypography.labelMedium)
+                Text(stringResource(Res.string.onboarding_skip), color = TextSecondary, style = AppTypography.labelMedium)
             }
             
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.extraLarge))

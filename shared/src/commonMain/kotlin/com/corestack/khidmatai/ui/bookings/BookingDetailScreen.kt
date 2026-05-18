@@ -18,6 +18,8 @@ import com.corestack.khidmatai.domain.model.RequestState
 import com.corestack.khidmatai.ui.components.TraceRowComponent
 import com.corestack.khidmatai.ui.home.ServiceRequestViewModel
 import com.corestack.khidmatai.ui.theme.*
+import khidmatai.shared.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -33,9 +35,9 @@ fun BookingDetailScreen(
 
     if (result == null || result.bookingId != bookingId) {
         Box(modifier = Modifier.fillMaxSize().background(Background), contentAlignment = Alignment.Center) {
-            Text("Booking Not Found for demo")
+            Text(stringResource(Res.string.booking_detail_not_found))
             Button(onClick = onBack, modifier = Modifier.padding(top = MaterialTheme.spacing.medium)) {
-                Text("Go Back")
+                Text(stringResource(Res.string.booking_detail_go_back))
             }
         }
         return
@@ -55,7 +57,7 @@ fun BookingDetailScreen(
                     color = Primary
                 )
                 Spacer(modifier = Modifier.width(MaterialTheme.spacing.small))
-                Text("Booking Detail", style = AppTypography.titleLarge, modifier = Modifier.weight(1f))
+                Text(stringResource(Res.string.booking_detail_title), style = AppTypography.titleLarge, modifier = Modifier.weight(1f))
                 Text("📤", modifier = Modifier.clickable { /* Share */ }.padding(MaterialTheme.spacing.small))
             }
         }
@@ -63,7 +65,7 @@ fun BookingDetailScreen(
         item {
             // Status Banner
             Box(modifier = Modifier.fillMaxWidth().background(SuccessLight).padding(MaterialTheme.spacing.medium)) {
-                Text("Confirmed", color = Success, style = AppTypography.labelMedium)
+                Text(stringResource(Res.string.booking_detail_confirmed), color = Success, style = AppTypography.labelMedium)
             }
         }
         
@@ -120,13 +122,13 @@ fun BookingDetailScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(modifier = Modifier.padding(MaterialTheme.spacing.medium)) {
-                        Text("🔔 Follow-up Info", style = AppTypography.titleLarge, color = TextPrimary)
+                        Text(stringResource(Res.string.booking_detail_followup_info), style = AppTypography.titleLarge, color = TextPrimary)
                         Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
                         HorizontalDivider(color = Border)
                         Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
-                        Text("Reminder set: ✅ Yes", style = AppTypography.bodySmall, color = TextSecondary)
-                        Text("Reminder time: 09:30 AM", style = AppTypography.bodySmall, color = TextSecondary)
-                        Text("Status: Booking Confirmed", style = AppTypography.bodySmall, color = TextSecondary)
+                        Text(stringResource(Res.string.booking_detail_reminder_set), style = AppTypography.bodySmall, color = TextSecondary)
+                        Text(stringResource(Res.string.booking_detail_reminder_time), style = AppTypography.bodySmall, color = TextSecondary)
+                        Text(stringResource(Res.string.booking_detail_status_confirmed), style = AppTypography.bodySmall, color = TextSecondary)
                     }
                 }
             }
@@ -142,7 +144,7 @@ fun BookingDetailScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text("🤖 AI Agent Log", style = AppTypography.titleLarge, color = TextPrimary)
+                    Text(stringResource(Res.string.booking_detail_agent_log), style = AppTypography.titleLarge, color = TextPrimary)
                     Text(if (expanded) "▼" else "▶", color = TextSecondary)
                 }
                 
