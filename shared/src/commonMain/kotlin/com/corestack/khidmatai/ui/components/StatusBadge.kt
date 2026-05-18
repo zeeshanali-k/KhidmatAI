@@ -3,10 +3,10 @@ package com.corestack.khidmatai.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.corestack.khidmatai.ui.theme.*
 
 enum class BadgeVariant {
@@ -31,7 +31,7 @@ fun StatusBadge(
         color = textColor,
         style = AppTypography.labelMedium,
         modifier = modifier
-            .background(bgColor, RoundedCornerShape(999.dp))
-            .padding(horizontal = 8.dp, vertical = 4.dp)
+            .background(bgColor, RoundedCornerShape(MaterialTheme.spacing.xxl))
+            .padding(horizontal = MaterialTheme.spacing.small, vertical = MaterialTheme.spacing.extraSmall)
     )
 }

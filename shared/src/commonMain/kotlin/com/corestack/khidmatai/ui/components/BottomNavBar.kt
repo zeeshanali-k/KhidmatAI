@@ -2,7 +2,6 @@ package com.corestack.khidmatai.ui.components
 
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.unit.dp
 import com.corestack.khidmatai.ui.theme.*
 
 @Composable
@@ -13,13 +12,13 @@ fun BottomNavBar(
     NavigationBar(
         containerColor = Surface,
         contentColor = TextSecondary,
-        tonalElevation = 8.dp
+        tonalElevation = MaterialTheme.spacing.small
     ) {
         NavigationBarItem(
             selected = currentRoute == "home",
             onClick = { onNavigate("home") },
             icon = { Text("🏠") },
-            label = { Text("Beranda", style = AppTypography.bodySmall) },
+            label = { Text("Home", style = AppTypography.bodySmall) },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = Primary,
                 selectedTextColor = Primary,

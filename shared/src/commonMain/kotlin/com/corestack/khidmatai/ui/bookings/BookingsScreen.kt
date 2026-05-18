@@ -12,7 +12,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.unit.dp
 import com.corestack.khidmatai.ui.components.BadgeVariant
 import com.corestack.khidmatai.ui.components.BottomNavBar
 import com.corestack.khidmatai.ui.components.StatusBadge
@@ -24,22 +23,23 @@ fun BookingsScreen(
     onBookingClick: (String) -> Unit
 ) {
     Scaffold(
+        modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.systemBars),
         containerColor = Background,
         bottomBar = {
             BottomNavBar(currentRoute = "bookings", onNavigate = onNavigate)
         }
     ) { paddingValues ->
         Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
-            Text("My Bookings", style = AppTypography.displayLarge, modifier = Modifier.padding(16.dp))
+            Text("My Bookings", style = AppTypography.displayLarge, modifier = Modifier.padding(MaterialTheme.spacing.medium))
             
             // Filters
-            Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            Row(modifier = Modifier.fillMaxWidth().padding(horizontal = MaterialTheme.spacing.medium), horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium)) {
                 Text("All", color = Primary, style = AppTypography.labelMedium)
                 Text("Upcoming", color = TextSecondary, style = AppTypography.labelMedium)
                 Text("Completed", color = TextSecondary, style = AppTypography.labelMedium)
             }
             
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
             
             LazyColumn(modifier = Modifier.fillMaxWidth()) {
                 item {
@@ -69,24 +69,24 @@ fun BookingListItem(
     onClick: () -> Unit
 ) {
     Card(
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(MaterialTheme.spacing.mediumSmall),
         colors = CardDefaults.cardColors(containerColor = Surface),
-        border = BorderStroke(1.dp, Border),
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp).clickable { onClick() }
+        border = BorderStroke(MaterialTheme.spacing.extraSmall / 4, Border),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = MaterialTheme.spacing.medium, vertical = MaterialTheme.spacing.small).clickable { onClick() }
     ) {
-        Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(modifier = Modifier.padding(MaterialTheme.spacing.medium), verticalAlignment = Alignment.CenterVertically) {
             Box(
-                modifier = Modifier.size(48.dp).clip(CircleShape).background(PrimaryLight),
+                modifier = Modifier.size(MaterialTheme.spacing.xxl).clip(CircleShape).background(PrimaryLight),
                 contentAlignment = Alignment.Center
             ) {
                 Text("🔧", style = AppTypography.titleLarge)
             }
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(MaterialTheme.spacing.medium))
             Column(modifier = Modifier.weight(1f)) {
                 Text(service, style = AppTypography.titleLarge, color = TextPrimary)
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(providerName, style = AppTypography.bodySmall, color = TextSecondary)
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(MaterialTheme.spacing.extraSmall))
                     Text("⭐ $rating", style = AppTypography.bodySmall, color = Warning)
                 }
                 Text("$time • $location", style = AppTypography.bodySmall, color = TextSecondary)

@@ -7,7 +7,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.corestack.khidmatai.domain.model.NextStep
 import com.corestack.khidmatai.ui.theme.*
 
@@ -19,28 +18,28 @@ fun NextStepCard(
     val isWarning = step.type == "warning"
 
     Card(
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(MaterialTheme.spacing.mediumSmall),
         colors = CardDefaults.cardColors(containerColor = Surface),
-        border = BorderStroke(1.dp, Border),
-        modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)
+        border = BorderStroke(MaterialTheme.spacing.extraSmall / 4, Border),
+        modifier = Modifier.fillMaxWidth().padding(vertical = MaterialTheme.spacing.small)
     ) {
         Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
             if (isWarning) {
                 Box(
                     modifier = Modifier
-                        .width(4.dp)
+                        .width(MaterialTheme.spacing.extraSmall)
                         .fillMaxHeight()
                         .background(Warning)
                 )
             }
             Column(
                 modifier = Modifier
-                    .padding(16.dp)
+                    .padding(MaterialTheme.spacing.medium)
                     .weight(1f)
             ) {
                 Row {
                     if (isWarning) {
-                        Text("⚠️", modifier = Modifier.padding(end = 8.dp))
+                        Text("⚠️", modifier = Modifier.padding(end = MaterialTheme.spacing.small))
                     }
                     Text(
                         text = step.title,
@@ -48,7 +47,7 @@ fun NextStepCard(
                         color = TextPrimary
                     )
                 }
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(MaterialTheme.spacing.extraSmall))
                 Text(
                     text = step.description,
                     style = AppTypography.bodyLarge,
@@ -56,22 +55,22 @@ fun NextStepCard(
                 )
 
                 if (step.type == "action" && step.actionLabel != null) {
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(MaterialTheme.spacing.mediumSmall))
                     Button(
                         onClick = { onActionClick(step.actionValue) },
-                        modifier = Modifier.fillMaxWidth().height(44.dp),
-                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier.fillMaxWidth().height(MaterialTheme.spacing.extraLarge + MaterialTheme.spacing.mediumSmall),
+                        shape = RoundedCornerShape(MaterialTheme.spacing.small),
                         colors = ButtonDefaults.buttonColors(containerColor = Primary)
                     ) {
                         Text(step.actionLabel, color = Surface, style = AppTypography.labelMedium)
                     }
                 } else if (step.actionLabel != null) {
                     // Info with action button
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(MaterialTheme.spacing.mediumSmall))
                     OutlinedButton(
                         onClick = { onActionClick(step.actionValue) },
-                        modifier = Modifier.fillMaxWidth().height(44.dp),
-                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier.fillMaxWidth().height(MaterialTheme.spacing.extraLarge + MaterialTheme.spacing.mediumSmall),
+                        shape = RoundedCornerShape(MaterialTheme.spacing.small),
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = Primary)
                     ) {
                         Text(step.actionLabel, style = AppTypography.labelMedium)

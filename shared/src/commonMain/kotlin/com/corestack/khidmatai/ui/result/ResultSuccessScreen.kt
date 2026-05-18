@@ -9,13 +9,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.unit.dp
 import com.corestack.khidmatai.domain.model.AiOrbState
 import com.corestack.khidmatai.domain.model.RequestState
 import com.corestack.khidmatai.ui.components.AiOrbView
@@ -30,7 +29,7 @@ fun ResultSuccessScreen(
     onViewBookingDetails: (String) -> Unit,
     onBackToHome: () -> Unit
 ) {
-    val state by viewModel.uiState.collectAsState()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
     val requestState = state.requestState
 
     if (requestState !is RequestState.Success) {
@@ -41,7 +40,7 @@ fun ResultSuccessScreen(
     val isEmergency = result.urgency == "emergency"
     
     LazyColumn(
-        modifier = Modifier.fillMaxSize().background(Background)
+        modifier = Modifier.fillMaxSize().background(Background).windowInsetsPadding(WindowInsets.systemBars)
     ) {
         // Status Banner
         item {
@@ -49,17 +48,17 @@ fun ResultSuccessScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(if (isEmergency) ErrorLight else SuccessLight)
-                    .padding(24.dp)
+                    .padding(MaterialTheme.spacing.large)
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-                    AiOrbView(state = AiOrbState.DONE, size = 24.dp)
-                    Spacer(modifier = Modifier.height(8.dp))
+                    AiOrbView(state = AiOrbState.DONE, size = MaterialTheme.spacing.large)
+                    Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
                     Text(
                         text = if (isEmergency) "EMERGENCY BOOKING" else "Booking Confirmed!",
                         style = AppTypography.titleLarge,
                         color = if (isEmergency) Error else Success
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(MaterialTheme.spacing.extraSmall))
                     Text(
                         text = result.message,
                         style = AppTypography.bodyLarge,
@@ -67,7 +66,7 @@ fun ResultSuccessScreen(
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
                     Text(
                         text = "[${result.bookingId}]",
                         style = AppTypography.labelSmall,
@@ -78,43 +77,43 @@ fun ResultSuccessScreen(
         }
 
         item {
-            Column(modifier = Modifier.padding(16.dp)) {
+            Column(modifier = Modifier.padding(MaterialTheme.spacing.medium)) {
                 // AI Decision Card
                 Card(
-                    shape = RoundedCornerShape(12.dp),
+                    shape = RoundedCornerShape(MaterialTheme.spacing.mediumSmall),
                     colors = CardDefaults.cardColors(containerColor = PrimaryLight),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Row(modifier = Modifier.height(IntrinsicSize.Min)) {
-                        Box(modifier = Modifier.width(4.dp).fillMaxHeight().background(Primary))
-                        Column(modifier = Modifier.padding(16.dp)) {
+                        Box(modifier = Modifier.width(MaterialTheme.spacing.extraSmall).fillMaxHeight().background(Primary))
+                        Column(modifier = Modifier.padding(MaterialTheme.spacing.medium)) {
                             Text("🤖 Kyun chuna? (AI Decision)", style = AppTypography.labelMedium, color = Primary)
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
                             Text(
                                 text = result.provider?.reasoning ?: "AI selected the best provider.",
                                 style = AppTypography.bodyLarge.copy(fontStyle = FontStyle.Italic),
                                 color = TextSecondary
                             )
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
                             Text("Score: 12.16 • Ranked #1 of 3 providers", style = AppTypography.bodySmall, color = TextSecondary)
                         }
                     }
                 }
                 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
 
                 // Provider Card
                 Card(
-                    shape = RoundedCornerShape(12.dp),
+                    shape = RoundedCornerShape(MaterialTheme.spacing.mediumSmall),
                     colors = CardDefaults.cardColors(containerColor = Surface),
-                    border = BorderStroke(1.dp, Border),
+                    border = BorderStroke(MaterialTheme.spacing.extraSmall / 4, Border),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
+                    Column(modifier = Modifier.padding(MaterialTheme.spacing.medium)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Box(
                                 modifier = Modifier
-                                    .size(48.dp)
+                                    .size(MaterialTheme.spacing.xxl)
                                     .clip(CircleShape)
                                     .background(Primary),
                                 contentAlignment = Alignment.Center
@@ -125,11 +124,11 @@ fun ResultSuccessScreen(
                                     style = AppTypography.titleLarge
                                 )
                             }
-                            Spacer(modifier = Modifier.width(16.dp))
+                            Spacer(modifier = Modifier.width(MaterialTheme.spacing.medium))
                             Column {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text(result.provider?.name ?: "Unknown", style = AppTypography.titleLarge, color = TextPrimary)
-                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Spacer(modifier = Modifier.width(MaterialTheme.spacing.small))
                                     Text("⭐ ${result.provider?.rating ?: "N/A"}", style = AppTypography.labelMedium, color = Warning)
                                 }
                                 Text(
@@ -140,22 +139,22 @@ fun ResultSuccessScreen(
                             }
                         }
                         
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
                         
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small)) {
                             OutlinedButton(
                                 onClick = { /* Call */ },
-                                modifier = Modifier.weight(1f).height(44.dp),
-                                shape = RoundedCornerShape(8.dp),
-                                border = BorderStroke(1.dp, Border)
+                                modifier = Modifier.weight(1f).height(MaterialTheme.spacing.extraLarge + MaterialTheme.spacing.mediumSmall),
+                                shape = RoundedCornerShape(MaterialTheme.spacing.small),
+                                border = BorderStroke(MaterialTheme.spacing.extraSmall / 4, Border)
                             ) {
                                 Text("📞 Call Now", color = TextPrimary)
                             }
                             OutlinedButton(
                                 onClick = { /* WhatsApp */ },
-                                modifier = Modifier.weight(1f).height(44.dp),
-                                shape = RoundedCornerShape(8.dp),
-                                border = BorderStroke(1.dp, Border)
+                                modifier = Modifier.weight(1f).height(MaterialTheme.spacing.extraLarge + MaterialTheme.spacing.mediumSmall),
+                                shape = RoundedCornerShape(MaterialTheme.spacing.small),
+                                border = BorderStroke(MaterialTheme.spacing.extraSmall / 4, Border)
                             ) {
                                 Text("💬 WhatsApp", color = TextPrimary)
                             }
@@ -163,34 +162,34 @@ fun ResultSuccessScreen(
                     }
                 }
                 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
                 
                 // Map Mock
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(200.dp)
-                        .clip(RoundedCornerShape(12.dp))
+                        .height(MaterialTheme.spacing.xxl * 4) // Approx 200dp
+                        .clip(RoundedCornerShape(MaterialTheme.spacing.mediumSmall))
                         .background(Border),
                     contentAlignment = Alignment.Center
                 ) {
                     Text("📍 Map View", color = TextSecondary)
                 }
                 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
                 
                 // Appointment Details
                 Card(
-                    shape = RoundedCornerShape(12.dp),
+                    shape = RoundedCornerShape(MaterialTheme.spacing.mediumSmall),
                     colors = CardDefaults.cardColors(containerColor = Surface),
-                    border = BorderStroke(1.dp, Border),
+                    border = BorderStroke(MaterialTheme.spacing.extraSmall / 4, Border),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
+                    Column(modifier = Modifier.padding(MaterialTheme.spacing.medium)) {
                         Text("📅 Appointment Details", style = AppTypography.titleLarge, color = TextPrimary)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Divider(color = Border)
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
+                        HorizontalDivider(color = Border)
+                        Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
                         
                         result.appointment?.let { apt ->
                             Text("Booking ID: ${apt.bookingId}", style = AppTypography.bodySmall, color = TextSecondary)
@@ -201,41 +200,41 @@ fun ResultSuccessScreen(
                     }
                 }
                 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
                 
                 Text("Agle Steps", style = AppTypography.titleLarge, color = TextPrimary)
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
             }
         }
         
         items(result.nextSteps) { step ->
-            Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+            Box(modifier = Modifier.padding(horizontal = MaterialTheme.spacing.medium)) {
                 NextStepCard(step = step, onActionClick = { /* Handle action */ })
             }
         }
         
         item {
-            Column(modifier = Modifier.padding(16.dp).fillMaxWidth()) {
-                Spacer(modifier = Modifier.height(16.dp))
+            Column(modifier = Modifier.padding(MaterialTheme.spacing.medium).fillMaxWidth()) {
+                Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
                 OutlinedButton(
                     onClick = { result.bookingId?.let { onViewBookingDetails(it) } },
-                    modifier = Modifier.fillMaxWidth().height(52.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    border = BorderStroke(1.dp, Border)
+                    modifier = Modifier.fillMaxWidth().height(MaterialTheme.spacing.extraLarge + MaterialTheme.spacing.medium),
+                    shape = RoundedCornerShape(MaterialTheme.spacing.mediumSmall),
+                    border = BorderStroke(MaterialTheme.spacing.extraSmall / 4, Border)
                 ) {
                     Text("View Full Booking Details", color = TextPrimary)
                 }
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
                 TextButton(
                     onClick = {
-                        viewModel.handleIntent(com.corestack.khidmatai.ui.home.ServiceRequestIntent.Reset)
+                        viewModel.onAction(com.corestack.khidmatai.ui.home.ServiceRequestIntent.Reset)
                         onBackToHome()
                     },
-                    modifier = Modifier.fillMaxWidth().height(52.dp)
+                    modifier = Modifier.fillMaxWidth().height(MaterialTheme.spacing.extraLarge + MaterialTheme.spacing.medium)
                 ) {
                     Text("Back to Home", color = TextSecondary)
                 }
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(MaterialTheme.spacing.extraLarge))
             }
         }
     }

@@ -10,13 +10,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import com.corestack.khidmatai.domain.model.AiOrbState
 import com.corestack.khidmatai.domain.model.RequestState
 import com.corestack.khidmatai.ui.components.AiOrbView
@@ -29,7 +28,7 @@ fun HomeScreen(
     onNavigateToProcessing: () -> Unit,
     onNavigateToBookings: () -> Unit
 ) {
-    val state by viewModel.uiState.collectAsState()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(state.requestState) {
         if (state.requestState is RequestState.Processing) {
@@ -41,10 +40,11 @@ fun HomeScreen(
     val backgroundColor = if (isEmergency) EmergencyBg else Background
 
     Scaffold(
+        modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.systemBars),
         containerColor = backgroundColor,
         topBar = {
             HomeAppBar(selectedLanguage = state.selectedLanguage) { newLang ->
-                viewModel.handleIntent(ServiceRequestIntent.UpdateLanguage(newLang))
+                viewModel.onAction(ServiceRequestIntent.UpdateLanguage(newLang))
             }
         },
         bottomBar = {
@@ -62,34 +62,34 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp)
+                .padding(MaterialTheme.spacing.medium)
         ) {
             Text("Assalam o Alaikum!", style = AppTypography.titleLarge, color = TextPrimary)
             Text("Aaj kya chahiye aapko?", style = AppTypography.bodyLarge, color = TextSecondary)
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
 
             if (isEmergency) {
                 EmergencyBanner()
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
             }
 
             // Main Input Card
             Card(
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(MaterialTheme.spacing.medium),
                 colors = CardDefaults.cardColors(containerColor = Surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = MaterialTheme.spacing.extraSmall / 2),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
+                Column(modifier = Modifier.padding(MaterialTheme.spacing.medium)) {
                     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopEnd) {
                         Text(
                             "🎤",
-                            modifier = Modifier.size(40.dp).clickable { /* TODO: Voice Input */ })
+                            modifier = Modifier.size(MaterialTheme.spacing.extraLarge + MaterialTheme.spacing.small).clickable { /* TODO: Voice Input */ })
                     }
                     TextField(
                         value = state.query,
-                        onValueChange = { viewModel.handleIntent(ServiceRequestIntent.UpdateQuery(it)) },
+                        onValueChange = { viewModel.onAction(ServiceRequestIntent.UpdateQuery(it)) },
                         placeholder = { Text("Apni zaroorat likhen...\nUrdu, Roman Urdu ya English") },
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = Color.Transparent,
@@ -112,7 +112,7 @@ fun HomeScreen(
                             Text(
                                 "Clear ✕",
                                 modifier = Modifier.clickable {
-                                    viewModel.handleIntent(ServiceRequestIntent.UpdateQuery(""))
+                                    viewModel.onAction(ServiceRequestIntent.UpdateQuery(""))
                                 },
                                 style = AppTypography.bodySmall,
                                 color = TextSecondary
@@ -122,16 +122,16 @@ fun HomeScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.mediumSmall))
 
             // Location
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(16.dp))
+                    .clip(RoundedCornerShape(MaterialTheme.spacing.medium))
                     .background(Surface)
-                    .border(1.dp, Border, RoundedCornerShape(16.dp))
-                    .padding(16.dp),
+                    .border(MaterialTheme.spacing.extraSmall / 4, Border, RoundedCornerShape(MaterialTheme.spacing.medium))
+                    .padding(MaterialTheme.spacing.medium),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -139,18 +139,18 @@ fun HomeScreen(
                 Text("Change", color = Primary, style = AppTypography.labelMedium)
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
 
             // Urgency
             Text("Kitni zaroorat hai?", style = AppTypography.bodySmall, color = TextSecondary)
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
             val urgencies = listOf(
                 "low" to "🟢 Low",
                 "medium" to "🟡 Medium",
                 "high" to "🔴 High",
                 "emergency" to "🚨 Emergency"
             )
-            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small)) {
                 items(urgencies) { (key, label) ->
                     val isSelected = state.urgency == key
                     val chipBgColor = if (isSelected) {
@@ -162,18 +162,18 @@ fun HomeScreen(
 
                     Box(
                         modifier = Modifier
-                            .height(36.dp)
-                            .clip(RoundedCornerShape(999.dp))
+                            .height(MaterialTheme.spacing.extraLarge + MaterialTheme.spacing.extraSmall)
+                            .clip(RoundedCornerShape(MaterialTheme.spacing.xxl))
                             .background(chipBgColor)
-                            .border(1.dp, border, RoundedCornerShape(999.dp))
+                            .border(MaterialTheme.spacing.extraSmall / 4, border, RoundedCornerShape(MaterialTheme.spacing.xxl))
                             .clickable {
-                                viewModel.handleIntent(
+                                viewModel.onAction(
                                     ServiceRequestIntent.UpdateUrgency(
                                         key
                                     )
                                 )
                             }
-                            .padding(horizontal = 16.dp),
+                            .padding(horizontal = MaterialTheme.spacing.medium),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(label, color = textColor, style = AppTypography.labelMedium)
@@ -181,32 +181,32 @@ fun HomeScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
 
             // Quick Chips
             Text("Kya chahiye?", style = AppTypography.bodySmall, color = TextSecondary)
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
             val quickChips = listOf(
                 "❄️ AC Tech" to "Mujhe AC technician chahiye",
                 "🔧 Plumber" to "Mujhe plumber chahiye, pipe leak hai",
                 "⚡ Electrician" to "Bijli ki problem hai, electrician chahiye",
                 "📚 Tutor" to "Bacche ko tutor chahiye math ke liye"
             )
-            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small)) {
                 items(quickChips) { (label, query) ->
                     Box(
                         modifier = Modifier
-                            .height(40.dp)
-                            .clip(RoundedCornerShape(999.dp))
-                            .border(1.dp, Border, RoundedCornerShape(999.dp))
+                            .height(MaterialTheme.spacing.extraLarge + MaterialTheme.spacing.small)
+                            .clip(RoundedCornerShape(MaterialTheme.spacing.xxl))
+                            .border(MaterialTheme.spacing.extraSmall / 4, Border, RoundedCornerShape(MaterialTheme.spacing.xxl))
                             .clickable {
-                                viewModel.handleIntent(
+                                viewModel.onAction(
                                     ServiceRequestIntent.UpdateQuery(
                                         query
                                     )
                                 )
                             }
-                            .padding(horizontal = 12.dp),
+                            .padding(horizontal = MaterialTheme.spacing.mediumSmall),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(label, style = AppTypography.labelMedium)
@@ -219,19 +219,19 @@ fun HomeScreen(
             // Submit Button
             val isSubmitting = state.requestState is RequestState.Processing
             Button(
-                onClick = { viewModel.handleIntent(ServiceRequestIntent.SubmitRequest) },
+                onClick = { viewModel.onAction(ServiceRequestIntent.SubmitRequest) },
                 enabled = state.query.isNotBlank() && !isSubmitting,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(52.dp),
-                shape = RoundedCornerShape(12.dp),
+                    .height(MaterialTheme.spacing.extraLarge + MaterialTheme.spacing.medium + MaterialTheme.spacing.extraSmall),
+                shape = RoundedCornerShape(MaterialTheme.spacing.mediumSmall),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = if (isEmergency) Error else Primary
                 )
             ) {
                 if (isSubmitting) {
-                    AiOrbView(AiOrbState.THINKING, 24.dp)
-                    Spacer(modifier = Modifier.width(8.dp))
+                    AiOrbView(AiOrbState.THINKING, MaterialTheme.spacing.large)
+                    Spacer(modifier = Modifier.width(MaterialTheme.spacing.small))
                     Text("Processing...", style = AppTypography.labelMedium)
                 } else {
                     Text(
@@ -247,7 +247,7 @@ fun HomeScreen(
 @Composable
 fun HomeAppBar(selectedLanguage: String, onLanguageSelected: (String) -> Unit) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        modifier = Modifier.fillMaxWidth().padding(MaterialTheme.spacing.medium),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -256,18 +256,18 @@ fun HomeAppBar(selectedLanguage: String, onLanguageSelected: (String) -> Unit) {
         // Language Toggle
         Row(
             modifier = Modifier
-                .clip(RoundedCornerShape(999.dp))
+                .clip(RoundedCornerShape(MaterialTheme.spacing.xxl))
                 .background(Surface)
-                .border(1.dp, Border, RoundedCornerShape(999.dp))
+                .border(MaterialTheme.spacing.extraSmall / 4, Border, RoundedCornerShape(MaterialTheme.spacing.xxl))
         ) {
             listOf("EN", "RU", "اردو").forEach { lang ->
                 val isSelected = selectedLanguage == lang
                 Box(
                     modifier = Modifier
-                        .height(32.dp)
+                        .height(MaterialTheme.spacing.extraLarge)
                         .background(if (isSelected) Primary else Color.Transparent)
                         .clickable { onLanguageSelected(lang) }
-                        .padding(horizontal = 12.dp),
+                        .padding(horizontal = MaterialTheme.spacing.mediumSmall),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -286,12 +286,12 @@ fun EmergencyBanner() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
+            .clip(RoundedCornerShape(MaterialTheme.spacing.small))
             .background(ErrorLight)
-            .border(1.dp, Border, RoundedCornerShape(8.dp))
-            .padding(12.dp)
+            .border(MaterialTheme.spacing.extraSmall / 4, Border, RoundedCornerShape(MaterialTheme.spacing.small))
+            .padding(MaterialTheme.spacing.mediumSmall)
     ) {
-        Text("⚠️", modifier = Modifier.padding(end = 8.dp))
+        Text("⚠️", modifier = Modifier.padding(end = MaterialTheme.spacing.small))
         Column {
             Text("Emergency Mode Active", style = AppTypography.labelMedium, color = Error)
             Text(

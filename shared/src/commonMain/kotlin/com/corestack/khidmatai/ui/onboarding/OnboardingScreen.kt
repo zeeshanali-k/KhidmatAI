@@ -8,7 +8,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import com.corestack.khidmatai.ui.theme.*
 
 @Composable
@@ -20,7 +19,8 @@ fun OnboardingScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Background)
-            .padding(16.dp),
+            .windowInsetsPadding(WindowInsets.systemBars)
+            .padding(MaterialTheme.spacing.medium),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Top 40% Illustration (Mocked with Box for now)
@@ -52,7 +52,7 @@ fun OnboardingScreen(
                 color = TextPrimary,
                 textAlign = TextAlign.Center
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
             Text(
                 text = "Taake hum aapke qareeb ke\nbest service providers dhundh sakein",
                 style = AppTypography.bodyLarge,
@@ -73,14 +73,14 @@ fun OnboardingScreen(
                 onClick = onLocationGranted,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(52.dp),
-                shape = RoundedCornerShape(12.dp),
+                    .height(MaterialTheme.spacing.extraLarge + MaterialTheme.spacing.medium + MaterialTheme.spacing.extraSmall),
+                shape = RoundedCornerShape(MaterialTheme.spacing.mediumSmall),
                 colors = ButtonDefaults.buttonColors(containerColor = Primary)
             ) {
                 Text("📍 Location use karne ki ijazat dein", color = Surface, style = AppTypography.labelMedium)
             }
             
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
             
             Text(
                 text = "Sirf service matching ke liye use hogi.\nKoi data share nahi hoga.",
@@ -89,13 +89,13 @@ fun OnboardingScreen(
                 textAlign = TextAlign.Center
             )
             
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
             
             TextButton(onClick = onSkip) {
                 Text("Skip for now", color = TextSecondary, style = AppTypography.labelMedium)
             }
             
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.extraLarge))
         }
     }
 }

@@ -7,10 +7,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.corestack.khidmatai.domain.model.AiOrbState
 import com.corestack.khidmatai.domain.model.RequestState
 import com.corestack.khidmatai.ui.components.AiOrbView
@@ -26,7 +27,7 @@ fun ProcessingScreen(
     onNavigateToSuccess: () -> Unit,
     onNavigateToUnavailable: () -> Unit
 ) {
-    val state by viewModel.uiState.collectAsState()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
     val requestState = state.requestState
 
     val isEmergency = state.urgency == "emergency"
@@ -45,22 +46,22 @@ fun ProcessingScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.systemBars)) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(backgroundColor)
-                .padding(24.dp),
+                .padding(MaterialTheme.spacing.large),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.xxl))
             
             AiOrbView(
                 state = if (requestState is RequestState.Success) AiOrbState.DONE else AiOrbState.THINKING,
-                size = 48.dp
+                size = MaterialTheme.spacing.xxl
             )
             
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
             
             Text(
                 text = if (isEmergency) "Emergency Request — Priority Processing 🚨" else "Agent chal raha hai...",
@@ -74,7 +75,7 @@ fun ProcessingScreen(
                 color = TextSecondary
             )
             
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.extraLarge))
             
             val traces = if (requestState is RequestState.Processing) requestState.traces else emptyList()
             val completedCount = traces.count { it.status == "completed" }
@@ -89,16 +90,16 @@ fun ProcessingScreen(
                 Text("${(progress * 100).toInt()}%", style = AppTypography.bodySmall)
             }
             
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
             
             LinearProgressIndicator(
                 progress = { progress },
-                modifier = Modifier.fillMaxWidth().height(8.dp),
+                modifier = Modifier.fillMaxWidth().height(MaterialTheme.spacing.small),
                 color = if (isEmergency) Error else Primary,
                 trackColor = Border
             )
             
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.extraLarge))
             
             LazyColumn(
                 modifier = Modifier.fillMaxWidth()

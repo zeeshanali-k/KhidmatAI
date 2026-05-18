@@ -8,7 +8,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import com.corestack.khidmatai.domain.model.AiOrbState
 import com.corestack.khidmatai.ui.components.AiOrbView
 import com.corestack.khidmatai.ui.home.ServiceRequestViewModel
@@ -24,7 +23,8 @@ fun ResultUnavailableScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Background),
+            .background(Background)
+            .windowInsetsPadding(WindowInsets.systemBars),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Top Banner
@@ -32,17 +32,17 @@ fun ResultUnavailableScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(WarningLight)
-                .padding(24.dp)
+                .padding(MaterialTheme.spacing.large)
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-                AiOrbView(state = AiOrbState.IDLE, size = 24.dp)
-                Spacer(modifier = Modifier.height(8.dp))
+                AiOrbView(state = AiOrbState.IDLE, size = MaterialTheme.spacing.large)
+                Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
                 Text(
                     text = "Koi Provider Available Nahi",
                     style = AppTypography.titleLarge,
                     color = Warning
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(MaterialTheme.spacing.extraSmall))
                 Text(
                     text = "Filhal is area mein service available nahi hai.",
                     style = AppTypography.bodyLarge,
@@ -54,18 +54,18 @@ fun ResultUnavailableScreen(
         
         Spacer(modifier = Modifier.weight(1f))
         
-        Text("🔍", style = AppTypography.displayLarge, modifier = Modifier.padding(16.dp))
+        Text("🔍", style = AppTypography.displayLarge, modifier = Modifier.padding(MaterialTheme.spacing.medium))
         
         Card(
-            shape = RoundedCornerShape(12.dp),
+            shape = RoundedCornerShape(MaterialTheme.spacing.mediumSmall),
             colors = CardDefaults.cardColors(containerColor = Surface),
-            modifier = Modifier.fillMaxWidth().padding(16.dp)
+            modifier = Modifier.fillMaxWidth().padding(MaterialTheme.spacing.medium)
         ) {
-            Column(modifier = Modifier.padding(16.dp)) {
+            Column(modifier = Modifier.padding(MaterialTheme.spacing.medium)) {
                 Text("Kya hua?", style = AppTypography.titleLarge, color = TextPrimary)
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
                 Text("Koi verified provider nahi mila.", style = AppTypography.bodyLarge, color = TextSecondary)
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
                 Text("Mashwara:", style = AppTypography.titleLarge, color = TextPrimary)
                 Text("Kuch der baad dobara try karein.", style = AppTypography.bodyLarge, color = TextSecondary)
             }
@@ -73,30 +73,30 @@ fun ResultUnavailableScreen(
         
         Spacer(modifier = Modifier.weight(1f))
         
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(MaterialTheme.spacing.medium)) {
             Button(
                 onClick = {
-                    viewModel.handleIntent(com.corestack.khidmatai.ui.home.ServiceRequestIntent.SubmitRequest)
+                    viewModel.onAction(com.corestack.khidmatai.ui.home.ServiceRequestIntent.SubmitRequest)
                     onRetry()
                 },
-                modifier = Modifier.fillMaxWidth().height(52.dp),
-                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth().height(MaterialTheme.spacing.extraLarge + MaterialTheme.spacing.medium),
+                shape = RoundedCornerShape(MaterialTheme.spacing.mediumSmall),
                 colors = ButtonDefaults.buttonColors(containerColor = Primary)
             ) {
                 Text("🔄 Retry Request", color = Surface, style = AppTypography.labelMedium)
             }
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.mediumSmall))
             OutlinedButton(
                 onClick = {
-                    viewModel.handleIntent(com.corestack.khidmatai.ui.home.ServiceRequestIntent.Reset)
+                    viewModel.onAction(com.corestack.khidmatai.ui.home.ServiceRequestIntent.Reset)
                     onBackToHome()
                 },
-                modifier = Modifier.fillMaxWidth().height(52.dp),
-                shape = RoundedCornerShape(12.dp)
+                modifier = Modifier.fillMaxWidth().height(MaterialTheme.spacing.extraLarge + MaterialTheme.spacing.medium),
+                shape = RoundedCornerShape(MaterialTheme.spacing.mediumSmall)
             ) {
                 Text("Try Different Service", color = TextPrimary, style = AppTypography.labelMedium)
             }
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.extraLarge))
         }
     }
 }
