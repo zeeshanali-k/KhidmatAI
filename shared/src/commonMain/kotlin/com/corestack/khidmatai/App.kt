@@ -8,6 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.corestack.khidmatai.ui.Home
 import com.corestack.khidmatai.ui.Onboarding
+import com.corestack.khidmatai.ui.VoiceInput
 import com.corestack.khidmatai.ui.bookings.BookingDetailScreen
 import com.corestack.khidmatai.ui.bookings.BookingsScreen
 import com.corestack.khidmatai.ui.home.HomeScreen
@@ -15,6 +16,7 @@ import com.corestack.khidmatai.ui.onboarding.OnboardingScreen
 import com.corestack.khidmatai.ui.processing.ProcessingScreen
 import com.corestack.khidmatai.ui.result.ResultSuccessScreen
 import com.corestack.khidmatai.ui.theme.AppTheme
+import com.corestack.khidmatai.ui.voice.VoiceInputScreen
 
 @Composable
 @Preview
@@ -49,6 +51,17 @@ fun App() {
                     },
                     onNavigateToBookings = {
                         navController.navigate(com.corestack.khidmatai.ui.Bookings)
+                    },
+                    onNavigateToVoice = {
+                        navController.navigate(VoiceInput)
+                    }
+                )
+            }
+
+            composable<VoiceInput> {
+                VoiceInputScreen(
+                    onNavigateBack = {
+                        navController.popBackStack()
                     }
                 )
             }

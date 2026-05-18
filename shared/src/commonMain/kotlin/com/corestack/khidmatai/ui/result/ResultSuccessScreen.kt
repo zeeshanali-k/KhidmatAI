@@ -8,8 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,10 +17,12 @@ import androidx.compose.ui.text.font.FontStyle
 import com.corestack.khidmatai.domain.model.AiOrbState
 import com.corestack.khidmatai.domain.model.RequestState
 import com.corestack.khidmatai.ui.components.AiOrbView
+import com.corestack.khidmatai.ui.components.MockPushNotification
 import com.corestack.khidmatai.ui.components.NextStepCard
 import com.corestack.khidmatai.ui.home.ServiceRequestViewModel
 import com.corestack.khidmatai.ui.theme.*
 import khidmatai.shared.generated.resources.*
+import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -40,7 +41,16 @@ fun ResultSuccessScreen(
 
     val result = requestState.result
     val isEmergency = result.urgency == "emergency"
-    
+
+    var showNotification by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        delay(3000L)
+        showNotification = true
+        delay(4000L)
+        showNotification = false
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
     LazyColumn(
         modifier = Modifier.fillMaxSize().background(Background).windowInsetsPadding(WindowInsets.systemBars)
     ) {
@@ -240,4 +250,11 @@ fun ResultSuccessScreen(
             }
         }
     }
+
+    // Notification overlay — slides in 3s after screen loads, auto-dismisses after 4s
+    MockPushNotification(
+        visible = showNotification,
+        onTap = { onViewBookingDetails(result.bookingId ?: "") }
+    )
+    } // end Box
 }

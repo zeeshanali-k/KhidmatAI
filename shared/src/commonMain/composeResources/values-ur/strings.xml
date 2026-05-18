@@ -96,6 +96,18 @@
     <string name="badge_upcoming">آنے والی</string>
     <string name="badge_emergency">ایمرجنسی</string>
 
+    <!-- Voice Input Screen -->
+    <string name="voice_title">بول کر بتائیں...</string>
+    <string name="voice_subtitle">اردو، رومن اردو، یا انگریزی میں بولیں</string>
+    <string name="voice_btn_cancel">✕ منسوخ کریں</string>
+    <string name="voice_btn_stop">⏹ رکیں اور استعمال کریں</string>
+    <string name="voice_transcribing">ٹرانسکرائب ہو رہا ہے...</string>
+
+    <!-- Push Notification Mock -->
+    <string name="notif_app_name">کام کرو</string>
+    <string name="notif_message">⏰ یاد دہانی: آپ کی AC سروس 1 گھنٹے میں ہے۔ کامران خان آ رہا ہے۔</string>
+    <string name="notif_time">09:30 AM</string>
+
     <!-- Trace Stages -->
     <string name="trace_intent">آپ کی درخواست سمجھی جا رہی ہے</string>
     <string name="trace_llm">AI تجزیہ</string>

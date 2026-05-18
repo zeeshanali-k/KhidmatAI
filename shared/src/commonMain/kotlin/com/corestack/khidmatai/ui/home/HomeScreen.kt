@@ -28,7 +28,8 @@ import org.koin.compose.viewmodel.koinViewModel
 fun HomeScreen(
     viewModel: ServiceRequestViewModel = koinViewModel(),
     onNavigateToProcessing: () -> Unit,
-    onNavigateToBookings: () -> Unit
+    onNavigateToBookings: () -> Unit,
+    onNavigateToVoice: () -> Unit = {}
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -87,7 +88,7 @@ fun HomeScreen(
                     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopEnd) {
                         Text(
                             "🎤",
-                            modifier = Modifier.size(MaterialTheme.spacing.extraLarge + MaterialTheme.spacing.small).clickable { /* TODO: Voice Input */ })
+                            modifier = Modifier.size(MaterialTheme.spacing.extraLarge + MaterialTheme.spacing.small).clickable { onNavigateToVoice() })
                     }
                     TextField(
                         value = state.query,

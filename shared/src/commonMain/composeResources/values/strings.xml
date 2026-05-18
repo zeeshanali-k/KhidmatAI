@@ -96,6 +96,18 @@
     <string name="badge_upcoming">Upcoming</string>
     <string name="badge_emergency">Emergency</string>
 
+    <!-- Voice Input Screen -->
+    <string name="voice_title">Bol kar batayein...</string>
+    <string name="voice_subtitle">Speak in Urdu, Roman Urdu, or English</string>
+    <string name="voice_btn_cancel">✕ Cancel</string>
+    <string name="voice_btn_stop">⏹ Stop &amp; Use</string>
+    <string name="voice_transcribing">Transcribing...</string>
+
+    <!-- Push Notification Mock -->
+    <string name="notif_app_name">KaamKaro</string>
+    <string name="notif_message">⏰ Reminder: Your AC service is in 1 hour. Kamran Khan is on the way.</string>
+    <string name="notif_time">09:30 AM</string>
+
     <!-- Trace Stages -->
     <string name="trace_intent">Understanding request</string>
     <string name="trace_llm">AI analysis</string>
