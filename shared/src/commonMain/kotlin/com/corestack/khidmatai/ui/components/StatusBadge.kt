@@ -3,10 +3,10 @@ package com.corestack.khidmatai.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.corestack.khidmatai.ui.theme.*
 
 enum class BadgeVariant {
@@ -18,20 +18,28 @@ fun StatusBadge(
     variant: BadgeVariant,
     modifier: Modifier = Modifier
 ) {
-    val (bgColor, textColor, text) = when (variant) {
-        BadgeVariant.COMPLETED -> Triple(Success, Surface, "Mukammal")
-        BadgeVariant.PENDING -> Triple(Warning, Surface, "Jari hai")
-        BadgeVariant.FAILED -> Triple(Error, Surface, "Nakam")
-        BadgeVariant.UPCOMING -> Triple(Primary, Surface, "Aane wala")
-        BadgeVariant.EMERGENCY -> Triple(Error, Surface, "Emergency")
+    val s = LocalAppStrings.current
+    val bgColor = when (variant) {
+        BadgeVariant.COMPLETED -> Success
+        BadgeVariant.PENDING -> Warning
+        BadgeVariant.FAILED -> Error
+        BadgeVariant.UPCOMING -> Primary
+        BadgeVariant.EMERGENCY -> Error
+    }
+    val label = when (variant) {
+        BadgeVariant.COMPLETED -> s.badgeCompleted
+        BadgeVariant.PENDING -> s.badgePending
+        BadgeVariant.FAILED -> s.badgeFailed
+        BadgeVariant.UPCOMING -> s.badgeUpcoming
+        BadgeVariant.EMERGENCY -> s.badgeEmergency
     }
 
     Text(
-        text = text,
-        color = textColor,
+        text = label,
+        color = Surface,
         style = AppTypography.labelMedium,
         modifier = modifier
-            .background(bgColor, RoundedCornerShape(999.dp))
-            .padding(horizontal = 8.dp, vertical = 4.dp)
+            .background(bgColor, RoundedCornerShape(MaterialTheme.spacing.xxl))
+            .padding(horizontal = MaterialTheme.spacing.small, vertical = MaterialTheme.spacing.extraSmall)
     )
 }

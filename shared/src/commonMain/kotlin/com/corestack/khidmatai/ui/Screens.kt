@@ -22,3 +22,9 @@ data class BookingDetail(val bookingId: String)
 
 @Serializable
 data object Bookings
+
+@Serializable
+data object VoiceInput
+
+@Serializable
+data object Profile

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Onboarding Screen -->
+    <string name="onboarding_title">First, tell us your location</string>
+    <string name="onboarding_desc">So we can find the best service providers near you</string>
+    <string name="onboarding_btn_location">📍 Allow Location Access</string>
+    <string name="onboarding_privacy">Only used for service matching.\nNo data will be shared.</string>
+    <string name="onboarding_skip">Skip for now</string>
+
+    <!-- Home Screen -->
+    <string name="app_name">Khidmat AI</string>
+    <string name="home_greeting">Hello!</string>
+    <string name="home_prompt">What do you need today?</string>
+    <string name="home_search_hint">Write your requirement...</string>
+    <string name="home_change_location">Change</string>
+    <string name="home_urgency_title">How urgent is it?</string>
+    <string name="home_quick_chips_title">Quick Needs?</string>
+    <string name="home_btn_find_service">Find Service →</string>
+    <string name="home_btn_find_emergency">Find Emergency Service 🚨</string>
+    <string name="home_processing">Processing...</string>
+    <string name="home_clear">Clear ✕</string>
+
+    <!-- Urgency Levels -->
+    <string name="urgency_low">🟢 Low</string>
+    <string name="urgency_medium">🟡 Medium</string>
+    <string name="urgency_high">🔴 High</string>
+    <string name="urgency_emergency">🚨 Emergency</string>
+
+    <!-- Quick Chips -->
+    <string name="quick_ac">❄️ AC Tech</string>
+    <string name="quick_ac_query">I need an AC technician</string>
+    <string name="quick_plumber">🔧 Plumber</string>
+    <string name="quick_plumber_query">I need a plumber, pipe is leaking</string>
+    <string name="quick_electrician">⚡ Electrician</string>
+    <string name="quick_electrician_query">There is an electrical issue, need an electrician</string>
+    <string name="quick_tutor">📚 Tutor</string>
+    <string name="quick_tutor_query">Need a math tutor for kid</string>
+    <string name="quick_beautician">💅 Beautician</string>
+    <string name="quick_beautician_query">I need a beautician at home</string>
+    <string name="quick_carpenter">🪚 Carpenter</string>
+    <string name="quick_carpenter_query">Need a carpenter for furniture repair</string>
+
+    <!-- Emergency Banner -->
+    <string name="emergency_mode_title">Emergency Mode Active</string>
+    <string name="emergency_mode_desc">Use only for genuine emergencies.</string>
+
+    <!-- Processing Screen -->
+    <string name="processing_title">Agent is running...</string>
+    <string name="processing_emergency_title">Emergency Request — Priority Processing 🚨</string>
+    <string name="processing_desc">AI is orchestrating your request</string>
+
+    <!-- Result Success Screen -->
+    <string name="result_success_emergency">EMERGENCY BOOKING</string>
+    <string name="result_success_title">Booking Confirmed!</string>
+    <string name="result_success_ai_decision">🤖 Why selected? (AI Decision)</string>
+    <string name="result_success_ai_reasoning_fallback">AI selected the best provider.</string>
+    <string name="result_success_call_now">📞 Call Now</string>
+    <string name="result_success_whatsapp">💬 WhatsApp</string>
+    <string name="result_success_map_view">📍 Map View</string>
+    <string name="result_success_appointment_details">📅 Appointment Details</string>
+    <string name="result_success_next_steps">Next Steps</string>
+    <string name="result_success_view_details">View Full Booking Details</string>
+    <string name="result_success_back_home">Back to Home</string>
+
+    <!-- Result Unavailable Screen -->
+    <string name="result_unavail_title">No Provider Available</string>
+    <string name="result_unavail_desc">Service is not available in this area right now.</string>
+    <string name="result_unavail_what_happened">What happened?</string>
+    <string name="result_unavail_what_happened_desc">No verified provider found.</string>
+    <string name="result_unavail_suggestion">Suggestion:</string>
+    <string name="result_unavail_suggestion_desc">Try again after some time.</string>
+    <string name="result_unavail_btn_retry">🔄 Retry Request</string>
+    <string name="result_unavail_btn_different">Try Different Service</string>
+
+    <!-- Bookings Screen -->
+    <string name="bookings_title">My Bookings</string>
+    <string name="bookings_filter_all">All</string>
+    <string name="bookings_filter_upcoming">Upcoming</string>
+    <string name="bookings_filter_completed">Completed</string>
+
+    <!-- Booking Detail Screen -->
+    <string name="booking_detail_title">Booking Detail</string>
+    <string name="booking_detail_not_found">Booking Not Found for demo</string>
+    <string name="booking_detail_go_back">Go Back</string>
+    <string name="booking_detail_confirmed">Confirmed</string>
+    <string name="booking_detail_followup_info">🔔 Follow-up Info</string>
+    <string name="booking_detail_reminder_set">Reminder set: ✅ Yes</string>
+    <string name="booking_detail_reminder_time">Reminder time: 09:30 AM</string>
+    <string name="booking_detail_status_confirmed">Status: Booking Confirmed</string>
+    <string name="booking_detail_agent_log">🤖 AI Agent Log</string>
+    <string name="booking_detail_reminder_yes">Reminder set: ✅ Yes</string>
+    <string name="booking_detail_reminder_no">Reminder set: ❌ No</string>
+    <string name="booking_detail_ai_decision">🤖 Why selected? (AI Decision)</string>
+    <string name="booking_detail_appointment_details">📅 Appointment Details</string>
+    <string name="booking_detail_next_steps">Next Steps</string>
+
+    <!-- Bottom Nav Bar -->
+    <string name="nav_home">Home</string>
+    <string name="nav_bookings">Bookings</string>
+    <string name="nav_profile">Profile</string>
+
+    <!-- Status Badges -->
+    <string name="badge_completed">Completed</string>
+    <string name="badge_pending">Pending</string>
+    <string name="badge_failed">Failed</string>
+    <string name="badge_upcoming">Upcoming</string>
+    <string name="badge_emergency">Emergency</string>
+
+    <!-- Voice Input Screen -->
+    <string name="voice_title">Speak your request...</string>
+    <string name="voice_subtitle">Speak in Urdu or English</string>
+    <string name="voice_btn_cancel">✕ Cancel</string>
+    <string name="voice_btn_stop">⏹ Stop &amp; Use</string>
+    <string name="voice_transcribing">Transcribing...</string>
+
+    <!-- Push Notification Mock -->
+    <string name="notif_app_name">KaamKaro</string>
+    <string name="notif_message">⏰ Reminder: Your AC service is in 1 hour. Kamran Khan is on the way.</string>
+    <string name="notif_time">09:30 AM</string>
+
+    <!-- Trace Stages -->
+    <string name="trace_intent">Understanding request</string>
+    <string name="trace_llm">AI analysis</string>
+    <string name="trace_service">Identifying service</string>
+    <string name="trace_urgency">Setting urgency level</string>
+    <string name="trace_discovery">Discovering providers</string>
+    <string name="trace_ranking">Selecting best match</string>
+    <string name="trace_selection">Selecting provider</string>
+    <string name="trace_execution">Confirming booking</string>
+    <string name="trace_followup">Setting reminders</string>
+</resources>

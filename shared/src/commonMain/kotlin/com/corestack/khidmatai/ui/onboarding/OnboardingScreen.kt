@@ -8,7 +8,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import com.corestack.khidmatai.ui.theme.*
 
 @Composable
@@ -16,14 +15,15 @@ fun OnboardingScreen(
     onLocationGranted: () -> Unit,
     onSkip: () -> Unit
 ) {
+    val s = LocalAppStrings.current
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Background)
-            .padding(16.dp),
+            .windowInsetsPadding(WindowInsets.systemBars)
+            .padding(MaterialTheme.spacing.medium),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Top 40% Illustration (Mocked with Box for now)
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -38,7 +38,6 @@ fun OnboardingScreen(
             )
         }
 
-        // Middle
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -46,22 +45,11 @@ fun OnboardingScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                text = "Pehle apni location batayein",
-                style = AppTypography.displayLarge,
-                color = TextPrimary,
-                textAlign = TextAlign.Center
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "Taake hum aapke qareeb ke\nbest service providers dhundh sakein",
-                style = AppTypography.bodyLarge,
-                color = TextSecondary,
-                textAlign = TextAlign.Center
-            )
+            Text(text = s.onboardingTitle, style = AppTypography.displayLarge, color = TextPrimary, textAlign = TextAlign.Center)
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
+            Text(text = s.onboardingDesc, style = AppTypography.bodyLarge, color = TextSecondary, textAlign = TextAlign.Center)
         }
 
-        // Bottom
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -73,29 +61,24 @@ fun OnboardingScreen(
                 onClick = onLocationGranted,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(52.dp),
-                shape = RoundedCornerShape(12.dp),
+                    .height(MaterialTheme.spacing.extraLarge + MaterialTheme.spacing.medium + MaterialTheme.spacing.extraSmall),
+                shape = RoundedCornerShape(MaterialTheme.spacing.mediumSmall),
                 colors = ButtonDefaults.buttonColors(containerColor = Primary)
             ) {
-                Text("📍 Location use karne ki ijazat dein", color = Surface, style = AppTypography.labelMedium)
+                Text(s.onboardingBtnLocation, color = Surface, style = AppTypography.labelMedium)
             }
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            Text(
-                text = "Sirf service matching ke liye use hogi.\nKoi data share nahi hoga.",
-                style = AppTypography.bodySmall,
-                color = TextSecondary,
-                textAlign = TextAlign.Center
-            )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
+
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
+
+            Text(text = s.onboardingPrivacy, style = AppTypography.bodySmall, color = TextSecondary, textAlign = TextAlign.Center)
+
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
+
             TextButton(onClick = onSkip) {
-                Text("Skip for now", color = TextSecondary, style = AppTypography.labelMedium)
+                Text(s.onboardingSkip, color = TextSecondary, style = AppTypography.labelMedium)
             }
-            
-            Spacer(modifier = Modifier.height(32.dp))
+
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.extraLarge))
         }
     }
 }

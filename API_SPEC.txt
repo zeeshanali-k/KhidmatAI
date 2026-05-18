@@ -1,0 +1,463 @@
+
+Base URL (It is dynamic, hence adopt it accordingly)
+http://localhost:8000
+
+For production, replace with your deployed server URL.
+
+Endpoint
+POST /requests/
+Send a service request. The agent workflow runs automatically: Intent Detection → Provider Discovery → Ranking → Booking → Follow-up
+
+Request Body
+{
+  "user_id": "user_001",
+  "raw_query": "Mujhe kal subah G-13 mein AC technician chahiye",
+  "urgency": "medium",
+  "location": {
+    "address": "G-13, Islamabad",
+    "lat": 33.6333,
+    "lng": 72.9667
+  }
+}
+
+Field Reference
+Field
+Type
+Required
+Values
+user_id
+string
+yes
+any unique string
+raw_query
+string
+yes
+Urdu / Roman Urdu / English
+urgency
+string
+no
+low medium high emergency
+location.address
+string
+yes
+any address string
+location.lat
+float
+yes
+latitude
+location.lng
+float
+yes
+longitude
+
+
+Response — SUCCESS
+{
+  "success": true,
+  "data": {
+    "status": "success",
+    "message": "Booking confirmed. Kamran Khan will contact you before 10:30 AM, 17 May.",
+    "service_request": {
+      "service_type": "ac_technician",
+      "service_label": "Ac Technician",
+      "urgency": "HIGH",
+      "raw_query": "Mujhe kal subah G-13 mein AC technician chahiye"
+    },
+    "provider": {
+      "id": "p1",
+      "name": "Kamran Khan",
+      "phone": "+923001234567",
+      "rating": 4.7,
+      "distance_km": 1.2,
+      "experience_years": 8,
+      "reasoning": "Kamran Khan is the top match with rating 4.7, located 1.2km from you."
+    },
+    "appointment": {
+      "booking_id": "BK-1747391234",
+      "scheduled_time_display": "10:30 AM, 17 May",
+      "scheduled_time_iso": "2026-05-17T10:30:00",
+      "location": {
+        "address": "G-13, Islamabad",
+        "lat": 33.6333,
+        "lng": 72.9667
+      },
+      "cost_per_hour": 1500,
+      "currency": "PKR"
+    },
+    "next_steps": [
+      {
+        "step": 1,
+        "title": "Provider call karega",
+        "description": "Kamran Khan aapko 15 minutes ke andar call karega booking confirm karne ke liye.",
+        "type": "action",
+        "action_value": "+923001234567",
+        "action_label": "Call Now"
+      },
+      {
+        "step": 2,
+        "title": "Jagah saaf karein",
+        "description": "Service ke liye relevant area clear karein.",
+        "type": "info",
+        "action_value": null,
+        "action_label": null
+      },
+      {
+        "step": 3,
+        "title": "Reminder mil jayega",
+        "description": "Appointment se 1 ghanta pehle (09:30 AM) aapko reminder milega.",
+        "type": "info",
+        "action_value": "09:30 AM",
+        "action_label": "Set Reminder"
+      },
+      {
+        "step": 4,
+        "title": "Booking track karein",
+        "description": "App mein apni booking ka real-time status dekh sakte hain.",
+        "type": "info",
+        "action_value": "BK-1747391234",
+        "action_label": "Track"
+      }
+    ],
+    "trace": [
+      { "stage": "intent_detection",      "message": "Input Query received and parsed", "status": "completed" },
+      { "stage": "llm_analysis",          "message": "intent=ac_technician language=roman_urdu urgency=medium", "status": "completed" },
+      { "stage": "service_classification","message": "Service Detected: AC_TECHNICIAN", "status": "completed" },
+      { "stage": "provider_discovery",    "message": "Found 3 verified providers near G-13", "status": "completed" },
+      { "stage": "provider_ranking",      "message": "Kamran Khan selected with score 12.16", "status": "completed" },
+      { "stage": "booking_execution",     "message": "Booking BK-1747391234 confirmed in DB", "status": "completed" },
+      { "stage": "followup",              "message": "Reminder scheduled for 09:30 AM", "status": "completed" }
+    ],
+    "followup": {
+      "reminder_scheduled": true,
+      "reminder_time_display": "09:30 AM",
+      "reminder_time_iso": "2026-05-17T09:30:00",
+      "status_update": "booking_confirmed",
+      "completion_confirmation": false
+    },
+    "error": null
+  },
+  "meta": {
+    "booking_id": "BK-1747391234",
+    "detected_intent": "ac_technician",
+    "detected_language": "roman_urdu",
+    "urgency": "medium"
+  }
+}
+
+
+Response — NO PROVIDER FOUND
+{
+  "success": false,
+  "data": {
+    "status": "unavailable",
+    "message": "Filhal aap ke area mein Ac Technician ke liye koi verified provider available nahi hai.",
+    "provider": null,
+    "appointment": null,
+    "next_steps": [
+      {
+        "step": 1,
+        "title": "Dobara try karein",
+        "description": "1-2 ghante baad dobara request karein.",
+        "type": "action",
+        "action_value": null,
+        "action_label": "Retry"
+      },
+      {
+        "step": 2,
+        "title": "Local contact karein",
+        "description": "Agar bohot urgent hai to apne local contacts ya nearest market se rabta karein.",
+        "type": "info",
+        "action_value": null,
+        "action_label": null
+      }
+    ],
+    "trace": [...],
+    "error": {
+      "code": "NO_PROVIDER_AVAILABLE",
+      "message": "Filhal aap ke area mein koi verified provider available nahi hai.",
+      "suggestion": "Kuch der baad dobara try karein."
+    }
+  },
+  "meta": {
+    "booking_id": null,
+    "detected_intent": "ac_technician",
+    "detected_language": "roman_urdu",
+    "urgency": "medium"
+  }
+}
+
+
+Response — SERVER ERROR
+{
+  "detail": "Workflow execution failed: <error message>"
+}
+
+HTTP status will be 500.
+
+next_steps — type values
+Frontend use these to render different UI components:
+type
+What to render
+action
+Button (e.g. Call Now, Retry)
+info
+Info card / plain text
+warning
+Warning card with icon
+
+
+trace — stage values
+stage
+Meaning
+intent_detection
+Query received and parsed
+llm_analysis
+Gemini LLM ran
+service_classification
+Service type identified
+urgency_classification
+Urgency level set
+provider_discovery
+Nearby providers fetched
+provider_ranking
+Providers scored and ranked
+provider_selection
+Best provider chosen
+booking_execution
+Booking saved to DB
+followup
+Reminders and follow-up scheduled
+
+trace — status values: completed | pending | failed
+Api integration · JS
+
+// ============================================================
+// Antigravity Service Orchestrator — Frontend Integration Code
+// Give this file to your frontend team member.
+// Works with React, React Native, or plain JavaScript.
+// ============================================================
+
+const API_BASE = "http://localhost:8000"; // change to production URL when deploying
+
+
+// ─────────────────────────────────────────────────────────────
+// 1. MAIN API FUNCTION — call this to submit a service request
+// ─────────────────────────────────────────────────────────────
+
+export async function submitServiceRequest({
+  userId,
+  query,
+  urgency = "medium",
+  address,
+  lat,
+  lng,
+}) {
+  const payload = {
+    user_id: userId,
+    raw_query: query,
+    urgency: urgency,               // "low" | "medium" | "high" | "emergency"
+    location: {
+      address: address,
+      lat: parseFloat(lat),
+      lng: parseFloat(lng),
+    },
+  };
+
+  const response = await fetch(`${API_BASE}/requests/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.detail || `Server error: HTTP ${response.status}`);
+  }
+
+  const json = await response.json();
+  return json; // see parseResponse() below for how to use this
+}
+
+
+// ─────────────────────────────────────────────────────────────
+// 2. RESPONSE PARSER — extract what you need for the UI
+// ─────────────────────────────────────────────────────────────
+
+export function parseResponse(json) {
+  const { success, data, meta } = json;
+
+  return {
+    // Top-level flags
+    success,                          // boolean
+    status: data.status,              // "success" | "unavailable" | "error"
+    message: data.message,            // string — safe to show directly in UI
+
+    // Booking meta
+    bookingId: meta.booking_id,       // "BK-1747391234" or null
+    detectedService: meta.detected_intent,   // "ac_technician" etc.
+    detectedLanguage: meta.detected_language, // "roman_urdu" | "en"
+    urgency: meta.urgency,            // "low" | "medium" | "high" | "emergency"
+
+    // Provider — null if no provider found
+    provider: data.provider
+      ? {
+          id: data.provider.id,
+          name: data.provider.name,
+          phone: data.provider.phone,
+          rating: data.provider.rating,           // float e.g. 4.7
+          distanceKm: data.provider.distance_km,  // float e.g. 1.2
+          experienceYears: data.provider.experience_years,
+          reasoning: data.provider.reasoning,     // why this provider was selected
+        }
+      : null,
+
+    // Appointment — null if no provider found
+    appointment: data.appointment
+      ? {
+          bookingId: data.appointment.booking_id,
+          timeDisplay: data.appointment.scheduled_time_display, // "10:30 AM, 17 May"
+          timeISO: data.appointment.scheduled_time_iso,         // for Date parsing
+          address: data.appointment.location?.address,
+          costPerHour: data.appointment.cost_per_hour,          // number e.g. 1500
+          currency: data.appointment.currency,                  // "PKR"
+        }
+      : null,
+
+    // Next steps — ALWAYS an array of objects, never plain strings
+    // type: "action" | "info" | "warning"
+    nextSteps: (data.next_steps || []).map((s) => ({
+      step: s.step,               // number
+      title: s.title,             // string — render as heading
+      description: s.description, // string — render as body text
+      type: s.type,               // "action" | "info" | "warning"
+      actionValue: s.action_value, // phone number / booking id / null
+      actionLabel: s.action_label, // "Call Now" / "Track" / null
+    })),
+
+    // Trace — ALWAYS an array of objects, never plain strings
+    trace: (data.trace || []).map((t) => ({
+      stage: t.stage,     // "intent_detection" | "provider_ranking" | etc.
+      message: t.message, // clean string — no emojis
+      status: t.status,   // "completed" | "pending" | "failed"
+    })),
+
+    // Followup info
+    followup: data.followup || null,
+
+    // Error info — only present when status !== "success"
+    error: data.error || null,
+  };
+}
+
+
+// ─────────────────────────────────────────────────────────────
+// 3. REACT HOOK — drop this into any React / React Native screen
+// ─────────────────────────────────────────────────────────────
+
+import { useState } from "react";
+
+export function useServiceRequest() {
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState(null);   // parsed response
+  const [error, setError] = useState(null);     // error string or null
+
+  async function submit(params) {
+    setLoading(true);
+    setError(null);
+    setResult(null);
+
+    try {
+      const raw = await submitServiceRequest(params);
+      const parsed = parseResponse(raw);
+      setResult(parsed);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return { submit, loading, result, error };
+}
+
+
+// ─────────────────────────────────────────────────────────────
+// 4. USAGE EXAMPLE — React component
+// ─────────────────────────────────────────────────────────────
+
+/*
+
+import { useServiceRequest } from "./api";
+
+export default function ServiceScreen() {
+  const { submit, loading, result, error } = useServiceRequest();
+
+  async function handleSubmit() {
+    await submit({
+      userId: "user_001",
+      query: "Mujhe kal subah AC repair karwana hai",
+      urgency: "medium",
+      address: "G-13, Islamabad",
+      lat: 33.6333,
+      lng: 72.9667,
+    });
+  }
+
+  return (
+    <View>
+      <Button onPress={handleSubmit} title={loading ? "Processing..." : "Find Service"} />
+
+      {error && <Text style={{ color: "red" }}>{error}</Text>}
+
+      {result && result.status === "success" && (
+        <View>
+          <Text>{result.message}</Text>
+
+          // Provider card
+          <Text>{result.provider.name}</Text>
+          <Text>Rating: {result.provider.rating}</Text>
+          <Text>Distance: {result.provider.distanceKm} km</Text>
+          <Text>{result.provider.reasoning}</Text>
+
+          // Appointment
+          <Text>Booking: {result.appointment.bookingId}</Text>
+          <Text>Time: {result.appointment.timeDisplay}</Text>
+          <Text>Cost: {result.appointment.currency} {result.appointment.costPerHour}/hr</Text>
+
+          // Next steps — parsed as objects, not strings
+          {result.nextSteps.map((step) => (
+            <View key={step.step}>
+              <Text>{step.step}. {step.title}</Text>
+              <Text>{step.description}</Text>
+              {step.type === "action" && step.actionLabel && (
+                <Button title={step.actionLabel} onPress={() => {
+                  if (step.actionValue?.startsWith("+")) {
+                    // phone call
+                    Linking.openURL(`tel:${step.actionValue}`);
+                  }
+                }} />
+              )}
+            </View>
+          ))}
+
+          // Trace — for debug/agent log screen
+          {result.trace.map((t, i) => (
+            <Text key={i}>[{t.status}] {t.stage}: {t.message}</Text>
+          ))}
+        </View>
+      )}
+
+      {result && result.status === "unavailable" && (
+        <View>
+          <Text>{result.error?.message}</Text>
+          {result.nextSteps.map((step) => (
+            <Text key={step.step}>{step.title}: {step.description}</Text>
+          ))}
+        </View>
+      )}
+    </View>
+  );
+}
+
+*/
+

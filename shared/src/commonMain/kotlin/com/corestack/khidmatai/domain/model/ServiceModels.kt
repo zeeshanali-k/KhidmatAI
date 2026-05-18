@@ -12,6 +12,7 @@ data class ServiceResult(
     val appointment: Appointment?,
     val nextSteps: List<NextStep> = emptyList(),
     val trace: List<TraceItem> = emptyList(),
+    val followup: Followup? = null,
     val error: String? = null
 )
 
@@ -46,6 +47,13 @@ data class NextStep(
     val type: String, // action, info, warning
     val actionValue: String?,
     val actionLabel: String?
+)
+
+data class Followup(
+    val reminderScheduled: Boolean,
+    val reminderTimeDisplay: String?,
+    val statusUpdate: String?,
+    val completionConfirmation: Boolean
 )
 
 enum class AiOrbState {

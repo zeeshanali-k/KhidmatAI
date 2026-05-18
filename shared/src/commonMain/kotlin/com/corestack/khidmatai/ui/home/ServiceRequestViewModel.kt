@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.koin.android.annotation.KoinViewModel
+import org.koin.core.annotation.KoinViewModel
 
 @KoinViewModel
 class ServiceRequestViewModel(
@@ -19,12 +19,12 @@ class ServiceRequestViewModel(
     private val _uiState = MutableStateFlow(ServiceRequestState())
     val uiState: StateFlow<ServiceRequestState> = _uiState.asStateFlow()
 
-    fun handleIntent(intent: ServiceRequestIntent) {
-        when (intent) {
-            is ServiceRequestIntent.UpdateQuery -> _uiState.update { it.copy(query = intent.query) }
-            is ServiceRequestIntent.UpdateLocation -> _uiState.update { it.copy(location = intent.location) }
-            is ServiceRequestIntent.UpdateUrgency -> _uiState.update { it.copy(urgency = intent.urgency) }
-            is ServiceRequestIntent.UpdateLanguage -> _uiState.update { it.copy(selectedLanguage = intent.language) }
+    fun onAction(action: ServiceRequestIntent) {
+        when (action) {
+            is ServiceRequestIntent.UpdateQuery -> _uiState.update { it.copy(query = action.query) }
+            is ServiceRequestIntent.UpdateLocation -> _uiState.update { it.copy(location = action.location) }
+            is ServiceRequestIntent.UpdateUrgency -> _uiState.update { it.copy(urgency = action.urgency) }
+            is ServiceRequestIntent.UpdateLanguage -> _uiState.update { it.copy(selectedLanguage = action.language) }
             ServiceRequestIntent.SubmitRequest -> submitRequest()
             ServiceRequestIntent.Reset -> _uiState.update { it.copy(requestState = RequestState.Idle) }
         }
