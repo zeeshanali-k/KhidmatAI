@@ -34,6 +34,10 @@
     <string name="quick_electrician_query">بجلی کا مسئلہ ہے، الیکٹریشن چاہیے</string>
     <string name="quick_tutor">📚 ٹیوٹر</string>
     <string name="quick_tutor_query">بچے کے لیے ریاضی کا ٹیوٹر چاہیے</string>
+    <string name="quick_beautician">💅 بیوٹیشن</string>
+    <string name="quick_beautician_query">گھر پر بیوٹیشن چاہیے</string>
+    <string name="quick_carpenter">🪚 بڑھئی</string>
+    <string name="quick_carpenter_query">فرنیچر ٹھیک کرنے کے لیے بڑھئی چاہیے</string>
 
     <!-- Emergency Banner -->
     <string name="emergency_mode_title">ایمرجنسی موڈ ایکٹو</string>
@@ -83,6 +87,11 @@
     <string name="booking_detail_reminder_time">ریمائنڈر کا وقت: 09:30 AM</string>
     <string name="booking_detail_status_confirmed">سٹیٹس: بکنگ کنفرم ہو گئی</string>
     <string name="booking_detail_agent_log">🤖 AI ایجنٹ کی لاگ</string>
+    <string name="booking_detail_reminder_yes">ریمائنڈر سیٹ: ✅ ہاں</string>
+    <string name="booking_detail_reminder_no">ریمائنڈر سیٹ: ❌ نہیں</string>
+    <string name="booking_detail_ai_decision">🤖 کیوں چنا؟ (AI فیصلہ)</string>
+    <string name="booking_detail_appointment_details">📅 اپوائنٹمنٹ کی تفصیلات</string>
+    <string name="booking_detail_next_steps">اگلے اقدامات</string>
 
     <!-- Bottom Nav Bar -->
     <string name="nav_home">ہوم</string>

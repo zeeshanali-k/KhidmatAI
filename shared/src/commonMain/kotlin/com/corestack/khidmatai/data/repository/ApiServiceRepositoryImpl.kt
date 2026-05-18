@@ -111,6 +111,9 @@ class ApiServiceRepositoryImpl(
             trace = data.trace.map { t ->
                 TraceItem(t.stage, t.message, t.status)
             },
+            followup = data.followup?.let { f ->
+                Followup(f.reminderScheduled, f.reminderTimeDisplay, f.statusUpdate, f.completionConfirmation)
+            },
             error = data.error?.message
         )
     }

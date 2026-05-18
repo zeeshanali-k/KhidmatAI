@@ -15,12 +15,10 @@ import com.corestack.khidmatai.ui.components.AiOrbView
 import com.corestack.khidmatai.ui.home.ServiceRequestIntent
 import com.corestack.khidmatai.ui.home.ServiceRequestViewModel
 import com.corestack.khidmatai.ui.theme.*
-import khidmatai.shared.generated.resources.*
 import kotlinx.coroutines.delay
-import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
-private const val MOCK_TRANSCRIPTION = "Mujhe kal subah G-13 mein AC technician chahiye"
+private const val MOCK_TRANSCRIPTION = "I need an AC technician tomorrow morning at G-13"
 private const val WAVEFORM_BARS = 20
 
 @Composable
@@ -28,6 +26,7 @@ fun VoiceInputScreen(
     viewModel: ServiceRequestViewModel = koinViewModel(),
     onNavigateBack: () -> Unit
 ) {
+    val s = LocalAppStrings.current
     var elapsedSeconds by remember { mutableStateOf(0) }
     var isTranscribing by remember { mutableStateOf(false) }
 
@@ -50,7 +49,6 @@ fun VoiceInputScreen(
                 .padding(MaterialTheme.spacing.large),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Dismiss handle
             Box(
                 modifier = Modifier
                     .width(MaterialTheme.spacing.xxl)
@@ -61,39 +59,24 @@ fun VoiceInputScreen(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // Orb
             AiOrbView(state = AiOrbState.THINKING, size = 64.dp)
 
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
 
             if (isTranscribing) {
-                Text(
-                    stringResource(Res.string.voice_transcribing),
-                    style = AppTypography.titleLarge,
-                    color = Surface
-                )
+                Text(s.voiceTranscribing, style = AppTypography.titleLarge, color = Surface)
             } else {
-                Text(
-                    stringResource(Res.string.voice_title),
-                    style = AppTypography.titleLarge,
-                    color = Surface
-                )
+                Text(s.voiceTitle, style = AppTypography.titleLarge, color = Surface)
                 Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
-                Text(
-                    stringResource(Res.string.voice_subtitle),
-                    style = AppTypography.bodySmall,
-                    color = Surface.copy(alpha = 0.6f)
-                )
+                Text(s.voiceSubtitle, style = AppTypography.bodySmall, color = Surface.copy(alpha = 0.6f))
             }
 
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
 
-            // Animated waveform
             WaveformView()
 
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
 
-            // Recording timer
             val minutes = elapsedSeconds / 60
             val seconds = elapsedSeconds % 60
             Text(
@@ -104,7 +87,6 @@ fun VoiceInputScreen(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // Bottom action row
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium)
@@ -113,26 +95,16 @@ fun VoiceInputScreen(
                     onClick = onNavigateBack,
                     modifier = Modifier.weight(1f).height(MaterialTheme.spacing.extraLarge + MaterialTheme.spacing.medium)
                 ) {
-                    Text(
-                        stringResource(Res.string.voice_btn_cancel),
-                        color = Error,
-                        style = AppTypography.labelMedium
-                    )
+                    Text(s.voiceBtnCancel, color = Error, style = AppTypography.labelMedium)
                 }
-
                 Button(
-                    onClick = {
-                        isTranscribing = true
-                    },
+                    onClick = { isTranscribing = true },
                     enabled = !isTranscribing,
                     modifier = Modifier.weight(2f).height(MaterialTheme.spacing.extraLarge + MaterialTheme.spacing.medium),
                     shape = RoundedCornerShape(MaterialTheme.spacing.mediumSmall),
                     colors = ButtonDefaults.buttonColors(containerColor = Primary)
                 ) {
-                    Text(
-                        stringResource(Res.string.voice_btn_stop),
-                        style = AppTypography.labelMedium
-                    )
+                    Text(s.voiceBtnStop, style = AppTypography.labelMedium)
                 }
             }
 
@@ -140,7 +112,6 @@ fun VoiceInputScreen(
         }
     }
 
-    // Trigger transcription after isTranscribing flips true
     LaunchedEffect(isTranscribing) {
         if (isTranscribing) {
             delay(1000L)
@@ -158,10 +129,7 @@ private fun WaveformView() {
             initialValue = 8f,
             targetValue = 40f,
             animationSpec = infiniteRepeatable(
-                animation = tween(
-                    durationMillis = 400 + (index * 50) % 400,
-                    easing = FastOutSlowInEasing
-                ),
+                animation = tween(durationMillis = 400 + (index * 50) % 400, easing = FastOutSlowInEasing),
                 repeatMode = RepeatMode.Reverse,
                 initialStartOffset = StartOffset((index * 80) % 800)
             ),

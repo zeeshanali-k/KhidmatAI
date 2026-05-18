@@ -14,9 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import com.corestack.khidmatai.domain.model.TraceItem
 import com.corestack.khidmatai.ui.theme.*
-import khidmatai.shared.generated.resources.*
-import org.jetbrains.compose.resources.StringResource
-import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun TraceRowComponent(
@@ -24,13 +21,13 @@ fun TraceRowComponent(
     isLast: Boolean = false,
     modifier: Modifier = Modifier
 ) {
+    val s = LocalAppStrings.current
     Row(
         modifier = modifier
             .fillMaxWidth()
             .padding(vertical = MaterialTheme.spacing.small),
         verticalAlignment = Alignment.Top
     ) {
-        // Icon / Timeline column
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.width(MaterialTheme.spacing.extraLarge)
@@ -40,8 +37,8 @@ fun TraceRowComponent(
                 Spacer(modifier = Modifier.height(MaterialTheme.spacing.extraSmall))
                 Box(
                     modifier = Modifier
-                        .width(MaterialTheme.spacing.extraSmall / 4) // 1dp
-                        .height(MaterialTheme.spacing.extraLarge + MaterialTheme.spacing.extraSmall) // 36dp
+                        .width(MaterialTheme.spacing.extraSmall / 4)
+                        .height(MaterialTheme.spacing.extraLarge + MaterialTheme.spacing.extraSmall)
                         .background(Border)
                 )
             }
@@ -49,19 +46,25 @@ fun TraceRowComponent(
 
         Spacer(modifier = Modifier.width(MaterialTheme.spacing.mediumSmall))
 
-        // Content
         Column(modifier = Modifier.weight(1f)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                val stageText = translateStage(item.stage)
-                Text(
-                    text = stageText?.let { stringResource(it) } ?: item.stage,
-                    style = AppTypography.labelMedium,
-                    color = TextPrimary
-                )
+                val stageLabel = when (item.stage) {
+                    "intent_detection" -> s.traceIntent
+                    "llm_analysis" -> s.traceLlm
+                    "service_classification" -> s.traceService
+                    "urgency_classification" -> s.traceUrgency
+                    "provider_discovery" -> s.traceDiscovery
+                    "provider_ranking" -> s.traceRanking
+                    "provider_selection" -> s.traceSelection
+                    "booking_execution" -> s.traceExecution
+                    "followup" -> s.traceFollowup
+                    else -> item.stage
+                }
+                Text(text = stageLabel, style = AppTypography.labelMedium, color = TextPrimary)
                 if (item.status != "waiting") {
                     StatusBadge(
                         variant = when (item.status) {
@@ -74,11 +77,7 @@ fun TraceRowComponent(
                 }
             }
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.extraSmall))
-            Text(
-                text = item.message,
-                style = AppTypography.labelSmall, // Mono
-                color = TextSecondary
-            )
+            Text(text = item.message, style = AppTypography.labelSmall, color = TextSecondary)
         }
     }
 }
@@ -88,10 +87,7 @@ fun StatusIcon(status: String) {
     when (status) {
         "completed" -> {
             Box(
-                modifier = Modifier
-                    .size(MaterialTheme.spacing.large)
-                    .clip(CircleShape)
-                    .background(Success),
+                modifier = Modifier.size(MaterialTheme.spacing.large).clip(CircleShape).background(Success),
                 contentAlignment = Alignment.Center
             ) {
                 Text("✓", color = Surface, style = AppTypography.labelSmall)
@@ -109,24 +105,18 @@ fun StatusIcon(status: String) {
                 label = "alpha"
             )
             Box(
-                modifier = Modifier
-                    .size(MaterialTheme.spacing.large)
-                    .clip(CircleShape)
-                    .background(Primary.copy(alpha = alpha))
+                modifier = Modifier.size(MaterialTheme.spacing.large).clip(CircleShape).background(Primary.copy(alpha = alpha))
             )
         }
         "failed" -> {
             Box(
-                modifier = Modifier
-                    .size(MaterialTheme.spacing.large)
-                    .clip(CircleShape)
-                    .background(Error),
+                modifier = Modifier.size(MaterialTheme.spacing.large).clip(CircleShape).background(Error),
                 contentAlignment = Alignment.Center
             ) {
                 Text("✕", color = Surface, style = AppTypography.labelSmall)
             }
         }
-        else -> { // waiting
+        else -> {
             Box(
                 modifier = Modifier
                     .size(MaterialTheme.spacing.large)
@@ -136,17 +126,4 @@ fun StatusIcon(status: String) {
             )
         }
     }
-}
-
-fun translateStage(stage: String): StringResource? = when (stage) {
-    "intent_detection" -> Res.string.trace_intent
-    "llm_analysis" -> Res.string.trace_llm
-    "service_classification" -> Res.string.trace_service
-    "urgency_classification" -> Res.string.trace_urgency
-    "provider_discovery" -> Res.string.trace_discovery
-    "provider_ranking" -> Res.string.trace_ranking
-    "provider_selection" -> Res.string.trace_selection
-    "booking_execution" -> Res.string.trace_execution
-    "followup" -> Res.string.trace_followup
-    else -> null
 }

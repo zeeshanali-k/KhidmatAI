@@ -9,14 +9,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import com.corestack.khidmatai.ui.theme.*
-import khidmatai.shared.generated.resources.*
-import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun OnboardingScreen(
     onLocationGranted: () -> Unit,
     onSkip: () -> Unit
 ) {
+    val s = LocalAppStrings.current
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -25,7 +24,6 @@ fun OnboardingScreen(
             .padding(MaterialTheme.spacing.medium),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Top 40% Illustration (Mocked with Box for now)
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -40,7 +38,6 @@ fun OnboardingScreen(
             )
         }
 
-        // Middle
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -48,22 +45,11 @@ fun OnboardingScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                text = stringResource(Res.string.onboarding_title),
-                style = AppTypography.displayLarge,
-                color = TextPrimary,
-                textAlign = TextAlign.Center
-            )
+            Text(text = s.onboardingTitle, style = AppTypography.displayLarge, color = TextPrimary, textAlign = TextAlign.Center)
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
-            Text(
-                text = stringResource(Res.string.onboarding_desc),
-                style = AppTypography.bodyLarge,
-                color = TextSecondary,
-                textAlign = TextAlign.Center
-            )
+            Text(text = s.onboardingDesc, style = AppTypography.bodyLarge, color = TextSecondary, textAlign = TextAlign.Center)
         }
 
-        // Bottom
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -79,24 +65,19 @@ fun OnboardingScreen(
                 shape = RoundedCornerShape(MaterialTheme.spacing.mediumSmall),
                 colors = ButtonDefaults.buttonColors(containerColor = Primary)
             ) {
-                Text(stringResource(Res.string.onboarding_btn_location), color = Surface, style = AppTypography.labelMedium)
+                Text(s.onboardingBtnLocation, color = Surface, style = AppTypography.labelMedium)
             }
-            
+
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
-            
-            Text(
-                text = stringResource(Res.string.onboarding_privacy),
-                style = AppTypography.bodySmall,
-                color = TextSecondary,
-                textAlign = TextAlign.Center
-            )
-            
+
+            Text(text = s.onboardingPrivacy, style = AppTypography.bodySmall, color = TextSecondary, textAlign = TextAlign.Center)
+
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
-            
+
             TextButton(onClick = onSkip) {
-                Text(stringResource(Res.string.onboarding_skip), color = TextSecondary, style = AppTypography.labelMedium)
+                Text(s.onboardingSkip, color = TextSecondary, style = AppTypography.labelMedium)
             }
-            
+
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.extraLarge))
         }
     }

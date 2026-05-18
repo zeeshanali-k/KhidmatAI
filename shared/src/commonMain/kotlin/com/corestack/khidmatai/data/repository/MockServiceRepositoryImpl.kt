@@ -57,12 +57,18 @@ class MockServiceRepositoryImpl : ServiceRepository {
                 costPerHour = 1500, currency = "PKR"
             ),
             nextSteps = listOf(
-                NextStep(1, "Provider call karega", "Kamran Khan aapko 15 minutes ke andar call karega.", "action", "+923001234567", "Call Now"),
-                NextStep(2, "Jagah saaf karein", "Service ke liye relevant area clear karein.", "info", null, null),
-                NextStep(3, "Reminder mil jayega", "Appointment se 1 ghanta pehle (09:30 AM) aapko reminder milega.", "info", "09:30 AM", "Set Reminder"),
-                NextStep(4, "Booking track karein", "App mein apni booking ka real-time status dekh sakte hain.", "info", "BK-1747391234", "Track")
+                NextStep(1, "Provider will call", "Kamran Khan will call you within 15 minutes.", "action", "+923001234567", "Call Now"),
+                NextStep(2, "Clear the area", "Clear the relevant area for the service.", "info", null, null),
+                NextStep(3, "Reminder scheduled", "You will receive a reminder 1 hour before your appointment (09:30 AM).", "info", "09:30 AM", "Set Reminder"),
+                NextStep(4, "Track booking", "View your booking status in real-time in the app.", "info", "BK-1747391234", "Track")
             ),
-            trace = trace.toList()
+            trace = trace.toList(),
+            followup = Followup(
+                reminderScheduled = true,
+                reminderTimeDisplay = "09:30 AM",
+                statusUpdate = "Booking Confirmed",
+                completionConfirmation = false
+            )
         )
         
         emit(RequestState.Success(mockSuccessResponse))

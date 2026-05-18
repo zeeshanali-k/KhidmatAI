@@ -27,13 +27,13 @@ fun ProcessingScreen(
     onNavigateToSuccess: () -> Unit,
     onNavigateToUnavailable: () -> Unit
 ) {
+    val s = LocalAppStrings.current
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val requestState = state.requestState
 
     val isEmergency = state.urgency == "emergency"
     val backgroundColor = if (isEmergency) EmergencyBg else Background
-    
-    // Flash effect state
+
     var showFlash by remember { mutableStateOf(false) }
 
     LaunchedEffect(requestState) {
@@ -55,72 +55,54 @@ fun ProcessingScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.xxl))
-            
+
             AiOrbView(
                 state = if (requestState is RequestState.Success) AiOrbState.DONE else AiOrbState.THINKING,
                 size = MaterialTheme.spacing.xxl
             )
-            
+
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
-            
+
             Text(
-                text = if (isEmergency) "Emergency Request — Priority Processing 🚨" else "Agent chal raha hai...",
+                text = if (isEmergency) s.processingEmergencyTitle else s.processingTitle,
                 style = AppTypography.titleLarge,
                 color = if (isEmergency) Error else TextPrimary
             )
-            
-            Text(
-                text = "AI is orchestrating your request",
-                style = AppTypography.bodySmall,
-                color = TextSecondary
-            )
-            
+
+            Text(text = s.processingDesc, style = AppTypography.bodySmall, color = TextSecondary)
+
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.extraLarge))
-            
+
             val traces = if (requestState is RequestState.Processing) requestState.traces else emptyList()
             val completedCount = traces.count { it.status == "completed" }
             val totalCount = traces.size
             val progress = if (totalCount > 0) completedCount.toFloat() / totalCount.toFloat() else 0f
-            
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
+
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text("Stage $completedCount of $totalCount", style = AppTypography.bodySmall)
                 Text("${(progress * 100).toInt()}%", style = AppTypography.bodySmall)
             }
-            
+
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
-            
+
             LinearProgressIndicator(
                 progress = { progress },
                 modifier = Modifier.fillMaxWidth().height(MaterialTheme.spacing.small),
                 color = if (isEmergency) Error else Primary,
                 trackColor = Border
             )
-            
+
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.extraLarge))
-            
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth()
-            ) {
+
+            LazyColumn(modifier = Modifier.fillMaxWidth()) {
                 itemsIndexed(traces) { index, item ->
                     TraceRowComponent(item = item, isLast = index == traces.size - 1)
                 }
             }
         }
-        
-        // Full screen flash for success
-        AnimatedVisibility(
-            visible = showFlash,
-            enter = fadeIn(),
-            exit = fadeOut()
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Success.copy(alpha = 0.8f))
-            )
+
+        AnimatedVisibility(visible = showFlash, enter = fadeIn(), exit = fadeOut()) {
+            Box(modifier = Modifier.fillMaxSize().background(Success.copy(alpha = 0.8f)))
         }
     }
 }

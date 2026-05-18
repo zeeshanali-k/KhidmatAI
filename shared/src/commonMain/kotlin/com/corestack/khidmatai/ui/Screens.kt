@@ -25,3 +25,6 @@ data object Bookings
 
 @Serializable
 data object VoiceInput
+
+@Serializable
+data object Profile

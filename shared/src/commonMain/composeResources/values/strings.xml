@@ -8,7 +8,7 @@
     <string name="onboarding_skip">Skip for now</string>
 
     <!-- Home Screen -->
-    <string name="home_greeting">Assalam o Alaikum!</string>
+    <string name="home_greeting">Hello!</string>
     <string name="home_prompt">What do you need today?</string>
     <string name="home_search_hint">Write your requirement...</string>
     <string name="home_change_location">Change</string>
@@ -34,13 +34,17 @@
     <string name="quick_electrician_query">There is an electrical issue, need an electrician</string>
     <string name="quick_tutor">📚 Tutor</string>
     <string name="quick_tutor_query">Need a math tutor for kid</string>
+    <string name="quick_beautician">💅 Beautician</string>
+    <string name="quick_beautician_query">I need a beautician at home</string>
+    <string name="quick_carpenter">🪚 Carpenter</string>
+    <string name="quick_carpenter_query">Need a carpenter for furniture repair</string>
 
     <!-- Emergency Banner -->
     <string name="emergency_mode_title">Emergency Mode Active</string>
     <string name="emergency_mode_desc">Use only for genuine emergencies.</string>
 
     <!-- Processing Screen -->
-    <string name="processing_title">Agent is working...</string>
+    <string name="processing_title">Agent is running...</string>
     <string name="processing_emergency_title">Emergency Request — Priority Processing 🚨</string>
     <string name="processing_desc">AI is orchestrating your request</string>
 
@@ -83,6 +87,11 @@
     <string name="booking_detail_reminder_time">Reminder time: 09:30 AM</string>
     <string name="booking_detail_status_confirmed">Status: Booking Confirmed</string>
     <string name="booking_detail_agent_log">🤖 AI Agent Log</string>
+    <string name="booking_detail_reminder_yes">Reminder set: ✅ Yes</string>
+    <string name="booking_detail_reminder_no">Reminder set: ❌ No</string>
+    <string name="booking_detail_ai_decision">🤖 Why selected? (AI Decision)</string>
+    <string name="booking_detail_appointment_details">📅 Appointment Details</string>
+    <string name="booking_detail_next_steps">Next Steps</string>
 
     <!-- Bottom Nav Bar -->
     <string name="nav_home">Home</string>
@@ -97,8 +106,8 @@
     <string name="badge_emergency">Emergency</string>
 
     <!-- Voice Input Screen -->
-    <string name="voice_title">Bol kar batayein...</string>
-    <string name="voice_subtitle">Speak in Urdu, Roman Urdu, or English</string>
+    <string name="voice_title">Speak your request...</string>
+    <string name="voice_subtitle">Speak in Urdu or English</string>
     <string name="voice_btn_cancel">✕ Cancel</string>
     <string name="voice_btn_stop">⏹ Stop &amp; Use</string>
     <string name="voice_transcribing">Transcribing...</string>

@@ -3,14 +3,20 @@ package com.corestack.khidmatai.ui.home
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,9 +25,8 @@ import androidx.compose.ui.graphics.Color
 import com.corestack.khidmatai.domain.model.AiOrbState
 import com.corestack.khidmatai.domain.model.RequestState
 import com.corestack.khidmatai.ui.components.AiOrbView
+import com.corestack.khidmatai.ui.components.BottomNavBar
 import com.corestack.khidmatai.ui.theme.*
-import khidmatai.shared.generated.resources.*
-import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -29,8 +34,11 @@ fun HomeScreen(
     viewModel: ServiceRequestViewModel = koinViewModel(),
     onNavigateToProcessing: () -> Unit,
     onNavigateToBookings: () -> Unit,
-    onNavigateToVoice: () -> Unit = {}
+    onNavigateToVoice: () -> Unit = {},
+    onNavigateToProfile: () -> Unit = {},
+    onLanguageChange: (String) -> Unit = {}
 ) {
+    val s = LocalAppStrings.current
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(state.requestState) {
@@ -48,14 +56,16 @@ fun HomeScreen(
         topBar = {
             HomeAppBar(selectedLanguage = state.selectedLanguage) { newLang ->
                 viewModel.onAction(ServiceRequestIntent.UpdateLanguage(newLang))
+                onLanguageChange(newLang)
             }
         },
         bottomBar = {
-            com.corestack.khidmatai.ui.components.BottomNavBar(
+            BottomNavBar(
                 currentRoute = "home",
                 onNavigate = { route ->
-                    if (route == "bookings") {
-                        onNavigateToBookings()
+                    when (route) {
+                        "bookings" -> onNavigateToBookings()
+                        "profile" -> onNavigateToProfile()
                     }
                 }
             )
@@ -67,8 +77,8 @@ fun HomeScreen(
                 .padding(paddingValues)
                 .padding(MaterialTheme.spacing.medium)
         ) {
-            Text(stringResource(Res.string.home_greeting), style = AppTypography.titleLarge, color = TextPrimary)
-            Text(stringResource(Res.string.home_prompt), style = AppTypography.bodyLarge, color = TextSecondary)
+            Text(s.homeGreeting, style = AppTypography.titleLarge, color = TextPrimary)
+            Text(s.homePrompt, style = AppTypography.bodyLarge, color = TextSecondary)
 
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
 
@@ -85,35 +95,48 @@ fun HomeScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.padding(MaterialTheme.spacing.medium)) {
-                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopEnd) {
+
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small)
+                    ) {
+                        TextField(
+                            value = state.query,
+                            onValueChange = { viewModel.onAction(ServiceRequestIntent.UpdateQuery(it)) },
+                            placeholder = { Text(s.homeSearchHint) },
+                            colors = TextFieldDefaults.colors(
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent,
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent
+                            ),
+                            modifier = Modifier.fillMaxWidth().weight(1f)
+                        )
                         Text(
                             "🎤",
-                            modifier = Modifier.size(MaterialTheme.spacing.extraLarge + MaterialTheme.spacing.small).clickable { onNavigateToVoice() })
+                            modifier = Modifier
+                                .size(MaterialTheme.spacing.extraLarge + MaterialTheme.spacing.small)
+                                .clip(CircleShape)
+                                .clickable { onNavigateToVoice() }
+                        )
                     }
-                    TextField(
-                        value = state.query,
-                        onValueChange = { viewModel.onAction(ServiceRequestIntent.UpdateQuery(it)) },
-                        placeholder = { Text(stringResource(Res.string.home_search_hint)) },
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent
-                        ),
-                        modifier = Modifier.fillMaxWidth()
-                    )
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
+                        val counterColor = when {
+                            state.query.length >= 300 -> Error
+                            state.query.length >= 250 -> Warning
+                            else -> TextSecondary
+                        }
                         Text(
                             "${state.query.length} / 300",
                             style = AppTypography.bodySmall,
-                            color = TextSecondary
+                            color = counterColor
                         )
                         if (state.query.isNotEmpty()) {
                             Text(
-                                stringResource(Res.string.home_clear),
+                                s.homeClear,
                                 modifier = Modifier.clickable {
                                     viewModel.onAction(ServiceRequestIntent.UpdateQuery(""))
                                 },
@@ -133,34 +156,38 @@ fun HomeScreen(
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(MaterialTheme.spacing.medium))
                     .background(Surface)
-                    .border(MaterialTheme.spacing.extraSmall / 4, Border, RoundedCornerShape(MaterialTheme.spacing.medium))
+                    .border(
+                        MaterialTheme.spacing.extraSmall / 4,
+                        Border,
+                        RoundedCornerShape(MaterialTheme.spacing.medium)
+                    )
                     .padding(MaterialTheme.spacing.medium),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text("📍 ${state.location}", style = AppTypography.bodyLarge)
-                Text(stringResource(Res.string.home_change_location), color = Primary, style = AppTypography.labelMedium)
+                Text(s.homeChangeLocation, color = Primary, style = AppTypography.labelMedium)
             }
 
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
 
             // Urgency
-            Text(stringResource(Res.string.home_urgency_title), style = AppTypography.bodySmall, color = TextSecondary)
+            Text(s.homeUrgencyTitle, style = AppTypography.bodySmall, color = TextSecondary)
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
             val urgencies = listOf(
-                "low" to Res.string.urgency_low,
-                "medium" to Res.string.urgency_medium,
-                "high" to Res.string.urgency_high,
-                "emergency" to Res.string.urgency_emergency
+                "low" to s.urgencyLow,
+                "medium" to s.urgencyMedium,
+                "high" to s.urgencyHigh,
+                "emergency" to s.urgencyEmergency
             )
             LazyRow(horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small)) {
-                items(urgencies) { (key, labelRes) ->
+                items(urgencies) { (key, label) ->
                     val isSelected = state.urgency == key
                     val chipBgColor = if (isSelected) {
                         if (key == "emergency") Error else Primary
                     } else Surface
                     val textColor = if (isSelected) Surface else TextPrimary
-                    val border =
+                    val chipBorder =
                         if (!isSelected) Border else if (key == "emergency") Error else Primary
 
                     Box(
@@ -168,18 +195,16 @@ fun HomeScreen(
                             .height(MaterialTheme.spacing.extraLarge + MaterialTheme.spacing.extraSmall)
                             .clip(RoundedCornerShape(MaterialTheme.spacing.xxl))
                             .background(chipBgColor)
-                            .border(MaterialTheme.spacing.extraSmall / 4, border, RoundedCornerShape(MaterialTheme.spacing.xxl))
-                            .clickable {
-                                viewModel.onAction(
-                                    ServiceRequestIntent.UpdateUrgency(
-                                        key
-                                    )
-                                )
-                            }
+                            .border(
+                                MaterialTheme.spacing.extraSmall / 4,
+                                chipBorder,
+                                RoundedCornerShape(MaterialTheme.spacing.xxl)
+                            )
+                            .clickable { viewModel.onAction(ServiceRequestIntent.UpdateUrgency(key)) }
                             .padding(horizontal = MaterialTheme.spacing.medium),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(stringResource(labelRes), color = textColor, style = AppTypography.labelMedium)
+                        Text(label, color = textColor, style = AppTypography.labelMedium)
                     }
                 }
             }
@@ -187,33 +212,32 @@ fun HomeScreen(
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
 
             // Quick Chips
-            Text(stringResource(Res.string.home_quick_chips_title), style = AppTypography.bodySmall, color = TextSecondary)
+            Text(s.homeQuickChipsTitle, style = AppTypography.bodySmall, color = TextSecondary)
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
             val quickChips = listOf(
-                Res.string.quick_ac to Res.string.quick_ac_query,
-                Res.string.quick_plumber to Res.string.quick_plumber_query,
-                Res.string.quick_electrician to Res.string.quick_electrician_query,
-                Res.string.quick_tutor to Res.string.quick_tutor_query
+                s.quickAc to s.quickAcQuery,
+                s.quickPlumber to s.quickPlumberQuery,
+                s.quickElectrician to s.quickElectricianQuery,
+                s.quickTutor to s.quickTutorQuery,
+                s.quickBeautician to s.quickBeauticianQuery,
+                s.quickCarpenter to s.quickCarpenterQuery
             )
             LazyRow(horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small)) {
-                items(quickChips) { (labelRes, queryRes) ->
-                    val query = stringResource(queryRes)
+                items(quickChips) { (label, query) ->
                     Box(
                         modifier = Modifier
                             .height(MaterialTheme.spacing.extraLarge + MaterialTheme.spacing.small)
                             .clip(RoundedCornerShape(MaterialTheme.spacing.xxl))
-                            .border(MaterialTheme.spacing.extraSmall / 4, Border, RoundedCornerShape(MaterialTheme.spacing.xxl))
-                            .clickable {
-                                viewModel.onAction(
-                                    ServiceRequestIntent.UpdateQuery(
-                                        query
-                                    )
-                                )
-                            }
+                            .border(
+                                MaterialTheme.spacing.extraSmall / 4,
+                                Border,
+                                RoundedCornerShape(MaterialTheme.spacing.xxl)
+                            )
+                            .clickable { viewModel.onAction(ServiceRequestIntent.UpdateQuery(query)) }
                             .padding(horizontal = MaterialTheme.spacing.mediumSmall),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(stringResource(labelRes), style = AppTypography.labelMedium)
+                        Text(label, style = AppTypography.labelMedium)
                     }
                 }
             }
@@ -236,10 +260,10 @@ fun HomeScreen(
                 if (isSubmitting) {
                     AiOrbView(AiOrbState.THINKING, MaterialTheme.spacing.large)
                     Spacer(modifier = Modifier.width(MaterialTheme.spacing.small))
-                    Text(stringResource(Res.string.home_processing), style = AppTypography.labelMedium)
+                    Text(s.homeProcessing, style = AppTypography.labelMedium)
                 } else {
                     Text(
-                        if (isEmergency) stringResource(Res.string.home_btn_find_emergency) else stringResource(Res.string.home_btn_find_service),
+                        if (isEmergency) s.homeBtnFindEmergency else s.homeBtnFindService,
                         style = AppTypography.labelMedium
                     )
                 }
@@ -257,14 +281,17 @@ fun HomeAppBar(selectedLanguage: String, onLanguageSelected: (String) -> Unit) {
     ) {
         Text("KaamKaro", style = AppTypography.titleLarge, color = Primary)
 
-        // Language Toggle
         Row(
             modifier = Modifier
                 .clip(RoundedCornerShape(MaterialTheme.spacing.xxl))
                 .background(Surface)
-                .border(MaterialTheme.spacing.extraSmall / 4, Border, RoundedCornerShape(MaterialTheme.spacing.xxl))
+                .border(
+                    MaterialTheme.spacing.extraSmall / 4,
+                    Border,
+                    RoundedCornerShape(MaterialTheme.spacing.xxl)
+                )
         ) {
-            listOf("EN", "اردو").forEach { lang ->
+            remember { listOf("EN", "اردو") }.forEach { lang ->
                 val isSelected = selectedLanguage == lang
                 Box(
                     modifier = Modifier
@@ -287,22 +314,30 @@ fun HomeAppBar(selectedLanguage: String, onLanguageSelected: (String) -> Unit) {
 
 @Composable
 fun EmergencyBanner() {
+    val s = LocalAppStrings.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(MaterialTheme.spacing.small))
             .background(ErrorLight)
-            .border(MaterialTheme.spacing.extraSmall / 4, Border, RoundedCornerShape(MaterialTheme.spacing.small))
-            .padding(MaterialTheme.spacing.mediumSmall)
+            .drawBehind {
+                drawRect(
+                    color = Error,
+                    topLeft = Offset.Zero,
+                    size = Size(4.dp.toPx(), size.height)
+                )
+            }
+            .padding(
+                start = MaterialTheme.spacing.medium,
+                top = MaterialTheme.spacing.mediumSmall,
+                end = MaterialTheme.spacing.mediumSmall,
+                bottom = MaterialTheme.spacing.mediumSmall
+            )
     ) {
         Text("⚠️", modifier = Modifier.padding(end = MaterialTheme.spacing.small))
         Column {
-            Text(stringResource(Res.string.emergency_mode_title), style = AppTypography.labelMedium, color = Error)
-            Text(
-                stringResource(Res.string.emergency_mode_desc),
-                style = AppTypography.bodySmall,
-                color = Error
-            )
+            Text(s.emergencyModeTitle, style = AppTypography.labelMedium, color = Error)
+            Text(s.emergencyModeDesc, style = AppTypography.bodySmall, color = Error)
         }
     }
 }

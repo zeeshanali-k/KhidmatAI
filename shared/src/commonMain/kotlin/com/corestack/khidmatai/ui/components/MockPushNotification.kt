@@ -13,14 +13,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.corestack.khidmatai.ui.theme.*
-import khidmatai.shared.generated.resources.*
-import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun MockPushNotification(
     visible: Boolean,
     onTap: () -> Unit
 ) {
+    val s = LocalAppStrings.current
     AnimatedVisibility(
         visible = visible,
         enter = slideInVertically { -it } + fadeIn(),
@@ -46,7 +45,6 @@ fun MockPushNotification(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.mediumSmall)
             ) {
-                // App icon
                 Box(
                     modifier = Modifier
                         .size(MaterialTheme.spacing.extraLarge)
@@ -58,24 +56,11 @@ fun MockPushNotification(
                 }
 
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        stringResource(Res.string.notif_app_name),
-                        style = AppTypography.labelMedium,
-                        color = TextPrimary
-                    )
-                    Text(
-                        stringResource(Res.string.notif_message),
-                        style = AppTypography.bodySmall,
-                        color = TextSecondary,
-                        maxLines = 2
-                    )
+                    Text(s.notifAppName, style = AppTypography.labelMedium, color = TextPrimary)
+                    Text(s.notifMessage, style = AppTypography.bodySmall, color = TextSecondary, maxLines = 2)
                 }
 
-                Text(
-                    stringResource(Res.string.notif_time),
-                    style = AppTypography.bodySmall,
-                    color = TextSecondary
-                )
+                Text(s.notifTime, style = AppTypography.bodySmall, color = TextSecondary)
             }
         }
     }

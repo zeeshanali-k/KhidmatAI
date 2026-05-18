@@ -12,18 +12,26 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.corestack.khidmatai.domain.model.RequestState
 import com.corestack.khidmatai.ui.components.BadgeVariant
 import com.corestack.khidmatai.ui.components.BottomNavBar
 import com.corestack.khidmatai.ui.components.StatusBadge
+import com.corestack.khidmatai.ui.home.ServiceRequestViewModel
 import com.corestack.khidmatai.ui.theme.*
-import khidmatai.shared.generated.resources.*
-import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun BookingsScreen(
+    viewModel: ServiceRequestViewModel = koinViewModel(),
     onNavigate: (String) -> Unit,
     onBookingClick: (String) -> Unit
 ) {
+    val s = LocalAppStrings.current
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val activeResult = (state.requestState as? RequestState.Success)?.result
+    var selectedFilter by remember { mutableStateOf("all") }
+
     Scaffold(
         modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.systemBars),
         containerColor = Background,
@@ -32,28 +40,67 @@ fun BookingsScreen(
         }
     ) { paddingValues ->
         Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
-            Text(stringResource(Res.string.bookings_title), style = AppTypography.displayLarge, modifier = Modifier.padding(MaterialTheme.spacing.medium))
-            
-            // Filters
-            Row(modifier = Modifier.fillMaxWidth().padding(horizontal = MaterialTheme.spacing.medium), horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium)) {
-                Text(stringResource(Res.string.bookings_filter_all), color = Primary, style = AppTypography.labelMedium)
-                Text(stringResource(Res.string.bookings_filter_upcoming), color = TextSecondary, style = AppTypography.labelMedium)
-                Text(stringResource(Res.string.bookings_filter_completed), color = TextSecondary, style = AppTypography.labelMedium)
-            }
-            
-            Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
-            
-            LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                item {
-                    BookingListItem(
-                        service = "AC Technician",
-                        providerName = "Kamran Khan",
-                        rating = 4.7f,
-                        time = "10:30 AM, 17 May",
-                        location = "G-13, Islamabad",
-                        status = BadgeVariant.UPCOMING,
-                        onClick = { onBookingClick("BK-1747391234") }
+            Text(s.bookingsTitle, style = AppTypography.displayLarge, modifier = Modifier.padding(MaterialTheme.spacing.medium))
+
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = MaterialTheme.spacing.medium),
+                horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium)
+            ) {
+                listOf(
+                    "all" to s.bookingsFilterAll,
+                    "upcoming" to s.bookingsFilterUpcoming,
+                    "completed" to s.bookingsFilterCompleted
+                ).forEach { (key, label) ->
+                    Text(
+                        label,
+                        color = if (selectedFilter == key) Primary else TextSecondary,
+                        style = AppTypography.labelMedium,
+                        modifier = Modifier.clickable { selectedFilter = key }
                     )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
+
+            LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                if (activeResult != null) {
+                    item {
+                        BookingListItem(
+                            service = activeResult.detectedService
+                                ?.replace("_", " ")
+                                ?.replaceFirstChar { it.uppercase() } ?: "Service",
+                            providerName = activeResult.provider?.name ?: "Unknown",
+                            rating = activeResult.provider?.rating ?: 0f,
+                            time = activeResult.appointment?.timeDisplay ?: "",
+                            location = activeResult.appointment?.address ?: "",
+                            status = BadgeVariant.UPCOMING,
+                            onClick = { activeResult.bookingId?.let { onBookingClick(it) } }
+                        )
+                    }
+                } else {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(MaterialTheme.spacing.xxl),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text("📋", style = AppTypography.displayLarge)
+                                Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
+                                Text(s.bookingsEmptyTitle, style = AppTypography.titleLarge, color = TextPrimary)
+                                Text(s.bookingsEmptyDesc, style = AppTypography.bodyLarge, color = TextSecondary)
+                                Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
+                                Button(
+                                    onClick = { onNavigate("home") },
+                                    colors = ButtonDefaults.buttonColors(containerColor = Primary),
+                                    shape = RoundedCornerShape(MaterialTheme.spacing.mediumSmall)
+                                ) {
+                                    Text(s.bookingsEmptyBtn, color = Surface, style = AppTypography.labelMedium)
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -74,7 +121,10 @@ fun BookingListItem(
         shape = RoundedCornerShape(MaterialTheme.spacing.mediumSmall),
         colors = CardDefaults.cardColors(containerColor = Surface),
         border = BorderStroke(MaterialTheme.spacing.extraSmall / 4, Border),
-        modifier = Modifier.fillMaxWidth().padding(horizontal = MaterialTheme.spacing.medium, vertical = MaterialTheme.spacing.small).clickable { onClick() }
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = MaterialTheme.spacing.medium, vertical = MaterialTheme.spacing.small)
+            .clickable { onClick() }
     ) {
         Row(modifier = Modifier.padding(MaterialTheme.spacing.medium), verticalAlignment = Alignment.CenterVertically) {
             Box(

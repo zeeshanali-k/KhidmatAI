@@ -8,8 +8,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.corestack.khidmatai.ui.theme.*
-import khidmatai.shared.generated.resources.*
-import org.jetbrains.compose.resources.stringResource
 
 enum class BadgeVariant {
     COMPLETED, PENDING, FAILED, UPCOMING, EMERGENCY
@@ -20,6 +18,7 @@ fun StatusBadge(
     variant: BadgeVariant,
     modifier: Modifier = Modifier
 ) {
+    val s = LocalAppStrings.current
     val bgColor = when (variant) {
         BadgeVariant.COMPLETED -> Success
         BadgeVariant.PENDING -> Warning
@@ -27,17 +26,16 @@ fun StatusBadge(
         BadgeVariant.UPCOMING -> Primary
         BadgeVariant.EMERGENCY -> Error
     }
-
-    val textRes = when (variant) {
-        BadgeVariant.COMPLETED -> Res.string.badge_completed
-        BadgeVariant.PENDING -> Res.string.badge_pending
-        BadgeVariant.FAILED -> Res.string.badge_failed
-        BadgeVariant.UPCOMING -> Res.string.badge_upcoming
-        BadgeVariant.EMERGENCY -> Res.string.badge_emergency
+    val label = when (variant) {
+        BadgeVariant.COMPLETED -> s.badgeCompleted
+        BadgeVariant.PENDING -> s.badgePending
+        BadgeVariant.FAILED -> s.badgeFailed
+        BadgeVariant.UPCOMING -> s.badgeUpcoming
+        BadgeVariant.EMERGENCY -> s.badgeEmergency
     }
 
     Text(
-        text = stringResource(textRes),
+        text = label,
         color = Surface,
         style = AppTypography.labelMedium,
         modifier = modifier
