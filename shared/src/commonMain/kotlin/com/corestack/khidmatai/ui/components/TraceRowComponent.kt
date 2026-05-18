@@ -24,7 +24,7 @@ fun TraceRowComponent(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp),
-        crossAxisAlignment = Alignment.Top
+        verticalAlignment = Alignment.Top
     ) {
         // Icon / Timeline
         Column(

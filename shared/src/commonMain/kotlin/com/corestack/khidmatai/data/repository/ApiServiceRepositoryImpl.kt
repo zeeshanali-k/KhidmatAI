@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.koin.core.annotation.Single
 
-@Single
 class ApiServiceRepositoryImpl(
     private val httpClient: HttpClient
 ) : ServiceRepository {

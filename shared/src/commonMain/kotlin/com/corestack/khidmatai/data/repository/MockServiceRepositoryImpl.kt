@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.koin.core.annotation.Single
 
-@Single
 class MockServiceRepositoryImpl : ServiceRepository {
     override fun submitRequest(query: String, location: String, urgency: String): Flow<RequestState> = flow {
         // Initial mock trace

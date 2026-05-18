@@ -1,6 +1,5 @@
 package com.corestack.khidmatai
 
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
@@ -9,7 +8,12 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.corestack.khidmatai.ui.Home
 import com.corestack.khidmatai.ui.Onboarding
+import com.corestack.khidmatai.ui.bookings.BookingDetailScreen
+import com.corestack.khidmatai.ui.bookings.BookingsScreen
+import com.corestack.khidmatai.ui.home.HomeScreen
 import com.corestack.khidmatai.ui.onboarding.OnboardingScreen
+import com.corestack.khidmatai.ui.processing.ProcessingScreen
+import com.corestack.khidmatai.ui.result.ResultSuccessScreen
 import com.corestack.khidmatai.ui.theme.AppTheme
 
 @Composable
@@ -39,7 +43,7 @@ fun App() {
             }
 
             composable<Home> {
-                com.corestack.khidmatai.ui.home.HomeScreen(
+                HomeScreen(
                     onNavigateToProcessing = {
                         navController.navigate(com.corestack.khidmatai.ui.Processing)
                     },
@@ -50,7 +54,7 @@ fun App() {
             }
             
             composable<com.corestack.khidmatai.ui.Processing> {
-                com.corestack.khidmatai.ui.processing.ProcessingScreen(
+                ProcessingScreen(
                     onNavigateToSuccess = {
                         navController.navigate(com.corestack.khidmatai.ui.ResultSuccess) {
                             popUpTo(Home) { inclusive = false }
@@ -65,7 +69,7 @@ fun App() {
             }
             
             composable<com.corestack.khidmatai.ui.ResultSuccess> {
-                com.corestack.khidmatai.ui.result.ResultSuccessScreen(
+                ResultSuccessScreen(
                     onViewBookingDetails = { bookingId ->
                         navController.navigate(com.corestack.khidmatai.ui.BookingDetail(bookingId))
                     },
@@ -79,7 +83,7 @@ fun App() {
             
             composable<com.corestack.khidmatai.ui.BookingDetail> { backStackEntry ->
                 val bookingDetail = backStackEntry.toRoute<com.corestack.khidmatai.ui.BookingDetail>()
-                com.corestack.khidmatai.ui.bookings.BookingDetailScreen(
+                BookingDetailScreen(
                     bookingId = bookingDetail.bookingId,
                     onBack = {
                         navController.popBackStack()
@@ -88,7 +92,7 @@ fun App() {
             }
             
             composable<com.corestack.khidmatai.ui.Bookings> {
-                com.corestack.khidmatai.ui.bookings.BookingsScreen(
+                BookingsScreen(
                     onNavigate = { route ->
                         if (route == "home") {
                             navController.navigate(Home) {
