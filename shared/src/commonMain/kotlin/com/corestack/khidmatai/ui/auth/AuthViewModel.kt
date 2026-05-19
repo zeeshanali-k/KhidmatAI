@@ -20,6 +20,8 @@ class AuthViewModel(
     private val _uiState = MutableStateFlow(AuthUiState())
     val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
 
+    val lastEmail: String get() = repository.getLastEmail()
+
     fun onAction(action: AuthIntent) {
         when (action) {
             is AuthIntent.Login -> login(action.email, action.password)
@@ -33,7 +35,9 @@ class AuthViewModel(
         viewModelScope.launch {
             repository.login(email, password).collect { result ->
                 when (result) {
-                    is AuthResult.Success -> _uiState.update { it.copy(authState = AuthState.Success(result.user)) }
+                    is AuthResult.Success -> {
+                        _uiState.update { it.copy(authState = AuthState.Success(result.user)) }
+                    }
                     is AuthResult.Error -> _uiState.update { it.copy(authState = AuthState.Error(result.message)) }
                 }
             }
@@ -45,7 +49,9 @@ class AuthViewModel(
         viewModelScope.launch {
             repository.register(name, email, password).collect { result ->
                 when (result) {
-                    is AuthResult.Success -> _uiState.update { it.copy(authState = AuthState.Success(result.user)) }
+                    is AuthResult.Success -> {
+                        _uiState.update { it.copy(authState = AuthState.Success(result.user)) }
+                    }
                     is AuthResult.Error -> _uiState.update { it.copy(authState = AuthState.Error(result.message)) }
                 }
             }

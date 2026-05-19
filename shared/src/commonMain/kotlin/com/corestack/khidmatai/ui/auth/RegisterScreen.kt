@@ -27,7 +27,7 @@ fun RegisterScreen(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     var name by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf(viewModel.lastEmail) }
     var password by remember { mutableStateOf("") }
 
     LaunchedEffect(state.authState) {

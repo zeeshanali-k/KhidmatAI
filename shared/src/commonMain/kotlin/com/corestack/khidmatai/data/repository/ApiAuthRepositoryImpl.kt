@@ -6,6 +6,7 @@ import com.corestack.khidmatai.data.dto.RegisterRequest
 import com.corestack.khidmatai.domain.model.AuthResult
 import com.corestack.khidmatai.domain.model.AuthUser
 import com.corestack.khidmatai.domain.repository.AuthRepository
+import com.corestack.khidmatai.domain.preferences.AppPreferences
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.post
@@ -18,8 +19,12 @@ import kotlinx.coroutines.flow.flow
 private const val BASE_URL = "http://10.0.2.2:8000"
 
 class ApiAuthRepositoryImpl(
-    private val httpClient: HttpClient
+    private val httpClient: HttpClient,
+    private val appPreferences: AppPreferences
 ) : AuthRepository {
+
+    override fun getLastEmail(): String = appPreferences.lastEmail
+    override fun isLoggedIn(): Boolean = appPreferences.isLoggedIn
 
     override fun login(email: String, password: String): Flow<AuthResult> = flow {
         try {
@@ -30,7 +35,10 @@ class ApiAuthRepositoryImpl(
             }.body()
 
             if (response.success && response.data != null) {
-                emit(AuthResult.Success(AuthUser(response.data.id, response.data.name, response.data.email, response.data.token)))
+                val user = AuthUser(response.data.id, response.data.name, response.data.email, response.data.token)
+                appPreferences.authToken = user.token
+                appPreferences.lastEmail = user.email
+                emit(AuthResult.Success(user))
             } else {
                 emit(AuthResult.Error(response.error ?: "Login failed"))
             }
@@ -48,7 +56,10 @@ class ApiAuthRepositoryImpl(
             }.body()
 
             if (response.success && response.data != null) {
-                emit(AuthResult.Success(AuthUser(response.data.id, response.data.name, response.data.email, response.data.token)))
+                val user = AuthUser(response.data.id, response.data.name, response.data.email, response.data.token)
+                appPreferences.authToken = user.token
+                appPreferences.lastEmail = user.email
+                emit(AuthResult.Success(user))
             } else {
                 emit(AuthResult.Error(response.error ?: "Registration failed"))
             }

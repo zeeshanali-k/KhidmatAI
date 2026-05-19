@@ -31,6 +31,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.corestack.khidmatai.domain.location.LocationService
 import com.corestack.khidmatai.domain.model.LocationPermissionStatus
+import com.corestack.khidmatai.domain.repository.AuthRepository
 import com.corestack.khidmatai.ui.theme.AppTypography
 import com.corestack.khidmatai.ui.theme.Background
 import com.corestack.khidmatai.ui.theme.Primary
@@ -46,9 +47,11 @@ import org.koin.compose.koinInject
 @Composable
 fun SplashScreen(
     onNavigateToHome: () -> Unit,
+    onNavigateToLogin: () -> Unit,
     onNavigateToOnboarding: () -> Unit
 ) {
     val locationService = koinInject<LocationService>()
+    val authRepository = koinInject<AuthRepository>()
 
     // --- Animation state ---
     val logoScale = remember { Animatable(0f) }
@@ -81,7 +84,11 @@ fun SplashScreen(
             checked = true
             val status = locationService.checkPermission()
             if (status == LocationPermissionStatus.GRANTED) {
-                onNavigateToHome()
+                if (authRepository.isLoggedIn()) {
+                    onNavigateToHome()
+                } else {
+                    onNavigateToLogin()
+                }
             } else {
                 onNavigateToOnboarding()
             }

@@ -45,6 +45,9 @@ import com.corestack.khidmatai.ui.theme.LocalAppStrings
 import com.corestack.khidmatai.ui.theme.UrduStrings
 import com.corestack.khidmatai.ui.splash.SplashScreen
 import com.corestack.khidmatai.ui.voice.VoiceInputScreen
+import com.corestack.khidmatai.domain.location.LocationService
+import com.corestack.khidmatai.domain.repository.SettingsRepository
+import org.koin.compose.KoinContext
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -52,12 +55,14 @@ import org.koin.compose.viewmodel.koinViewModel
 @Preview
 fun App() {
     AppTheme {
-        var selectedLanguage by remember { mutableStateOf("EN") }
+        val locationPreferences = koinInject<LocationPreferences>()
+        val settingsRepository = koinInject<SettingsRepository>()
+        
+        var selectedLanguage by remember { mutableStateOf(settingsRepository.language) }
         val strings = when (selectedLanguage) {
             "اردو" -> UrduStrings
             else -> EnglishStrings
         }
-        val locationPreferences = koinInject<LocationPreferences>()
 
         CompositionLocalProvider(LocalAppStrings provides strings) {
             val navController = rememberNavController()
@@ -69,6 +74,11 @@ fun App() {
                 composable<Splash> {
                     SplashScreen(
                         onNavigateToHome = {
+                            navController.navigate(Home) {
+                                popUpTo(Splash) { inclusive = true }
+                            }
+                        },
+                        onNavigateToLogin = {
                             navController.navigate(Login) {
                                 popUpTo(Splash) { inclusive = true }
                             }
@@ -142,7 +152,10 @@ fun App() {
                         onNavigateToLocationPicker = {
                             navController.navigate(LocationPicker)
                         },
-                        onLanguageChange = { selectedLanguage = it }
+                        onLanguageChange = { 
+                            selectedLanguage = it 
+                            settingsRepository.language = it
+                        }
                     )
                 }
 
