@@ -32,62 +32,65 @@ fun DashboardScreen(navController: NavController) {
             )
         }
 
-        when (val s = state) {
-            is com.corestack.khidmatai.core.domain.model.AdminState.Loading -> item { LoadingBox(Modifier.height(200.dp)) }
-            is com.corestack.khidmatai.core.domain.model.AdminState.Error -> item { ErrorBox(s.message, onRetry = vm::load) }
-            is com.corestack.khidmatai.core.domain.model.AdminState.Success -> {
-                val data = s.data
+        val s = state
+        if (s is AdminState.Loading) {
+            item { LoadingBox(Modifier.height(200.dp)) }
+        }
+        if (s is AdminState.Error) {
+            item { ErrorBox(s.message, onRetry = vm::load) }
+        }
+        if (s is AdminState.Success) {
+            val data = s.data
 
-                item {
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                        StatCard("Total Bookings", data.totalBookings.toString(), Modifier.weight(1f))
-                        StatCard("Active Providers", data.activeProviders.toString(), Modifier.weight(1f))
-                        StatCard("Total Requests", data.totalRequests.toString(), Modifier.weight(1f))
-                    }
+            item {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    StatCard("Total Bookings", data.totalBookings.toString(), Modifier.weight(1f))
+                    StatCard("Active Providers", data.activeProviders.toString(), Modifier.weight(1f))
+                    StatCard("Total Requests", data.totalRequests.toString(), Modifier.weight(1f))
                 }
+            }
 
-                item {
-                    Text("Recent Bookings", color = TextPrimary, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
-                }
+            item {
+                Text("Recent Bookings", color = TextPrimary, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+            }
 
-                if (data.recentBookings.isEmpty()) {
-                    item { Text("No bookings yet.", color = TextSecondary, fontSize = 13.sp) }
-                } else {
-                    items(data.recentBookings) { booking ->
-                        AdminCard(Modifier.fillMaxWidth()) {
-                            Row(
-                                Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Column {
-                                    Text(booking.id, color = TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.Medium)
-                                    Text(booking.serviceType, color = TextSecondary, fontSize = 12.sp)
-                                }
-                                StatusChip(booking.status)
+            if (data.recentBookings.isEmpty()) {
+                item { Text("No bookings yet.", color = TextSecondary, fontSize = 13.sp) }
+            } else {
+                items(data.recentBookings) { booking ->
+                    AdminCard(Modifier.fillMaxWidth()) {
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Column {
+                                Text(booking.id, color = TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.Medium)
+                                Text(booking.serviceType, color = TextSecondary, fontSize = 12.sp)
                             }
+                            StatusChip(booking.status)
                         }
                     }
                 }
+            }
 
-                item {
-                    Text("Recent Requests", color = TextPrimary, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
-                }
+            item {
+                Text("Recent Requests", color = TextPrimary, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+            }
 
-                if (data.recentRequests.isEmpty()) {
-                    item { Text("No requests yet.", color = TextSecondary, fontSize = 13.sp) }
-                } else {
-                    items(data.recentRequests) { req ->
-                        AdminCard(Modifier.fillMaxWidth()) {
-                            Row(
-                                Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Column(Modifier.weight(1f)) {
-                                    Text(req.rawQuery, color = TextPrimary, fontSize = 13.sp, maxLines = 1)
-                                    Text(req.userId, color = TextSecondary, fontSize = 12.sp)
-                                }
-                                StatusChip(req.status)
+            if (data.recentRequests.isEmpty()) {
+                item { Text("No requests yet.", color = TextSecondary, fontSize = 13.sp) }
+            } else {
+                items(data.recentRequests) { req ->
+                    AdminCard(Modifier.fillMaxWidth()) {
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Column(Modifier.weight(1f)) {
+                                Text(req.rawQuery, color = TextPrimary, fontSize = 13.sp, maxLines = 1)
+                                Text(req.userId, color = TextSecondary, fontSize = 12.sp)
                             }
+                            StatusChip(req.status)
                         }
                     }
                 }

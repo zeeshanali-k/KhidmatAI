@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.corestack.khidmatai.admin.AdminRoute
 import com.corestack.khidmatai.admin.ui.components.*
 import com.corestack.khidmatai.core.domain.model.AdminProvider
 import com.corestack.khidmatai.core.domain.model.AdminState
@@ -34,26 +35,29 @@ fun ProvidersScreen(navController: NavController) {
                 title = "Providers",
                 subtitle = "Manage service providers",
                 action = {
-                    PrimaryButton("+ Add Provider", onClick = { navController.navigate("providers/new") })
+                    PrimaryButton("+ Add Provider", onClick = { navController.navigate(AdminRoute.ProviderCreate) })
                 }
             )
         }
 
-        when (val s = state) {
-            is com.corestack.khidmatai.core.domain.model.AdminState.Loading -> item { LoadingBox(Modifier.height(200.dp)) }
-            is com.corestack.khidmatai.core.domain.model.AdminState.Error -> item { ErrorBox(s.message, onRetry = vm::loadAll) }
-            is com.corestack.khidmatai.core.domain.model.AdminState.Success -> {
-                if (s.data.isEmpty()) {
-                    item { Text("No providers found.", color = TextSecondary, fontSize = 13.sp) }
-                } else {
-                    items(s.data) { provider ->
-                        ProviderCard(
-                            provider = provider,
-                            onEdit = { navController.navigate("providers/${provider.id}/edit") },
-                            onDelete = { vm.delete(provider.id) },
-                            onToggle = { vm.toggleAvailability(provider.id) }
-                        )
-                    }
+        val s = state
+        if (s is AdminState.Loading) {
+            item { LoadingBox(Modifier.height(200.dp)) }
+        }
+        if (s is AdminState.Error) {
+            item { ErrorBox(s.message, onRetry = vm::loadAll) }
+        }
+        if (s is AdminState.Success) {
+            if (s.data.isEmpty()) {
+                item { Text("No providers found.", color = TextSecondary, fontSize = 13.sp) }
+            } else {
+                items(s.data) { provider ->
+                    ProviderCard(
+                        provider = provider,
+                        onEdit = { navController.navigate(AdminRoute.ProviderEdit(provider.id)) },
+                        onDelete = { vm.delete(provider.id) },
+                        onToggle = { vm.toggleAvailability(provider.id) }
+                    )
                 }
             }
         }
@@ -62,7 +66,7 @@ fun ProvidersScreen(navController: NavController) {
 
 @Composable
 private fun ProviderCard(
-    provider: com.corestack.khidmatai.core.domain.model.AdminProvider,
+    provider: AdminProvider,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
     onToggle: () -> Unit

@@ -34,17 +34,20 @@ fun BookingsScreen(navController: NavController) {
             )
         }
 
-        when (val s = state) {
-            is com.corestack.khidmatai.core.domain.model.AdminState.Loading -> item { LoadingBox(Modifier.height(200.dp)) }
-            is com.corestack.khidmatai.core.domain.model.AdminState.Error -> item { ErrorBox(s.message, onRetry = vm::loadAll) }
-            is com.corestack.khidmatai.core.domain.model.AdminState.Success -> {
-                if (s.data.isEmpty()) {
-                    item { Text("No bookings found.", color = TextSecondary, fontSize = 13.sp) }
-                } else {
-                    items(s.data) { booking ->
-                        BookingRow(booking) {
-                            navController.navigate("bookings/${booking.id}")
-                        }
+        val s = state
+        if (s is AdminState.Loading) {
+            item { LoadingBox(Modifier.height(200.dp)) }
+        }
+        if (s is AdminState.Error) {
+            item { ErrorBox(s.message, onRetry = vm::loadAll) }
+        }
+        if (s is AdminState.Success) {
+            if (s.data.isEmpty()) {
+                item { Text("No bookings found.", color = TextSecondary, fontSize = 13.sp) }
+            } else {
+                items(s.data) { booking ->
+                    BookingRow(booking) {
+                        navController.navigate(AdminRoute.BookingDetail(booking.id))
                     }
                 }
             }
@@ -53,7 +56,7 @@ fun BookingsScreen(navController: NavController) {
 }
 
 @Composable
-private fun BookingRow(booking: com.corestack.khidmatai.core.domain.model.AdminBooking, onClick: () -> Unit) {
+private fun BookingRow(booking: AdminBooking, onClick: () -> Unit) {
     AdminCard(
         modifier = Modifier.fillMaxWidth().clickable(onClick = onClick)
     ) {

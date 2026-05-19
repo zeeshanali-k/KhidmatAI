@@ -1,6 +1,8 @@
 package com.corestack.khidmatai.admin.di
 
 import com.corestack.khidmatai.core.data.repository.ApiAdminRepositoryImpl
+import com.corestack.khidmatai.core.data.repository.MockAdminRepositoryImpl
+import com.corestack.khidmatai.core.domain.AppEnvironment
 import com.corestack.khidmatai.core.domain.repository.AdminRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -19,6 +21,9 @@ import org.koin.core.annotation.Single
 class KhidamatAIAdminModule {
 
     @Single
+    fun provideEnvironment(): AppEnvironment = AppEnvironment.DEV
+
+    @Single
     fun provideHttpClient(): HttpClient = HttpClient {
         install(ContentNegotiation) {
             json(Json {
@@ -34,8 +39,15 @@ class KhidamatAIAdminModule {
     }
 
     @Single
-    fun provideAdminRepository(httpClient: HttpClient): AdminRepository =
-        ApiAdminRepositoryImpl(httpClient)
+    fun provideAdminRepository(
+        env: AppEnvironment,
+        httpClient: HttpClient
+    ): AdminRepository {
+        return when (env) {
+            AppEnvironment.DEV -> MockAdminRepositoryImpl()
+            AppEnvironment.PROD -> ApiAdminRepositoryImpl(httpClient)
+        }
+    }
 }
 
 private class AdminWebKtorLogger : Logger {

@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.corestack.khidmatai.admin.AdminRoute
 import com.corestack.khidmatai.admin.ui.components.*
 import com.corestack.khidmatai.core.domain.model.AdminRequest
 import com.corestack.khidmatai.core.domain.model.AdminState
@@ -31,17 +32,20 @@ fun RequestsScreen(navController: NavController) {
             ScreenHeader(title = "Requests", subtitle = "User service request history")
         }
 
-        when (val s = state) {
-            is com.corestack.khidmatai.core.domain.model.AdminState.Loading -> item { LoadingBox(Modifier.height(200.dp)) }
-            is com.corestack.khidmatai.core.domain.model.AdminState.Error -> item { ErrorBox(s.message, onRetry = vm::loadAll) }
-            is com.corestack.khidmatai.core.domain.model.AdminState.Success -> {
-                if (s.data.isEmpty()) {
-                    item { Text("No requests found.", color = TextSecondary, fontSize = 13.sp) }
-                } else {
-                    items(s.data) { req ->
-                        RequestRow(req) {
-                            navController.navigate("requests/${req.id}")
-                        }
+        val s = state
+        if (s is AdminState.Loading) {
+            item { LoadingBox(Modifier.height(200.dp)) }
+        }
+        if (s is AdminState.Error) {
+            item { ErrorBox(s.message, onRetry = vm::loadAll) }
+        }
+        if (s is AdminState.Success) {
+            if (s.data.isEmpty()) {
+                item { Text("No requests found.", color = TextSecondary, fontSize = 13.sp) }
+            } else {
+                items(s.data) { req ->
+                    RequestRow(req) {
+                        navController.navigate(AdminRoute.RequestDetail(req.id))
                     }
                 }
             }
@@ -50,7 +54,7 @@ fun RequestsScreen(navController: NavController) {
 }
 
 @Composable
-private fun RequestRow(req: com.corestack.khidmatai.core.domain.model.AdminRequest, onClick: () -> Unit) {
+private fun RequestRow(req: AdminRequest, onClick: () -> Unit) {
     AdminCard(
         modifier = Modifier.fillMaxWidth().clickable(onClick = onClick)
     ) {

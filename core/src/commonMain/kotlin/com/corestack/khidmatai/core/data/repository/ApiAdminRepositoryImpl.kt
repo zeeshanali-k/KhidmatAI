@@ -20,11 +20,10 @@ import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
-import org.koin.core.annotation.Single
+
 
 private const val BASE_URL = "http://localhost:8000"
 
-@Single(binds = [AdminRepository::class])
 class ApiAdminRepositoryImpl(
     private val httpClient: HttpClient
 ) : AdminRepository {
