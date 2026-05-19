@@ -50,4 +50,15 @@ class AppModule {
         }
     }
 
+    @Single
+    fun provideAuthRepository(
+        env: AppEnvironment,
+        httpClient: HttpClient,
+    ): com.corestack.khidmatai.domain.repository.AuthRepository {
+        return when (env) {
+            AppEnvironment.DEV -> com.corestack.khidmatai.data.repository.MockAuthRepositoryImpl()
+            AppEnvironment.PROD -> com.corestack.khidmatai.data.repository.ApiAuthRepositoryImpl(httpClient)
+        }
+    }
+
 }

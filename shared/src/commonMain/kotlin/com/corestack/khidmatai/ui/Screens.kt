@@ -3,6 +3,15 @@ package com.corestack.khidmatai.ui
 import kotlinx.serialization.Serializable
 
 @Serializable
+data object Splash
+
+@Serializable
+data object Login
+
+@Serializable
+data object Register
+
+@Serializable
 data object Onboarding
 
 @Serializable
