@@ -128,4 +128,14 @@
     <string name="trace_selection">Selecting provider</string>
     <string name="trace_execution">Confirming booking</string>
     <string name="trace_followup">Setting reminders</string>
+    <string name="location_picker_title">Select Location</string>
+    <string name="location_picker_search_hint">Search locations...</string>
+    <string name="location_picker_detect">Detect My Location</string>
+    <string name="location_picker_detecting">Detecting...</string>
+    <string name="location_picker_popular_areas">Popular Areas</string>
+    <string name="location_picker_major_cities">Major Cities</string>
+    <string name="location_picker_no_results">No results found</string>
+    <string name="onboarding_detecting_location">Getting your location...</string>
+    <string name="onboarding_permission_denied">Location permission denied. Please enable in Settings.</string>
+    <string name="location_permission_required">Grant Location Permission</string>
 </resources>

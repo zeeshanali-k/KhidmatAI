@@ -39,6 +39,7 @@ fun HomeScreen(
     onNavigateToBookings: () -> Unit,
     onNavigateToVoice: () -> Unit = {},
     onNavigateToProfile: () -> Unit = {},
+    onNavigateToLocationPicker: () -> Unit = {},
     onLanguageChange: (String) -> Unit = {}
 ) {
     val s = LocalAppStrings.current
@@ -54,10 +55,14 @@ fun HomeScreen(
     val backgroundColor = if (isEmergency) EmergencyBg else Background
 
     Scaffold(
-        modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.systemBars),
+        modifier = Modifier
+            .fillMaxSize()
+            .windowInsetsPadding(WindowInsets.systemBars),
         containerColor = backgroundColor,
         topBar = {
-            HomeAppBar(selectedLanguage = state.selectedLanguage) { newLang ->
+            HomeAppBar(
+                selectedLanguage = state.selectedLanguage
+            ) { newLang ->
                 viewModel.onAction(ServiceRequestIntent.UpdateLanguage(newLang))
                 onLanguageChange(newLang)
             }
@@ -169,7 +174,12 @@ fun HomeScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text("📍 ${state.location}", style = AppTypography.bodyLarge)
-                Text(s.homeChangeLocation, color = Primary, style = AppTypography.labelMedium)
+                Text(
+                    s.homeChangeLocation,
+                    color = Primary,
+                    style = AppTypography.labelMedium,
+                    modifier = Modifier.clickable { onNavigateToLocationPicker() }
+                )
             }
 
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
@@ -177,12 +187,14 @@ fun HomeScreen(
             // Urgency
             Text(s.homeUrgencyTitle, style = AppTypography.bodySmall, color = TextSecondary)
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
-            val urgencies = listOf(
-                "low" to s.urgencyLow,
-                "medium" to s.urgencyMedium,
-                "high" to s.urgencyHigh,
-                "emergency" to s.urgencyEmergency
-            )
+            val urgencies = remember {
+                listOf(
+                    "low" to s.urgencyLow,
+                    "medium" to s.urgencyMedium,
+                    "high" to s.urgencyHigh,
+                    "emergency" to s.urgencyEmergency
+                )
+            }
             LazyRow(horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small)) {
                 items(urgencies) { (key, label) ->
                     val isSelected = state.urgency == key
@@ -217,14 +229,16 @@ fun HomeScreen(
             // Quick Chips
             Text(s.homeQuickChipsTitle, style = AppTypography.bodySmall, color = TextSecondary)
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
-            val quickChips = listOf(
-                s.quickAc to s.quickAcQuery,
-                s.quickPlumber to s.quickPlumberQuery,
-                s.quickElectrician to s.quickElectricianQuery,
-                s.quickTutor to s.quickTutorQuery,
-                s.quickBeautician to s.quickBeauticianQuery,
-                s.quickCarpenter to s.quickCarpenterQuery
-            )
+            val quickChips = remember {
+                listOf(
+                    s.quickAc to s.quickAcQuery,
+                    s.quickPlumber to s.quickPlumberQuery,
+                    s.quickElectrician to s.quickElectricianQuery,
+                    s.quickTutor to s.quickTutorQuery,
+                    s.quickBeautician to s.quickBeauticianQuery,
+                    s.quickCarpenter to s.quickCarpenterQuery
+                )
+            }
             LazyRow(horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small)) {
                 items(quickChips) { (label, query) ->
                     Box(

@@ -7,17 +7,28 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.corestack.khidmatai.data.location.LocationPreferences
+import com.corestack.khidmatai.ui.BookingDetail
+import com.corestack.khidmatai.ui.Bookings
 import com.corestack.khidmatai.ui.Home
+import com.corestack.khidmatai.ui.LocationPicker
 import com.corestack.khidmatai.ui.Onboarding
 import com.corestack.khidmatai.ui.Profile
+import com.corestack.khidmatai.ui.ServiceRequestProcessing
+import com.corestack.khidmatai.ui.ServiceResultSuccess
+import com.corestack.khidmatai.ui.ServiceResultUnavailable
 import com.corestack.khidmatai.ui.VoiceInput
 import com.corestack.khidmatai.ui.bookings.BookingDetailScreen
 import com.corestack.khidmatai.ui.bookings.BookingsScreen
 import com.corestack.khidmatai.ui.home.HomeScreen
+import com.corestack.khidmatai.ui.home.ServiceRequestIntent
+import com.corestack.khidmatai.ui.home.ServiceRequestViewModel
+import com.corestack.khidmatai.ui.location.LocationPickerScreen
 import com.corestack.khidmatai.ui.onboarding.OnboardingScreen
 import com.corestack.khidmatai.ui.processing.ProcessingScreen
 import com.corestack.khidmatai.ui.profile.ProfileScreen
@@ -28,6 +39,8 @@ import com.corestack.khidmatai.ui.theme.EnglishStrings
 import com.corestack.khidmatai.ui.theme.LocalAppStrings
 import com.corestack.khidmatai.ui.theme.UrduStrings
 import com.corestack.khidmatai.ui.voice.VoiceInputScreen
+import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 @Preview
@@ -38,6 +51,7 @@ fun App() {
             "اردو" -> UrduStrings
             else -> EnglishStrings
         }
+        val locationPreferences = koinInject<LocationPreferences>()
 
         CompositionLocalProvider(LocalAppStrings provides strings) {
             val navController = rememberNavController()
@@ -48,7 +62,8 @@ fun App() {
             ) {
                 composable<Onboarding> {
                     OnboardingScreen(
-                        onLocationGranted = {
+                        onLocationGranted = { address ->
+                            locationPreferences.detectedLocation = address
                             navController.navigate(Home) {
                                 popUpTo(Onboarding) { inclusive = true }
                             }
@@ -61,13 +76,15 @@ fun App() {
                     )
                 }
 
-                composable<Home> {
+                composable<Home> { homeEntry ->
+                    val homeViewModel: ServiceRequestViewModel = koinViewModel(viewModelStoreOwner = homeEntry)
                     HomeScreen(
+                        viewModel = homeViewModel,
                         onNavigateToProcessing = {
-                            navController.navigate(com.corestack.khidmatai.ui.Processing)
+                            navController.navigate(ServiceRequestProcessing)
                         },
                         onNavigateToBookings = {
-                            navController.navigate(com.corestack.khidmatai.ui.Bookings)
+                            navController.navigate(Bookings)
                         },
                         onNavigateToVoice = {
                             navController.navigate(VoiceInput)
@@ -75,7 +92,28 @@ fun App() {
                         onNavigateToProfile = {
                             navController.navigate(Profile)
                         },
+                        onNavigateToLocationPicker = {
+                            navController.navigate(LocationPicker)
+                        },
                         onLanguageChange = { selectedLanguage = it }
+                    )
+                }
+
+                composable<LocationPicker> {
+                    val homeEntry = remember(navController) {
+                        navController.getBackStackEntry<Home>()
+                    }
+                    val homeViewModel: ServiceRequestViewModel = koinViewModel(viewModelStoreOwner = homeEntry)
+                    val homeState by homeViewModel.uiState.collectAsStateWithLifecycle()
+
+                    LocationPickerScreen(
+                        currentLocation = homeState.location,
+                        onLocationSelected = { loc ->
+                            locationPreferences.detectedLocation = loc
+                            homeViewModel.onAction(ServiceRequestIntent.UpdateLocation(loc))
+                            navController.popBackStack()
+                        },
+                        onNavigateBack = { navController.popBackStack() }
                     )
                 }
 
@@ -87,25 +125,35 @@ fun App() {
                     )
                 }
 
-                composable<com.corestack.khidmatai.ui.Processing> {
+                composable<ServiceRequestProcessing> {
+                    val homeEntry = remember(navController) {
+                        navController.getBackStackEntry<Home>()
+                    }
+                    val homeViewModel: ServiceRequestViewModel = koinViewModel(viewModelStoreOwner = homeEntry)
                     ProcessingScreen(
+                        viewModel = homeViewModel,
                         onNavigateToSuccess = {
-                            navController.navigate(com.corestack.khidmatai.ui.ResultSuccess) {
+                            navController.navigate(ServiceResultSuccess) {
                                 popUpTo(Home) { inclusive = false }
                             }
                         },
                         onNavigateToUnavailable = {
-                            navController.navigate(com.corestack.khidmatai.ui.ResultUnavailable) {
+                            navController.navigate(ServiceResultUnavailable) {
                                 popUpTo(Home) { inclusive = false }
                             }
                         }
                     )
                 }
 
-                composable<com.corestack.khidmatai.ui.ResultSuccess> {
+                composable<ServiceResultSuccess> {
+                    val homeEntry = remember(navController) {
+                        navController.getBackStackEntry<Home>()
+                    }
+                    val homeViewModel: ServiceRequestViewModel = koinViewModel(viewModelStoreOwner = homeEntry)
                     ResultSuccessScreen(
+                        viewModel = homeViewModel,
                         onViewBookingDetails = { bookingId ->
-                            navController.navigate(com.corestack.khidmatai.ui.BookingDetail(bookingId))
+                            navController.navigate(BookingDetail(bookingId))
                         },
                         onBackToHome = {
                             navController.navigate(Home) {
@@ -115,11 +163,16 @@ fun App() {
                     )
                 }
 
-                composable<com.corestack.khidmatai.ui.ResultUnavailable> {
+                composable<ServiceResultUnavailable> {
+                    val homeEntry = remember(navController) {
+                        navController.getBackStackEntry<Home>()
+                    }
+                    val homeViewModel: ServiceRequestViewModel = koinViewModel(viewModelStoreOwner = homeEntry)
                     ResultUnavailableScreen(
+                        viewModel = homeViewModel,
                         onRetry = {
-                            navController.navigate(com.corestack.khidmatai.ui.Processing) {
-                                popUpTo(com.corestack.khidmatai.ui.ResultUnavailable) { inclusive = true }
+                            navController.navigate(ServiceRequestProcessing) {
+                                popUpTo(ServiceResultUnavailable) { inclusive = true }
                             }
                         },
                         onBackToHome = {
@@ -128,8 +181,8 @@ fun App() {
                     )
                 }
 
-                composable<com.corestack.khidmatai.ui.BookingDetail> { backStackEntry ->
-                    val bookingDetail = backStackEntry.toRoute<com.corestack.khidmatai.ui.BookingDetail>()
+                composable<BookingDetail> { backStackEntry ->
+                    val bookingDetail = backStackEntry.toRoute<BookingDetail>()
                     BookingDetailScreen(
                         bookingId = bookingDetail.bookingId,
                         onBack = {
@@ -138,7 +191,7 @@ fun App() {
                     )
                 }
 
-                composable<com.corestack.khidmatai.ui.Bookings> {
+                composable<Bookings> {
                     BookingsScreen(
                         onNavigate = { route ->
                             when (route) {
@@ -147,7 +200,7 @@ fun App() {
                             }
                         },
                         onBookingClick = { bookingId ->
-                            navController.navigate(com.corestack.khidmatai.ui.BookingDetail(bookingId))
+                            navController.navigate(BookingDetail(bookingId))
                         }
                     )
                 }
@@ -159,7 +212,7 @@ fun App() {
                         onNavigate = { route ->
                             when (route) {
                                 "home" -> navController.navigate(Home) { popUpTo(0) }
-                                "bookings" -> navController.navigate(com.corestack.khidmatai.ui.Bookings)
+                                "bookings" -> navController.navigate(Bookings)
                             }
                         }
                     )
