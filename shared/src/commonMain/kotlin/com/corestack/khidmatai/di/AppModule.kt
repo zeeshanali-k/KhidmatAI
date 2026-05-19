@@ -50,4 +50,22 @@ class AppModule {
         }
     }
 
+    @Single
+    fun provideAuthRepository(
+        env: AppEnvironment,
+        httpClient: HttpClient,
+        appPreferences: com.corestack.khidmatai.domain.preferences.AppPreferences
+    ): com.corestack.khidmatai.domain.repository.AuthRepository {
+        return when (env) {
+            AppEnvironment.DEV -> com.corestack.khidmatai.data.repository.MockAuthRepositoryImpl(appPreferences)
+            AppEnvironment.PROD -> com.corestack.khidmatai.data.repository.ApiAuthRepositoryImpl(httpClient, appPreferences)
+        }
+    }
+
+    @Single
+    fun provideSettingsRepository(
+        appPreferences: com.corestack.khidmatai.domain.preferences.AppPreferences
+    ): com.corestack.khidmatai.domain.repository.SettingsRepository {
+        return com.corestack.khidmatai.data.repository.SettingsRepositoryImpl(appPreferences)
+    }
 }

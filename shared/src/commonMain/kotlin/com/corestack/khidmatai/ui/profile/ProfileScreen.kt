@@ -126,7 +126,7 @@ fun ProfileScreen(
                                         if (label == s.profileLanguage) {
                                             val next = when (selectedLanguage) {
                                                 "EN" -> "اردو"
-                                                "اردو" -> "RU"
+                                                "اردو" -> "EN"
                                                 else -> "EN"
                                             }
                                             onLanguageChange(next)

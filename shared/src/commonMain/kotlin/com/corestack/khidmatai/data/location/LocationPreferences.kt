@@ -4,5 +4,5 @@ import org.koin.core.annotation.Single
 
 @Single
 class LocationPreferences {
-    var detectedLocation: String = "G-13, Islamabad"
+    var detectedLocation: String = "--"
 }

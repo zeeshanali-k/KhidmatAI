@@ -14,6 +14,9 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.corestack.khidmatai.data.location.LocationPreferences
 import com.corestack.khidmatai.ui.BookingDetail
+import com.corestack.khidmatai.ui.Splash
+import com.corestack.khidmatai.ui.Login
+import com.corestack.khidmatai.ui.Register
 import com.corestack.khidmatai.ui.Bookings
 import com.corestack.khidmatai.ui.Home
 import com.corestack.khidmatai.ui.LocationPicker
@@ -25,6 +28,8 @@ import com.corestack.khidmatai.ui.ServiceResultUnavailable
 import com.corestack.khidmatai.ui.VoiceInput
 import com.corestack.khidmatai.ui.bookings.BookingDetailScreen
 import com.corestack.khidmatai.ui.bookings.BookingsScreen
+import com.corestack.khidmatai.ui.auth.LoginScreen
+import com.corestack.khidmatai.ui.auth.RegisterScreen
 import com.corestack.khidmatai.ui.home.HomeScreen
 import com.corestack.khidmatai.ui.home.ServiceRequestIntent
 import com.corestack.khidmatai.ui.home.ServiceRequestViewModel
@@ -38,7 +43,11 @@ import com.corestack.khidmatai.ui.theme.AppTheme
 import com.corestack.khidmatai.ui.theme.EnglishStrings
 import com.corestack.khidmatai.ui.theme.LocalAppStrings
 import com.corestack.khidmatai.ui.theme.UrduStrings
+import com.corestack.khidmatai.ui.splash.SplashScreen
 import com.corestack.khidmatai.ui.voice.VoiceInputScreen
+import com.corestack.khidmatai.domain.location.LocationService
+import com.corestack.khidmatai.domain.repository.SettingsRepository
+import org.koin.compose.KoinContext
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -46,31 +55,79 @@ import org.koin.compose.viewmodel.koinViewModel
 @Preview
 fun App() {
     AppTheme {
-        var selectedLanguage by remember { mutableStateOf("EN") }
+        val locationPreferences = koinInject<LocationPreferences>()
+        val settingsRepository = koinInject<SettingsRepository>()
+        
+        var selectedLanguage by remember { mutableStateOf(settingsRepository.language) }
         val strings = when (selectedLanguage) {
             "اردو" -> UrduStrings
             else -> EnglishStrings
         }
-        val locationPreferences = koinInject<LocationPreferences>()
 
         CompositionLocalProvider(LocalAppStrings provides strings) {
             val navController = rememberNavController()
 
             NavHost(
                 navController = navController,
-                startDestination = Onboarding,
+                startDestination = Splash,
             ) {
+                composable<Splash> {
+                    SplashScreen(
+                        onNavigateToHome = {
+                            navController.navigate(Home) {
+                                popUpTo(Splash) { inclusive = true }
+                            }
+                        },
+                        onNavigateToLogin = {
+                            navController.navigate(Login) {
+                                popUpTo(Splash) { inclusive = true }
+                            }
+                        },
+                        onNavigateToOnboarding = {
+                            navController.navigate(Onboarding) {
+                                popUpTo(Splash) { inclusive = true }
+                            }
+                        }
+                    )
+                }
+
                 composable<Onboarding> {
                     OnboardingScreen(
                         onLocationGranted = { address ->
                             locationPreferences.detectedLocation = address
-                            navController.navigate(Home) {
+                            navController.navigate(Login) {
                                 popUpTo(Onboarding) { inclusive = true }
                             }
                         },
                         onSkip = {
-                            navController.navigate(Home) {
+                            navController.navigate(Login) {
                                 popUpTo(Onboarding) { inclusive = true }
+                            }
+                        }
+                    )
+                }
+
+                composable<Login> {
+                    LoginScreen(
+                        onNavigateToRegister = {
+                            navController.navigate(Register)
+                        },
+                        onLoginSuccess = {
+                            navController.navigate(Home) {
+                                popUpTo(Login) { inclusive = true }
+                            }
+                        }
+                    )
+                }
+
+                composable<Register> {
+                    RegisterScreen(
+                        onNavigateToLogin = {
+                            navController.popBackStack()
+                        },
+                        onRegisterSuccess = {
+                            navController.navigate(Home) {
+                                popUpTo(Login) { inclusive = true } // Clear up to Login since it came from there
                             }
                         }
                     )
@@ -95,7 +152,10 @@ fun App() {
                         onNavigateToLocationPicker = {
                             navController.navigate(LocationPicker)
                         },
-                        onLanguageChange = { selectedLanguage = it }
+                        onLanguageChange = { 
+                            selectedLanguage = it 
+                            settingsRepository.language = it
+                        }
                     )
                 }
 
@@ -183,16 +243,26 @@ fun App() {
 
                 composable<BookingDetail> { backStackEntry ->
                     val bookingDetail = backStackEntry.toRoute<BookingDetail>()
+                    val homeEntry = remember(navController) {
+                        navController.getBackStackEntry<Home>()
+                    }
+                    val homeViewModel: ServiceRequestViewModel = koinViewModel(viewModelStoreOwner = homeEntry)
                     BookingDetailScreen(
                         bookingId = bookingDetail.bookingId,
+                        viewModel = homeViewModel,
                         onBack = {
                             navController.popBackStack()
                         }
                     )
                 }
 
-                composable<Bookings> {
+                composable<Bookings> { bookingsEntry ->
+                    val homeEntry = remember(navController) {
+                        navController.getBackStackEntry<Home>()
+                    }
+                    val homeViewModel: ServiceRequestViewModel = koinViewModel(viewModelStoreOwner = homeEntry)
                     BookingsScreen(
+                        viewModel = homeViewModel,
                         onNavigate = { route ->
                             when (route) {
                                 "home" -> navController.navigate(Home) { popUpTo(0) }
