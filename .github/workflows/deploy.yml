@@ -8,6 +8,8 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 jobs:
   build-android:
@@ -32,20 +34,19 @@ jobs:
       - name: Build Android APKs
         run: ./gradlew :androidApp:assembleDebug :androidApp:assembleRelease
 
-      - name: Upload Debug APK
-        uses: actions/upload-artifact@v4
+      - name: Create GitHub Release with APKs
+        uses: softprops/action-gh-release@v2
         with:
-          name: KhidmatAI-Android-Debug
-          path: androidApp/build/outputs/apk/debug/*.apk
+          tag_name: build-${{ github.run_number }}
+          name: "KhidmatAI Build #${{ github.run_number }}"
+          body: "Automated build from commit ${{ github.sha }}"
+          files: |
+            androidApp/build/outputs/apk/debug/*.apk
+            androidApp/build/outputs/apk/release/*.apk
+          make_latest: true
 
-      - name: Upload Release APK (Unsigned)
-        uses: actions/upload-artifact@v4
-        with:
-          name: KhidmatAI-Android-Release-Unsigned
-          path: androidApp/build/outputs/apk/release/*.apk
-
-  deploy-web:
-    name: Deploy Admin Web App
+  build-web:
+    name: Build Web App
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -66,8 +67,19 @@ jobs:
       - name: Build Web App Distribution
         run: ./gradlew :adminWebApp:wasmJsBrowserDistribution
 
-      - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          branch: gh-pages
-          folder: adminWebApp/build/dist/wasmJs/productionExecutable
+          path: adminWebApp/build/dist/wasmJs/productionExecutable
+
+  deploy-web:
+    name: Deploy Admin Web App to GitHub Pages
+    needs: build-web
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
