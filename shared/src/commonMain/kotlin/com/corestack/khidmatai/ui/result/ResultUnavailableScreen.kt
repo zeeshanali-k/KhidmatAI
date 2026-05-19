@@ -10,8 +10,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.corestack.khidmatai.domain.model.AiOrbState
-import com.corestack.khidmatai.domain.model.RequestState
+import com.corestack.khidmatai.core.domain.model.AiOrbState
+import com.corestack.khidmatai.core.domain.model.RequestState
 import com.corestack.khidmatai.ui.components.AiOrbView
 import com.corestack.khidmatai.ui.home.ServiceRequestIntent
 import com.corestack.khidmatai.ui.home.ServiceRequestViewModel

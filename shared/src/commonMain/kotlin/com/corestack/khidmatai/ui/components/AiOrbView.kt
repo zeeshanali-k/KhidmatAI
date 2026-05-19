@@ -14,7 +14,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.Dp
-import com.corestack.khidmatai.domain.model.AiOrbState
+import com.corestack.khidmatai.core.domain.model.AiOrbState
 import com.corestack.khidmatai.ui.theme.*
 
 @Composable

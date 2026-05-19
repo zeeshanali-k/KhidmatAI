@@ -2,9 +2,9 @@ package com.corestack.khidmatai.ui.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.corestack.khidmatai.domain.model.AuthResult
-import com.corestack.khidmatai.domain.model.AuthState
-import com.corestack.khidmatai.domain.repository.AuthRepository
+import com.corestack.khidmatai.core.domain.model.AuthResult
+import com.corestack.khidmatai.core.domain.model.AuthState
+import com.corestack.khidmatai.core.domain.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

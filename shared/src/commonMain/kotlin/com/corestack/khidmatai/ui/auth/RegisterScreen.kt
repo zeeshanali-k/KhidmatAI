@@ -12,7 +12,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.corestack.khidmatai.domain.model.AuthState
+import com.corestack.khidmatai.core.domain.model.AuthState
 import com.corestack.khidmatai.ui.theme.*
 import org.koin.compose.viewmodel.koinViewModel
 

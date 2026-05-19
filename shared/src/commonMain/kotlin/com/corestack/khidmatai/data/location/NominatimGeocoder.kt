@@ -7,10 +7,11 @@ import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.koin.core.annotation.Provided
 import org.koin.core.annotation.Single
 
 @Single
-class NominatimGeocoder(private val httpClient: HttpClient) {
+class NominatimGeocoder(@Provided private val httpClient: HttpClient) {
     suspend fun reverseGeocode(lat: Double, lon: Double): String = try {
         val response = httpClient.get("https://nominatim.openstreetmap.org/reverse") {
             parameter("format", "json")

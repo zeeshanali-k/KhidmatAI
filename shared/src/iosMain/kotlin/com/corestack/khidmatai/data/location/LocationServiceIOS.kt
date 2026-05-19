@@ -1,9 +1,13 @@
+@file:OptIn(ExperimentalForeignApi::class)
+
 package com.corestack.khidmatai.data.location
 
 import com.corestack.khidmatai.domain.location.LocationService
 import com.corestack.khidmatai.domain.model.LocationAddress
 import com.corestack.khidmatai.domain.model.LocationFetchResult
 import com.corestack.khidmatai.domain.model.LocationPermissionStatus
+import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.useContents
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.koin.core.annotation.Single
 import platform.CoreLocation.CLLocation
@@ -18,7 +22,7 @@ import platform.Foundation.NSError
 import platform.darwin.NSObject
 import kotlin.coroutines.resume
 
-@Single
+@Single(binds = [LocationService::class])
 class LocationServiceIOS(
     private val geocoder: NominatimGeocoder
 ) : LocationService {
@@ -42,7 +46,7 @@ class LocationServiceIOS(
                 override fun locationManager(manager: CLLocationManager, didUpdateLocations: List<*>) {
                     val loc = didUpdateLocations.lastOrNull() as? CLLocation
                     manager.delegate = null
-                    cont.resume(loc?.coordinate?.let { Pair(it.latitude, it.longitude) })
+                    cont.resume(loc?.coordinate?.let { Pair(it.useContents { latitude }, it.useContents { longitude }) })
                 }
 
                 override fun locationManager(manager: CLLocationManager, didFailWithError: NSError) {

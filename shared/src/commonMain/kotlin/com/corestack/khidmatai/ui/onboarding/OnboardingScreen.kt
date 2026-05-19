@@ -29,9 +29,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.corestack.khidmatai.core.domain.model.LocationFetchResult
+import com.corestack.khidmatai.core.domain.model.LocationPermissionStatus
 import com.corestack.khidmatai.domain.location.LocationService
-import com.corestack.khidmatai.domain.model.LocationFetchResult
-import com.corestack.khidmatai.domain.model.LocationPermissionStatus
 import com.corestack.khidmatai.ui.location.rememberLocationPermissionState
 import com.corestack.khidmatai.ui.theme.AppTypography
 import com.corestack.khidmatai.ui.theme.Background

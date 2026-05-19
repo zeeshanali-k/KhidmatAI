@@ -1,7 +1,7 @@
 package com.corestack.khidmatai.ui.location
 
 import androidx.compose.runtime.Composable
-import com.corestack.khidmatai.domain.model.LocationPermissionStatus
+import com.corestack.khidmatai.core.domain.model.LocationPermissionStatus
 
 data class LocationPermissionState(
     val status: LocationPermissionStatus,
