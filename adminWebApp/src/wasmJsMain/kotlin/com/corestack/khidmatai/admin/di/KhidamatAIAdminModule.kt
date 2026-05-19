@@ -4,7 +4,6 @@ import com.corestack.khidmatai.core.data.repository.ApiAdminRepositoryImpl
 import com.corestack.khidmatai.core.domain.repository.AdminRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.logging.DEFAULT
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
@@ -29,12 +28,18 @@ class KhidamatAIAdminModule {
             })
         }
         install(Logging) {
-            logger = Logger.DEFAULT
-            level = LogLevel.INFO
+            logger = AdminWebKtorLogger()
+            level = LogLevel.ALL
         }
     }
 
     @Single
     fun provideAdminRepository(httpClient: HttpClient): AdminRepository =
         ApiAdminRepositoryImpl(httpClient)
+}
+
+private class AdminWebKtorLogger : Logger {
+    override fun log(message: String) {
+        println("Ktor(AdminWeb): $message")
+    }
 }
