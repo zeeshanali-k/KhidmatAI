@@ -47,6 +47,8 @@ kotlin {
             implementation(libs.ktor.client.native)
         }
         commonMain.dependencies {
+            api(projects.core)
+            
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
             implementation(libs.compose.material3)
@@ -66,17 +68,6 @@ kotlin {
             implementation(libs.navigation.compose)
             //Serialization
             implementation(libs.kotlinx.serialization.json)
-
-            // Ktor Client
-            implementation(libs.ktor.client.core)
-            implementation(libs.ktor.client.content.negotiation)
-            implementation(libs.ktor.client.websockets)
-            implementation(libs.ktor.client.logging)
-            implementation(libs.ktor.serialization.kotlinx.json)
-            // Settings
-            implementation(libs.multiplatform.settings)
-            implementation(libs.multiplatform.settings.coroutines)
-            implementation(libs.multiplatform.settings.no.arg)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

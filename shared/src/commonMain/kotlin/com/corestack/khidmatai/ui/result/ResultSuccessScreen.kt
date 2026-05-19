@@ -20,8 +20,8 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.corestack.khidmatai.domain.model.AiOrbState
-import com.corestack.khidmatai.domain.model.RequestState
+import com.corestack.khidmatai.core.domain.model.AiOrbState
+import com.corestack.khidmatai.core.domain.model.RequestState
 import com.corestack.khidmatai.ui.components.AiOrbView
 import com.corestack.khidmatai.ui.components.MockPushNotification
 import com.corestack.khidmatai.ui.components.NextStepCard

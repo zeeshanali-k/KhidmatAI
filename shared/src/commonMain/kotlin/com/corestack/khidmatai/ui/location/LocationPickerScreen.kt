@@ -11,7 +11,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -40,7 +39,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.corestack.khidmatai.domain.model.LocationPermissionStatus
+import com.corestack.khidmatai.core.domain.model.LocationPermissionStatus
 import com.corestack.khidmatai.ui.theme.AppTypography
 import com.corestack.khidmatai.ui.theme.Background
 import com.corestack.khidmatai.ui.theme.Border

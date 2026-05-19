@@ -5,16 +5,17 @@ import android.content.Context
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
 import com.corestack.khidmatai.domain.location.LocationService
-import com.corestack.khidmatai.domain.model.LocationAddress
-import com.corestack.khidmatai.domain.model.LocationFetchResult
-import com.corestack.khidmatai.domain.model.LocationPermissionStatus
+import android.annotation.SuppressLint
+import com.corestack.khidmatai.core.domain.model.LocationAddress
+import com.corestack.khidmatai.core.domain.model.LocationFetchResult
+import com.corestack.khidmatai.core.domain.model.LocationPermissionStatus
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.koin.core.annotation.Single
 import kotlin.coroutines.resume
 
-@Single
+@Single(binds = [LocationService::class])
 class LocationServiceAndroid(
     private val context: Context,
     private val geocoder: NominatimGeocoder
@@ -27,6 +28,7 @@ class LocationServiceAndroid(
             == PackageManager.PERMISSION_GRANTED
         ) LocationPermissionStatus.GRANTED else LocationPermissionStatus.UNKNOWN
 
+    @SuppressLint("MissingPermission")
     override suspend fun fetchCurrentLocation(): LocationFetchResult {
         if (checkPermission() != LocationPermissionStatus.GRANTED)
             return LocationFetchResult.PermissionDenied

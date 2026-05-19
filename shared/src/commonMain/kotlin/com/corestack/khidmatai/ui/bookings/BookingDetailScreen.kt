@@ -17,7 +17,7 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.corestack.khidmatai.domain.model.RequestState
+import com.corestack.khidmatai.core.domain.model.RequestState
 import com.corestack.khidmatai.ui.components.NextStepCard
 import com.corestack.khidmatai.ui.components.TraceRowComponent
 import com.corestack.khidmatai.ui.home.ServiceRequestViewModel

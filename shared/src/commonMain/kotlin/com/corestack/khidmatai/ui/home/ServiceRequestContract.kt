@@ -1,7 +1,7 @@
 package com.corestack.khidmatai.ui.home
 
 import androidx.compose.runtime.Immutable
-import com.corestack.khidmatai.domain.model.RequestState
+import com.corestack.khidmatai.core.domain.model.RequestState
 
 @Immutable
 data class ServiceRequestState(

@@ -11,7 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
-import com.corestack.khidmatai.domain.model.LocationPermissionStatus
+import com.corestack.khidmatai.core.domain.model.LocationPermissionStatus
 
 @Composable
 actual fun rememberLocationPermissionState(

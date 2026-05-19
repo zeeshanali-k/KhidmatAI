@@ -7,7 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.corestack.khidmatai.domain.model.NextStep
+import com.corestack.khidmatai.core.domain.model.NextStep
 import com.corestack.khidmatai.ui.theme.*
 
 @Composable
@@ -62,7 +62,7 @@ fun NextStepCard(
                         shape = RoundedCornerShape(MaterialTheme.spacing.small),
                         colors = ButtonDefaults.buttonColors(containerColor = Primary)
                     ) {
-                        Text(step.actionLabel, color = Surface, style = AppTypography.labelMedium)
+                        Text(step.actionLabel!!, color = Surface, style = AppTypography.labelMedium)
                     }
                 } else if (step.actionLabel != null) {
                     // Info with action button
@@ -73,7 +73,7 @@ fun NextStepCard(
                         shape = RoundedCornerShape(MaterialTheme.spacing.small),
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = Primary)
                     ) {
-                        Text(step.actionLabel, style = AppTypography.labelMedium)
+                        Text(step.actionLabel!!, style = AppTypography.labelMedium)
                     }
                 }
             }

@@ -13,8 +13,8 @@ import androidx.compose.runtime.*
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.corestack.khidmatai.domain.model.AiOrbState
-import com.corestack.khidmatai.domain.model.RequestState
+import com.corestack.khidmatai.core.domain.model.AiOrbState
+import com.corestack.khidmatai.core.domain.model.RequestState
 import com.corestack.khidmatai.ui.components.AiOrbView
 import com.corestack.khidmatai.ui.components.TraceRowComponent
 import com.corestack.khidmatai.ui.home.ServiceRequestViewModel

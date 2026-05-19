@@ -2,8 +2,8 @@ package com.corestack.khidmatai.ui.location
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.corestack.khidmatai.core.domain.model.LocationFetchResult
 import com.corestack.khidmatai.domain.location.LocationService
-import com.corestack.khidmatai.domain.model.LocationFetchResult
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow

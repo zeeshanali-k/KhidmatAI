@@ -1,6 +1,6 @@
 package com.corestack.khidmatai.ui.auth
 
-import com.corestack.khidmatai.domain.model.AuthState
+import com.corestack.khidmatai.core.domain.model.AuthState
 
 sealed class AuthIntent {
     data class Login(val email: String, val password: String) : AuthIntent()

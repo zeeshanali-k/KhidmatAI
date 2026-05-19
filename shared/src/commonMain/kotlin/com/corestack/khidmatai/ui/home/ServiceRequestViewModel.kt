@@ -2,9 +2,9 @@ package com.corestack.khidmatai.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.corestack.khidmatai.core.domain.model.RequestState
+import com.corestack.khidmatai.core.domain.repository.ServiceRepository
 import com.corestack.khidmatai.data.location.LocationPreferences
-import com.corestack.khidmatai.domain.model.RequestState
-import com.corestack.khidmatai.domain.repository.ServiceRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

@@ -21,6 +21,7 @@ dependencies {
     debugImplementation(libs.compose.uiTooling)
     implementation(libs.koin.core)
     implementation(libs.koin.android)
+    implementation(libs.koin.annotations)
     implementation(libs.ktor.client.okhttp)
 }
 

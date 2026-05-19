@@ -1,0 +1,24 @@
+# Admin Panel Implementation Tasks
+
+- `[/]` **Phase 1: Refactor — Extract `:core` Module**
+  - `[ ]` Create `core` directory and `build.gradle.kts`
+  - `[ ]` Update `settings.gradle.kts` and root `build.gradle.kts`
+  - `[ ]` Move shared packages (`domain`, `data`, `di`) from `:shared` to `:core`
+  - `[ ]` Update `:shared` dependencies to include `project(":core")`
+- `[ ]` **Phase 2: Admin Domain Logic in `:core`**
+  - `[ ]` Create `AdminModels.kt` (AdminBooking, AdminProvider, AdminRequest, AdminState)
+  - `[ ]` Create `AdminRepository.kt` interface
+  - `[ ]` Create `ApiAdminRepositoryImpl.kt` implementation
+- `[ ]` **Phase 3: Create `:adminWebApp` Module**
+  - `[ ]` Create `adminWebApp/build.gradle.kts` for wasmJs
+  - `[ ]` Set up web entry points (`main.kt`, `AdminApp.kt`)
+  - `[ ]` Configure Koin DI (`AdminModule.kt`)
+  - `[ ]` Implement Dashboard screen
+  - `[ ]` Implement Bookings screens
+  - `[ ]` Implement Providers screens
+  - `[ ]` Implement Requests screens
+- `[ ]` **Phase 4: Backend Admin APIs**
+  - `[ ]` Add `request_logs` to `mock_db.py`
+  - `[ ]` Instrument `routers/requests.py` for logging
+  - `[ ]` Create `routers/admin.py` with CRUD endpoints
+  - `[ ]` Register `/admin` router in `main.py`

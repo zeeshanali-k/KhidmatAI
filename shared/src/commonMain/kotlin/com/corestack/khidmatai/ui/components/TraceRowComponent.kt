@@ -12,7 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import com.corestack.khidmatai.domain.model.TraceItem
+import com.corestack.khidmatai.core.domain.model.TraceItem
 import com.corestack.khidmatai.ui.theme.*
 
 @Composable

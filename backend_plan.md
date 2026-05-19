@@ -42,3 +42,24 @@ The frontend will likely need more than just the main orchestrator trigger to fu
 While currently using a mock DB, prepare the schemas for migration.
 1. **Define ORM Models**: If transitioning to PostgreSQL or similar, add SQLAlchemy models or Prisma schema mirroring the Pydantic schemas in `models.py`.
 2. **Abstract DB Tool**: Ensure `db_tool.py` interface remains identical so that switching from `mock_db` to the real DB doesn't require changes in the agent logic.
+
+### Phase 5: Admin API Implementation
+To support the new KhidmatAI web-based Admin Panel, the backend requires a set of CRUD and management endpoints.
+1. **Admin Router (`routers/admin.py`)**:
+   - `GET /admin/bookings/`: List all bookings across all users.
+   - `GET /admin/bookings/{booking_id}`: Get specific booking details.
+   - `POST /admin/bookings/{booking_id}/complete`: Mark a booking as completed.
+   - `POST /admin/bookings/{booking_id}/cancel`: Mark a booking as cancelled.
+   - `GET /admin/providers/`: List all available and unavailable providers.
+   - `POST /admin/providers/`: Create a new service provider.
+   - `PUT /admin/providers/{provider_id}`: Update provider details.
+   - `DELETE /admin/providers/{provider_id}`: Delete a provider.
+   - `PATCH /admin/providers/{provider_id}/availability`: Toggle provider availability.
+   - `GET /admin/requests/`: Fetch a history of all user requests and their traces.
+2. **Mock DB Updates**:
+   - Add a `request_logs` list to `mock_db.py`.
+   - Implement `log_request(entry)` to record incoming queries from `POST /requests/` before and after graph execution.
+3. **Pydantic Schemas**:
+   - Define `ProviderCreate` and `AdminRequestLog` in `schemas/models.py`.
+4. **Security**:
+   - While authentication is currently bypassed, these endpoints must eventually be protected by an admin-role validation middleware.
