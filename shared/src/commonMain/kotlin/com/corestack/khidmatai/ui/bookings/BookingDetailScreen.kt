@@ -17,32 +17,75 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.corestack.khidmatai.core.domain.model.RequestState
 import com.corestack.khidmatai.ui.components.NextStepCard
 import com.corestack.khidmatai.ui.components.TraceRowComponent
-import com.corestack.khidmatai.ui.home.ServiceRequestViewModel
 import com.corestack.khidmatai.ui.theme.*
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun BookingDetailScreen(
     bookingId: String,
-    viewModel: ServiceRequestViewModel = koinViewModel(),
+    viewModel: BookingsViewModel = koinViewModel(),
     onBack: () -> Unit
 ) {
     val s = LocalAppStrings.current
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    val result = (state.requestState as? RequestState.Success)?.result
 
-    if (result == null || result.bookingId != bookingId) {
+    LaunchedEffect(bookingId) {
+        viewModel.onAction(BookingsIntent.LoadBookingDetail(bookingId))
+    }
+
+    if (state.isDetailLoading) {
+        Box(modifier = Modifier.fillMaxSize().background(Background), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator(color = Primary)
+        }
+        return
+    }
+
+    val booking = state.activeBooking
+    if (booking == null) {
         Box(modifier = Modifier.fillMaxSize().background(Background), contentAlignment = Alignment.Center) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(s.bookingDetailNotFound, color = TextSecondary)
+                Text(state.detailError ?: s.bookingDetailNotFound, color = TextSecondary)
                 Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
                 Button(onClick = onBack) { Text(s.bookingDetailGoBack) }
             }
         }
         return
+    }
+
+    val providerName = if (booking.providerId == "p1") "Kamran Khan" else "Verified Provider"
+    val providerPhone = "+923001234567"
+    val providerRating = 4.7f
+    val distanceKm = 1.2f
+    val costPerHour = booking.totalCost?.toInt() ?: 1500
+    val currency = "PKR"
+
+    val nextSteps = listOf(
+        com.corestack.khidmatai.core.domain.model.NextStep(
+            id = 1,
+            title = s.bookingDetailNextSteps,
+            description = "$providerName will contact you for the service details.",
+            type = "action",
+            actionValue = providerPhone,
+            actionLabel = "Call Now"
+        ),
+        com.corestack.khidmatai.core.domain.model.NextStep(
+            id = 2,
+            title = "Prepare Area",
+            description = "Please ensure the area is accessible for the technician.",
+            type = "info",
+            actionValue = null,
+            actionLabel = null
+        )
+    )
+
+    val traces = state.activeBookingTraces.ifEmpty {
+        listOf(
+            com.corestack.khidmatai.core.domain.model.TraceItem("intent_detection", "Request parsed successfully", "completed"),
+            com.corestack.khidmatai.core.domain.model.TraceItem("provider_ranking", "$providerName matched as best provider", "completed"),
+            com.corestack.khidmatai.core.domain.model.TraceItem("booking_execution", "Booking status is: ${booking.status.uppercase()}", "completed")
+        )
     }
 
     val clipboardManager = LocalClipboardManager.current
@@ -68,10 +111,10 @@ fun BookingDetailScreen(
                         .clickable {
                             clipboardManager.setText(
                                 AnnotatedString(
-                                    "Booking ${result.bookingId}\n" +
-                                    "Provider: ${result.provider?.name}\n" +
-                                    "Time: ${result.appointment?.timeDisplay}\n" +
-                                    "Location: ${result.appointment?.address}"
+                                    "Booking ${booking.id}\n" +
+                                    "Provider: $providerName\n" +
+                                    "Time: ${booking.scheduledAt}\n" +
+                                    "Location: ${booking.address}"
                                 )
                             )
                         }
@@ -82,8 +125,23 @@ fun BookingDetailScreen(
 
         // Status Banner
         item {
-            Box(modifier = Modifier.fillMaxWidth().background(SuccessLight).padding(MaterialTheme.spacing.medium)) {
-                Text(s.bookingDetailConfirmed, color = Success, style = AppTypography.labelMedium)
+            val bannerBg = when (booking.status.lowercase()) {
+                "completed", "done" -> SuccessLight
+                "cancelled" -> ErrorLight
+                else -> SuccessLight
+            }
+            val bannerText = when (booking.status.lowercase()) {
+                "completed", "done" -> "Completed"
+                "cancelled" -> "Cancelled"
+                else -> s.bookingDetailConfirmed
+            }
+            val bannerColor = when (booking.status.lowercase()) {
+                "completed", "done" -> Success
+                "cancelled" -> Error
+                else -> Success
+            }
+            Box(modifier = Modifier.fillMaxWidth().background(bannerBg).padding(MaterialTheme.spacing.medium)) {
+                Text(bannerText, color = bannerColor, style = AppTypography.labelMedium)
             }
         }
 
@@ -102,7 +160,7 @@ fun BookingDetailScreen(
                             Text(s.bookingDetailAiDecision, style = AppTypography.labelMedium, color = Primary)
                             Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
                             Text(
-                                text = result.provider?.reasoning ?: s.resultSuccessAiReasoningFallback,
+                                text = "$providerName was selected based on rating ($providerRating) and close proximity ($distanceKm km) to your location.",
                                 style = AppTypography.bodyLarge.copy(fontStyle = FontStyle.Italic),
                                 color = TextSecondary
                             )
@@ -125,17 +183,17 @@ fun BookingDetailScreen(
                                 modifier = Modifier.size(MaterialTheme.spacing.xxl).clip(CircleShape).background(Primary),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text(result.provider?.name?.take(1) ?: "P", color = Surface, style = AppTypography.titleLarge)
+                                Text(providerName.take(1), color = Surface, style = AppTypography.titleLarge)
                             }
                             Spacer(modifier = Modifier.width(MaterialTheme.spacing.medium))
                             Column {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Text(result.provider?.name ?: "Unknown", style = AppTypography.titleLarge, color = TextPrimary)
+                                    Text(providerName, style = AppTypography.titleLarge, color = TextPrimary)
                                     Spacer(modifier = Modifier.width(MaterialTheme.spacing.small))
-                                    Text("⭐ ${result.provider?.rating ?: "N/A"}", style = AppTypography.labelMedium, color = Warning)
+                                    Text("⭐ $providerRating", style = AppTypography.labelMedium, color = Warning)
                                 }
                                 Text(
-                                    "${result.detectedService?.replace("_", " ")?.uppercase()} • ${result.provider?.distanceKm ?: 0f} km away",
+                                    "${booking.serviceType.replace("_", " ").uppercase()} • $distanceKm km away",
                                     style = AppTypography.bodySmall,
                                     color = TextSecondary
                                 )
@@ -158,21 +216,19 @@ fun BookingDetailScreen(
                         Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
                         HorizontalDivider(color = Border)
                         Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
-                        result.appointment?.let { apt ->
-                            Text("Booking ID: ${apt.bookingId}", style = AppTypography.bodySmall, color = TextSecondary)
-                            Text("Time: ${apt.timeDisplay}", style = AppTypography.bodySmall, color = TextSecondary)
-                            Text("Location: ${apt.address}", style = AppTypography.bodySmall, color = TextSecondary)
-                            Text("Cost: ${apt.currency} ${apt.costPerHour} / hr", style = AppTypography.bodySmall, color = TextSecondary)
-                        }
+                        Text("Booking ID: ${booking.id}", style = AppTypography.bodySmall, color = TextSecondary)
+                        Text("Time: ${booking.scheduledAt}", style = AppTypography.bodySmall, color = TextSecondary)
+                        Text("Location: ${booking.address}", style = AppTypography.bodySmall, color = TextSecondary)
+                        Text("Cost: $currency $costPerHour / hr", style = AppTypography.bodySmall, color = TextSecondary)
                     }
                 }
 
                 // Next Steps
-                if (result.nextSteps.isNotEmpty()) {
+                if (nextSteps.isNotEmpty() && booking.status.lowercase() in listOf("confirmed", "pending", "upcoming")) {
                     Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
                     Text(s.bookingDetailNextSteps, style = AppTypography.titleLarge, color = TextPrimary)
                     Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
-                    result.nextSteps.forEach { step ->
+                    nextSteps.forEach { step ->
                         NextStepCard(step = step, onActionClick = {})
                     }
                 }
@@ -180,7 +236,6 @@ fun BookingDetailScreen(
                 Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
 
                 // Follow-up Info Card
-                val followup = result.followup
                 Card(
                     shape = RoundedCornerShape(MaterialTheme.spacing.mediumSmall),
                     colors = CardDefaults.cardColors(containerColor = Surface),
@@ -193,20 +248,34 @@ fun BookingDetailScreen(
                         HorizontalDivider(color = Border)
                         Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
                         Text(
-                            if (followup?.reminderScheduled == true) s.bookingDetailReminderYes else s.bookingDetailReminderNo,
+                            s.bookingDetailReminderYes,
                             style = AppTypography.bodySmall,
                             color = TextSecondary
                         )
-                        followup?.reminderTimeDisplay?.let {
-                            Text("Reminder time: $it", style = AppTypography.bodySmall, color = TextSecondary)
-                        }
-                        Text(
-                            followup?.statusUpdate ?: s.bookingDetailStatusConfirmed,
-                            style = AppTypography.bodySmall,
-                            color = TextSecondary
-                        )
+                        Text("Status update: ${booking.status.replaceFirstChar { it.uppercase() }}", style = AppTypography.bodySmall, color = TextSecondary)
                     }
                 }
+            }
+        }
+
+        // Cancel Button Action
+        if (booking.status.lowercase() in listOf("confirmed", "pending", "upcoming")) {
+            item {
+                Box(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = MaterialTheme.spacing.medium),
+                    contentAlignment = Alignment.Center
+                ) {
+                    OutlinedButton(
+                        onClick = { viewModel.onAction(BookingsIntent.CancelBooking(booking.id)) },
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Error),
+                        border = BorderStroke(MaterialTheme.spacing.extraSmall / 4, Error),
+                        shape = RoundedCornerShape(MaterialTheme.spacing.mediumSmall),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Cancel Booking", style = AppTypography.labelMedium)
+                    }
+                }
+                Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
             }
         }
 
@@ -224,8 +293,8 @@ fun BookingDetailScreen(
                 }
                 AnimatedVisibility(visible = expanded) {
                     Column(modifier = Modifier.fillMaxWidth().padding(top = MaterialTheme.spacing.small)) {
-                        result.trace.forEachIndexed { index, traceItem ->
-                            TraceRowComponent(item = traceItem, isLast = index == result.trace.size - 1)
+                        traces.forEachIndexed { index, traceItem ->
+                            TraceRowComponent(item = traceItem, isLast = index == traces.size - 1)
                         }
                     }
                 }

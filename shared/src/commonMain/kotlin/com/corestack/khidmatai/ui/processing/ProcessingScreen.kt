@@ -9,6 +9,11 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.RoundedCornerShape
+import com.corestack.khidmatai.ui.home.ServiceRequestIntent
 import androidx.compose.runtime.*
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
@@ -26,7 +31,8 @@ import org.koin.compose.viewmodel.koinViewModel
 fun ProcessingScreen(
     viewModel: ServiceRequestViewModel = koinViewModel(),
     onNavigateToSuccess: () -> Unit,
-    onNavigateToUnavailable: () -> Unit
+    onNavigateToUnavailable: () -> Unit,
+    onNavigateBack: () -> Unit
 ) {
     val s = LocalAppStrings.current
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -44,6 +50,8 @@ fun ProcessingScreen(
             onNavigateToSuccess()
         } else if (requestState is RequestState.Unavailable) {
             onNavigateToUnavailable()
+        } else if (requestState is RequestState.Idle) {
+            onNavigateBack()
         }
     }
 
@@ -104,10 +112,25 @@ fun ProcessingScreen(
 
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.extraLarge))
 
-            LazyColumn(modifier = Modifier.fillMaxWidth()) {
+            LazyColumn(modifier = Modifier.fillMaxWidth().weight(1f)) {
                 itemsIndexed(traces) { index, item ->
                     TraceRowComponent(item = item, isLast = index == traces.size - 1)
                 }
+            }
+
+            Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
+
+            OutlinedButton(
+                onClick = { viewModel.onAction(ServiceRequestIntent.CancelRequest) },
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = if (isEmergency) Error else TextSecondary),
+                border = BorderStroke(
+                    MaterialTheme.spacing.extraSmall / 4,
+                    if (isEmergency) Error else TextSecondary
+                ),
+                shape = RoundedCornerShape(MaterialTheme.spacing.mediumSmall),
+                modifier = Modifier.fillMaxWidth().padding(bottom = MaterialTheme.spacing.medium)
+            ) {
+                Text(s.processingBtnCancel, style = AppTypography.labelMedium)
             }
         }
 

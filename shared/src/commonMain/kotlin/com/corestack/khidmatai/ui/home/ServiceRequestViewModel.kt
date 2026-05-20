@@ -15,13 +15,15 @@ import org.koin.core.annotation.KoinViewModel
 @KoinViewModel
 class ServiceRequestViewModel(
     private val repository: ServiceRepository,
-    private val locationPreferences: LocationPreferences
+    locationPreferences: LocationPreferences
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
         ServiceRequestState(location = locationPreferences.detectedLocation)
     )
     val uiState: StateFlow<ServiceRequestState> = _uiState.asStateFlow()
+
+    private var requestJob: kotlinx.coroutines.Job? = null
 
     fun onAction(action: ServiceRequestIntent) {
         when (action) {
@@ -30,7 +32,8 @@ class ServiceRequestViewModel(
             is ServiceRequestIntent.UpdateUrgency -> _uiState.update { it.copy(urgency = action.urgency) }
             is ServiceRequestIntent.UpdateLanguage -> _uiState.update { it.copy(selectedLanguage = action.language) }
             ServiceRequestIntent.SubmitRequest -> submitRequest()
-            ServiceRequestIntent.Reset -> _uiState.update { it.copy(requestState = RequestState.Idle) }
+            ServiceRequestIntent.CancelRequest -> cancelActiveRequest()
+            ServiceRequestIntent.Reset -> _uiState.update { it.copy(requestState = RequestState.Idle, activeRequestId = null) }
         }
     }
 
@@ -38,14 +41,41 @@ class ServiceRequestViewModel(
         val currentState = _uiState.value
         if (currentState.query.isBlank()) return
 
-        viewModelScope.launch {
-            repository.submitRequest(
+        requestJob?.cancel()
+        requestJob = viewModelScope.launch {
+            repository.submitRequestStream(
                 query = currentState.query,
                 location = currentState.location,
                 urgency = currentState.urgency
             ).collect { state ->
-                _uiState.update { it.copy(requestState = state) }
+                var reqId: String? = null
+                if (state is RequestState.Processing) {
+                    reqId = state.traces.firstOrNull { it.requestId != null }?.requestId
+                }
+                _uiState.update { 
+                    it.copy(
+                        requestState = state,
+                        activeRequestId = reqId ?: it.activeRequestId
+                    )
+                }
             }
+        }
+    }
+
+    private fun cancelActiveRequest() {
+        requestJob?.cancel()
+        requestJob = null
+        val activeId = _uiState.value.activeRequestId
+        if (activeId != null) {
+            viewModelScope.launch {
+                repository.cancelRequest(activeId)
+            }
+        }
+        _uiState.update { 
+            it.copy(
+                requestState = RequestState.Idle,
+                activeRequestId = null
+            )
         }
     }
 }

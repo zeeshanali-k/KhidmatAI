@@ -37,7 +37,8 @@ data class Appointment(
 data class TraceItem(
     val stage: String,
     val message: String,
-    val status: String // completed, pending, waiting, failed
+    val status: String, // completed, pending, waiting, failed
+    val requestId: String? = null
 )
 
 data class NextStep(
@@ -67,3 +68,25 @@ sealed class RequestState {
     data class Unavailable(val result: com.corestack.khidmatai.core.domain.model.ServiceResult) : RequestState()
     data class Error(val message: String) : RequestState()
 }
+
+data class ServiceCategory(
+    val id: String,
+    val value: String,
+    val label: String
+)
+
+data class Booking(
+    val id: String,
+    val userId: String,
+    val providerId: String,
+    val serviceType: String,
+    val status: String,
+    val scheduledAt: String,
+    val address: String,
+    val lat: Double,
+    val lng: Double,
+    val totalCost: Double?,
+    val createdAt: String,
+    val updatedAt: String
+)
+

@@ -53,11 +53,13 @@ class AppModule {
     fun provideServiceRepository(
         env: AppEnvironment,
         httpClient: HttpClient,
+        appPreferences: AppPreferences
     ): ServiceRepository {
         return when (env) {
             AppEnvironment.DEV -> MockServiceRepositoryImpl()
             AppEnvironment.PROD -> ApiServiceRepositoryImpl(
-                httpClient
+                httpClient,
+                appPreferences
             )
         }
     }

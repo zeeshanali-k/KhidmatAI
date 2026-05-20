@@ -22,9 +22,9 @@ import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
+import com.corestack.khidmatai.core.util.getApiBaseUrl
 
-
-private const val BASE_URL = "http://localhost:8000"
+private val BASE_URL get() = getApiBaseUrl()
 
 class ApiAdminRepositoryImpl(
     private val httpClient: HttpClient
