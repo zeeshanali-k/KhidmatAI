@@ -110,6 +110,7 @@ fun HomeScreen(
                     ) {
                         TextField(
                             value = state.query,
+                            maxLines = 4,
                             onValueChange = { viewModel.onAction(ServiceRequestIntent.UpdateQuery(it)) },
                             placeholder = { Text(s.homeSearchHint) },
                             colors = TextFieldDefaults.colors(

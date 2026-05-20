@@ -3,9 +3,9 @@
 package com.corestack.khidmatai.data.location
 
 import com.corestack.khidmatai.domain.location.LocationService
-import com.corestack.khidmatai.domain.model.LocationAddress
-import com.corestack.khidmatai.domain.model.LocationFetchResult
-import com.corestack.khidmatai.domain.model.LocationPermissionStatus
+import com.corestack.khidmatai.core.domain.model.LocationAddress
+import com.corestack.khidmatai.core.domain.model.LocationFetchResult
+import com.corestack.khidmatai.core.domain.model.LocationPermissionStatus
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
 import kotlinx.coroutines.suspendCancellableCoroutine
