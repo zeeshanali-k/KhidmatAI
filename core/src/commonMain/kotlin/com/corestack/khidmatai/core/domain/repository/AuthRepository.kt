@@ -7,4 +7,7 @@ interface AuthRepository {
     fun register(name: String, email: String, password: String): Flow<com.corestack.khidmatai.core.domain.model.AuthResult>
     fun getLastEmail(): String
     fun isLoggedIn(): Boolean
+    fun logout()
+    fun getUserName(): String
+    fun getUserEmail(): String
 }
