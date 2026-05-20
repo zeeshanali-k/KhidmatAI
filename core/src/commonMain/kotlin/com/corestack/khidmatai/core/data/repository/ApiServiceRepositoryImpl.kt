@@ -37,12 +37,9 @@ import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import com.corestack.khidmatai.core.domain.preferences.AppPreferences
-import com.corestack.khidmatai.core.util.getApiBaseUrl
 import kotlinx.serialization.json.double
 import kotlinx.serialization.json.float
 import kotlinx.serialization.json.int
-
-private val BASE_URL get() = getApiBaseUrl()
 
 private const val DEFAULT_LAT = 33.6333
 private const val DEFAULT_LNG = 72.9667

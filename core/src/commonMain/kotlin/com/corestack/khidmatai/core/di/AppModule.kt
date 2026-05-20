@@ -17,6 +17,8 @@ import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import com.corestack.khidmatai.core.util.ktorLogger
+import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.request.header
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import org.koin.core.annotation.Module
@@ -43,6 +45,10 @@ class AppModule {
                 isLenient = true
                 encodeDefaults = true
             })
+        }
+
+        defaultRequest {
+            header("ngrok-skip-browser-warning", "true")
         }
         install(Logging) {
             logger = ktorLogger

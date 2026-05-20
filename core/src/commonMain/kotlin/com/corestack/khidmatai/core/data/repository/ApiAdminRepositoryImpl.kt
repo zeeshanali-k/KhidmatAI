@@ -1,12 +1,11 @@
 package com.corestack.khidmatai.core.data.repository
 
+import com.corestack.khidmatai.core.data.dto.AdminApiResponse
 import com.corestack.khidmatai.core.data.dto.AdminBookingDto
 import com.corestack.khidmatai.core.data.dto.AdminProviderCreateDto
 import com.corestack.khidmatai.core.data.dto.AdminProviderDto
 import com.corestack.khidmatai.core.data.dto.AdminRequestDto
 import com.corestack.khidmatai.core.data.dto.ApiLocation
-import com.corestack.khidmatai.core.data.dto.AdminApiResponse
-import com.corestack.khidmatai.core.data.dto.AdminErrorDetail
 import com.corestack.khidmatai.core.domain.model.AdminBooking
 import com.corestack.khidmatai.core.domain.model.AdminProvider
 import com.corestack.khidmatai.core.domain.model.AdminRequest
@@ -22,9 +21,7 @@ import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
-import com.corestack.khidmatai.core.util.getApiBaseUrl
-
-private val BASE_URL get() = getApiBaseUrl()
+val BASE_URL = "https://ascertain-antler-poking.ngrok-free.dev"
 
 class ApiAdminRepositoryImpl(
     private val httpClient: HttpClient

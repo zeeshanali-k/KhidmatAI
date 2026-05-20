@@ -47,13 +47,13 @@ fun ResultSuccessScreen(
     val isEmergency = result.urgency == "emergency"
     val uriHandler = LocalUriHandler.current
 
-    var showNotification by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) {
-        delay(3000L)
-        showNotification = true
-        delay(4000L)
-        showNotification = false
-    }
+//    var showNotification by remember { mutableStateOf(false) }
+//    LaunchedEffect(Unit) {
+//        delay(3000L)
+//        showNotification = true
+//        delay(4000L)
+//        showNotification = false
+//    }
 
     Scaffold(
         Modifier.fillMaxSize()
@@ -64,7 +64,8 @@ fun ResultSuccessScreen(
             LazyColumn(
                 modifier = Modifier.fillMaxSize().background(Background)
                     .windowInsetsPadding(WindowInsets.systemBars)
-            ) {
+            )
+            {
                 // Status Banner
                 item {
                     Box(
@@ -366,10 +367,10 @@ fun ResultSuccessScreen(
                 }
             }
 
-            MockPushNotification(
-                visible = showNotification,
-                onTap = { onViewBookingDetails(result.bookingId ?: "") }
-            )
+//            MockPushNotification(
+//                visible = showNotification,
+//                onTap = { onViewBookingDetails(result.bookingId ?: "") }
+//            )
         }
 
     }
