@@ -16,14 +16,21 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.style.TextAlign
 import com.corestack.khidmatai.ui.components.BottomNavBar
 import com.corestack.khidmatai.ui.theme.*
+import org.koin.compose.koinInject
+import com.corestack.khidmatai.core.domain.repository.AuthRepository
 
 @Composable
 fun ProfileScreen(
     selectedLanguage: String = "EN",
     onLanguageChange: (String) -> Unit = {},
-    onNavigate: (String) -> Unit = {}
+    onNavigate: (String) -> Unit = {},
+    onLogout: () -> Unit = {}
 ) {
     val s = LocalAppStrings.current
+    val authRepository = koinInject<AuthRepository>()
+    val userName = authRepository.getUserName()
+    val userEmail = authRepository.getUserEmail()
+    val avatarLetter = if (userName.isNotEmpty()) userName.take(1).uppercase() else "A"
 
     Scaffold(
         modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.systemBars),
@@ -73,13 +80,15 @@ fun ProfileScreen(
                                 ),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text("A", style = AppTypography.displayLarge, color = Surface)
+                            Text(avatarLetter, style = AppTypography.displayLarge, color = Surface)
                         }
 
-                        // Name & phone
+                        // Name & email
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("Ali Raza", style = AppTypography.titleLarge, color = TextPrimary)
-                            Text("+92 300 1234567", style = AppTypography.bodySmall, color = TextSecondary)
+                            Text(userName.ifEmpty { "User" }, style = AppTypography.titleLarge, color = TextPrimary)
+                            if (userEmail.isNotEmpty()) {
+                                Text(userEmail, style = AppTypography.bodySmall, color = TextSecondary)
+                            }
                         }
 
                         // Stats row
@@ -112,9 +121,9 @@ fun ProfileScreen(
                 ) {
                     Column(modifier = Modifier.fillMaxWidth()) {
                         val menuItems = listOf(
-                            Triple("🔔", s.profileNotifications, "Reminders on"),
+//                            Triple("🔔", s.profileNotifications, "Reminders on"),
                             Triple("🌐", s.profileLanguage, selectedLanguage),
-                            Triple("📍", s.profileSavedLocations, "2 saved"),
+//                            Triple("📍", s.profileSavedLocations, "2 saved"),
                             Triple("🔐", s.profilePrivacy, ""),
                             Triple("ℹ️", s.profileAbout, "v1.0"),
                         )
@@ -158,7 +167,10 @@ fun ProfileScreen(
             // Sign Out
             item {
                 OutlinedButton(
-                    onClick = {},
+                    onClick = {
+                        authRepository.logout()
+                        onLogout()
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(MaterialTheme.spacing.extraLarge + MaterialTheme.spacing.medium),

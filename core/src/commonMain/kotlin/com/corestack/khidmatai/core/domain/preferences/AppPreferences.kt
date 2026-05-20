@@ -22,10 +22,15 @@ class AppPreferences {
         get() = settings.getBoolean("onboarding_completed", false)
         set(value) = settings.putBoolean("onboarding_completed", value)
 
+    var userName: String
+        get() = settings.getString("user_name", "")
+        set(value) = settings.putString("user_name", value)
+
     val isLoggedIn: Boolean
         get() = authToken.isNotEmpty()
 
     fun clearAuth() {
         authToken = ""
+        userName = ""
     }
 }

@@ -275,6 +275,11 @@ fun App() {
                                 "home" -> navController.navigate(Home) { popUpTo(0) }
                                 "bookings" -> navController.navigate(Bookings)
                             }
+                        },
+                        onLogout = {
+                            navController.navigate(Login) {
+                                popUpTo(0) { inclusive = true }
+                            }
                         }
                     )
                 }

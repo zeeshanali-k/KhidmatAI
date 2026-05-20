@@ -27,6 +27,14 @@ class ApiAuthRepositoryImpl(
     override fun getLastEmail(): String = appPreferences.lastEmail
     override fun isLoggedIn(): Boolean = appPreferences.isLoggedIn
 
+    override fun logout() {
+        appPreferences.clearAuth()
+    }
+
+    override fun getUserName(): String = appPreferences.userName
+
+    override fun getUserEmail(): String = appPreferences.lastEmail
+
     override fun login(email: String, password: String): Flow<AuthResult> = flow {
         try {
             val response: HttpResponse = httpClient.submitForm(
@@ -50,6 +58,7 @@ class ApiAuthRepositoryImpl(
                 )
                 appPreferences.authToken = user.token
                 appPreferences.lastEmail = user.email
+                appPreferences.userName = user.name
                 emit(AuthResult.Success(user))
             } else {
                 val errorMsg = runCatching {
@@ -89,6 +98,7 @@ class ApiAuthRepositoryImpl(
                     )
                     appPreferences.authToken = user.token
                     appPreferences.lastEmail = user.email
+                    appPreferences.userName = user.name
                     emit(AuthResult.Success(user))
                 } else {
                     val errorMsg = runCatching {
