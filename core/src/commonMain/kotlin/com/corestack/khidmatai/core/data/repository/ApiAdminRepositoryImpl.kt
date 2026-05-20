@@ -5,6 +5,8 @@ import com.corestack.khidmatai.core.data.dto.AdminProviderCreateDto
 import com.corestack.khidmatai.core.data.dto.AdminProviderDto
 import com.corestack.khidmatai.core.data.dto.AdminRequestDto
 import com.corestack.khidmatai.core.data.dto.ApiLocation
+import com.corestack.khidmatai.core.data.dto.AdminApiResponse
+import com.corestack.khidmatai.core.data.dto.AdminErrorDetail
 import com.corestack.khidmatai.core.domain.model.AdminBooking
 import com.corestack.khidmatai.core.domain.model.AdminProvider
 import com.corestack.khidmatai.core.domain.model.AdminRequest
@@ -28,20 +30,43 @@ class ApiAdminRepositoryImpl(
     private val httpClient: HttpClient
 ) : AdminRepository {
 
+    private fun <T> AdminApiResponse<T>.unwrap(): T {
+        if (!success) {
+            val errType = error?.type ?: "UnknownError"
+            throw Exception("$errType: $message")
+        }
+        return data ?: throw Exception("Response data is null")
+    }
+
     override suspend fun getAllBookings(): List<AdminBooking> =
-        httpClient.get("${BASE_URL}/admin/bookings/").body<List<AdminBookingDto>>().map { it.toDomain() }
+        httpClient.get("${BASE_URL}/admin/bookings/")
+            .body<AdminApiResponse<List<AdminBookingDto>>>()
+            .unwrap()
+            .map { it.toDomain() }
 
     override suspend fun getBookingById(bookingId: String): AdminBooking =
-        httpClient.get("${BASE_URL}/admin/bookings/$bookingId").body<AdminBookingDto>().toDomain()
+        httpClient.get("${BASE_URL}/admin/bookings/$bookingId")
+            .body<AdminApiResponse<AdminBookingDto>>()
+            .unwrap()
+            .toDomain()
 
     override suspend fun cancelBooking(bookingId: String): AdminBooking =
-        httpClient.post("${BASE_URL}/admin/bookings/$bookingId/cancel").body<AdminBookingDto>().toDomain()
+        httpClient.post("${BASE_URL}/admin/bookings/$bookingId/cancel")
+            .body<AdminApiResponse<AdminBookingDto>>()
+            .unwrap()
+            .toDomain()
 
     override suspend fun completeBooking(bookingId: String): AdminBooking =
-        httpClient.post("${BASE_URL}/admin/bookings/$bookingId/complete").body<AdminBookingDto>().toDomain()
+        httpClient.post("${BASE_URL}/admin/bookings/$bookingId/complete")
+            .body<AdminApiResponse<AdminBookingDto>>()
+            .unwrap()
+            .toDomain()
 
     override suspend fun getAllProviders(): List<AdminProvider> =
-        httpClient.get("${BASE_URL}/admin/providers/").body<List<AdminProviderDto>>().map { it.toDomain() }
+        httpClient.get("${BASE_URL}/admin/providers/")
+            .body<AdminApiResponse<List<AdminProviderDto>>>()
+            .unwrap()
+            .map { it.toDomain() }
 
     override suspend fun createProvider(provider: AdminProvider): AdminProvider {
         val dto = AdminProviderCreateDto(
@@ -61,7 +86,7 @@ class ApiAdminRepositoryImpl(
         return httpClient.post("${BASE_URL}/admin/providers/") {
             contentType(ContentType.Application.Json)
             setBody(dto)
-        }.body<AdminProviderDto>().toDomain()
+        }.body<AdminApiResponse<AdminProviderDto>>().unwrap().toDomain()
     }
 
     override suspend fun updateProvider(providerId: String, provider: AdminProvider): AdminProvider {
@@ -82,21 +107,35 @@ class ApiAdminRepositoryImpl(
         return httpClient.put("${BASE_URL}/admin/providers/$providerId") {
             contentType(ContentType.Application.Json)
             setBody(dto)
-        }.body<AdminProviderDto>().toDomain()
+        }.body<AdminApiResponse<AdminProviderDto>>().unwrap().toDomain()
     }
 
     override suspend fun deleteProvider(providerId: String) {
-        httpClient.delete("${BASE_URL}/admin/providers/$providerId")
+        val response = httpClient.delete("${BASE_URL}/admin/providers/$providerId")
+            .body<AdminApiResponse<kotlinx.serialization.json.JsonElement?>>()
+        if (!response.success) {
+            val errType = response.error?.type ?: "UnknownError"
+            throw Exception("$errType: ${response.message}")
+        }
     }
 
     override suspend fun toggleProviderAvailability(providerId: String): AdminProvider =
-        httpClient.patch("${BASE_URL}/admin/providers/$providerId/availability").body<AdminProviderDto>().toDomain()
+        httpClient.patch("${BASE_URL}/admin/providers/$providerId/availability")
+            .body<AdminApiResponse<AdminProviderDto>>()
+            .unwrap()
+            .toDomain()
 
     override suspend fun getAllRequests(): List<AdminRequest> =
-        httpClient.get("${BASE_URL}/admin/requests/").body<List<AdminRequestDto>>().map { it.toDomain() }
+        httpClient.get("${BASE_URL}/admin/requests/")
+            .body<AdminApiResponse<List<AdminRequestDto>>>()
+            .unwrap()
+            .map { it.toDomain() }
 
     override suspend fun getRequestById(requestId: String): AdminRequest =
-        httpClient.get("${BASE_URL}/admin/requests/$requestId").body<AdminRequestDto>().toDomain()
+        httpClient.get("${BASE_URL}/admin/requests/$requestId")
+            .body<AdminApiResponse<AdminRequestDto>>()
+            .unwrap()
+            .toDomain()
 }
 
 private fun AdminBookingDto.toDomain() =

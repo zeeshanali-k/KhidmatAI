@@ -1,5 +1,8 @@
 package com.corestack.khidmatai.core.data.repository
 
+import com.corestack.khidmatai.core.data.dto.AuthResponse
+import com.corestack.khidmatai.core.data.dto.LoginRequest
+import com.corestack.khidmatai.core.domain.model.AuthResult
 import com.corestack.khidmatai.core.domain.preferences.AppPreferences
 import com.corestack.khidmatai.core.domain.repository.AuthRepository
 import io.ktor.client.HttpClient
@@ -21,13 +24,13 @@ class ApiAuthRepositoryImpl(
     override fun getLastEmail(): String = appPreferences.lastEmail
     override fun isLoggedIn(): Boolean = appPreferences.isLoggedIn
 
-    override fun login(email: String, password: String): Flow<com.corestack.khidmatai.core.domain.model.AuthResult> = flow {
+    override fun login(email: String, password: String): Flow<AuthResult> = flow {
         try {
-            val body = _root_ide_package_.com.corestack.khidmatai.core.data.dto.LoginRequest(
+            val body = LoginRequest(
                 email,
                 password
             )
-            val response: com.corestack.khidmatai.core.data.dto.AuthResponse = httpClient.post("${BASE_URL}/auth/login") {
+            val response: AuthResponse = httpClient.post("${BASE_URL}/auth/login") {
                 contentType(ContentType.Application.Json)
                 setBody(body)
             }.body()
@@ -41,23 +44,23 @@ class ApiAuthRepositoryImpl(
                 )
                 appPreferences.authToken = user.token
                 appPreferences.lastEmail = user.email
-                emit(com.corestack.khidmatai.core.domain.model.AuthResult.Success(user))
+                emit(AuthResult.Success(user))
             } else {
-                emit(com.corestack.khidmatai.core.domain.model.AuthResult.Error(response.error ?: "Login failed"))
+                emit(AuthResult.Error(response.error ?: "Login failed"))
             }
         } catch (e: Exception) {
-            emit(com.corestack.khidmatai.core.domain.model.AuthResult.Error(e.message ?: "Network error. Please check your connection."))
+            emit(AuthResult.Error(e.message ?: "Network error. Please check your connection."))
         }
     }
 
-    override fun register(name: String, email: String, password: String): Flow<com.corestack.khidmatai.core.domain.model.AuthResult> = flow {
+    override fun register(name: String, email: String, password: String): Flow<AuthResult> = flow {
         try {
             val body = _root_ide_package_.com.corestack.khidmatai.core.data.dto.RegisterRequest(
                 name,
                 email,
                 password
             )
-            val response: com.corestack.khidmatai.core.data.dto.AuthResponse = httpClient.post("${BASE_URL}/auth/register") {
+            val response: AuthResponse = httpClient.post("${BASE_URL}/auth/register") {
                 contentType(ContentType.Application.Json)
                 setBody(body)
             }.body()
@@ -71,12 +74,12 @@ class ApiAuthRepositoryImpl(
                 )
                 appPreferences.authToken = user.token
                 appPreferences.lastEmail = user.email
-                emit(com.corestack.khidmatai.core.domain.model.AuthResult.Success(user))
+                emit(AuthResult.Success(user))
             } else {
-                emit(com.corestack.khidmatai.core.domain.model.AuthResult.Error(response.error ?: "Registration failed"))
+                emit(AuthResult.Error(response.error ?: "Registration failed"))
             }
         } catch (e: Exception) {
-            emit(com.corestack.khidmatai.core.domain.model.AuthResult.Error(e.message ?: "Network error. Please check your connection."))
+            emit(AuthResult.Error(e.message ?: "Network error. Please check your connection."))
         }
     }
 }

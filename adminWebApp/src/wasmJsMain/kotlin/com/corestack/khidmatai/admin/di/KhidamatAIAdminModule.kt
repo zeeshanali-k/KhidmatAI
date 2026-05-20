@@ -2,6 +2,7 @@ package com.corestack.khidmatai.admin.di
 
 import com.corestack.khidmatai.core.data.repository.ApiAdminRepositoryImpl
 import com.corestack.khidmatai.core.data.repository.MockAdminRepositoryImpl
+import com.corestack.khidmatai.core.domain.ACTIVE_ENV
 import com.corestack.khidmatai.core.domain.AppEnvironment
 import com.corestack.khidmatai.core.domain.repository.AdminRepository
 import io.ktor.client.HttpClient
@@ -21,7 +22,7 @@ import org.koin.core.annotation.Single
 class KhidamatAIAdminModule {
 
     @Single
-    fun provideEnvironment(): AppEnvironment = AppEnvironment.DEV
+    fun provideEnvironment(): AppEnvironment = ACTIVE_ENV
 
     @Single
     fun provideHttpClient(): HttpClient = HttpClient {
