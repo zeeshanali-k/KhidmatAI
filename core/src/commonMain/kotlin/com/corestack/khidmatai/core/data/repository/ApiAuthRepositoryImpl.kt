@@ -18,9 +18,6 @@ import io.ktor.http.contentType
 import io.ktor.http.parameters
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import com.corestack.khidmatai.core.util.getApiBaseUrl
-
-private val BASE_URL get() = getApiBaseUrl()
 
 class ApiAuthRepositoryImpl(
     private val httpClient: HttpClient,

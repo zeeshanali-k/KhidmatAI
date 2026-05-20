@@ -12,36 +12,36 @@ import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
 
 @KoinViewModel
-class BookingsViewModel(private val adminRepository: com.corestack.khidmatai.core.domain.repository.AdminRepository) : ViewModel() {
+class BookingsViewModel(private val adminRepository: AdminRepository) : ViewModel() {
 
-    private val _listState = MutableStateFlow<com.corestack.khidmatai.core.domain.model.AdminState<List<com.corestack.khidmatai.core.domain.model.AdminBooking>>>(
-        _root_ide_package_.com.corestack.khidmatai.core.domain.model.AdminState.Loading)
-    val listState: StateFlow<com.corestack.khidmatai.core.domain.model.AdminState<List<com.corestack.khidmatai.core.domain.model.AdminBooking>>> = _listState.asStateFlow()
+    private val _listState = MutableStateFlow<AdminState<List<AdminBooking>>>(
+        AdminState.Loading)
+    val listState: StateFlow<AdminState<List<AdminBooking>>> = _listState.asStateFlow()
 
-    private val _detailState = MutableStateFlow<com.corestack.khidmatai.core.domain.model.AdminState<com.corestack.khidmatai.core.domain.model.AdminBooking>>(
-        _root_ide_package_.com.corestack.khidmatai.core.domain.model.AdminState.Loading)
-    val detailState: StateFlow<com.corestack.khidmatai.core.domain.model.AdminState<com.corestack.khidmatai.core.domain.model.AdminBooking>> = _detailState.asStateFlow()
+    private val _detailState = MutableStateFlow<AdminState<AdminBooking>>(
+        AdminState.Loading)
+    val detailState: StateFlow<AdminState<AdminBooking>> = _detailState.asStateFlow()
 
     init { loadAll() }
 
     fun loadAll() {
-        _listState.value = _root_ide_package_.com.corestack.khidmatai.core.domain.model.AdminState.Loading
+        _listState.value = AdminState.Loading
         viewModelScope.launch {
             try {
-                _listState.value = _root_ide_package_.com.corestack.khidmatai.core.domain.model.AdminState.Success(adminRepository.getAllBookings())
+                _listState.value = AdminState.Success(adminRepository.getAllBookings())
             } catch (e: Exception) {
-                _listState.value = _root_ide_package_.com.corestack.khidmatai.core.domain.model.AdminState.Error(e.message ?: "Failed to load bookings")
+                _listState.value = AdminState.Error(e.message ?: "Failed to load bookings")
             }
         }
     }
 
     fun loadDetail(bookingId: String) {
-        _detailState.value = _root_ide_package_.com.corestack.khidmatai.core.domain.model.AdminState.Loading
+        _detailState.value = AdminState.Loading
         viewModelScope.launch {
             try {
-                _detailState.value = _root_ide_package_.com.corestack.khidmatai.core.domain.model.AdminState.Success(adminRepository.getBookingById(bookingId))
+                _detailState.value = AdminState.Success(adminRepository.getBookingById(bookingId))
             } catch (e: Exception) {
-                _detailState.value = _root_ide_package_.com.corestack.khidmatai.core.domain.model.AdminState.Error(e.message ?: "Failed to load booking")
+                _detailState.value = AdminState.Error(e.message ?: "Failed to load booking")
             }
         }
     }
@@ -50,10 +50,10 @@ class BookingsViewModel(private val adminRepository: com.corestack.khidmatai.cor
         viewModelScope.launch {
             try {
                 val updated = adminRepository.completeBooking(bookingId)
-                _detailState.value = _root_ide_package_.com.corestack.khidmatai.core.domain.model.AdminState.Success(updated)
+                _detailState.value = AdminState.Success(updated)
                 loadAll()
             } catch (e: Exception) {
-                _detailState.value = _root_ide_package_.com.corestack.khidmatai.core.domain.model.AdminState.Error(e.message ?: "Failed to complete booking")
+                _detailState.value = AdminState.Error(e.message ?: "Failed to complete booking")
             }
         }
     }
@@ -62,10 +62,10 @@ class BookingsViewModel(private val adminRepository: com.corestack.khidmatai.cor
         viewModelScope.launch {
             try {
                 val updated = adminRepository.cancelBooking(bookingId)
-                _detailState.value = _root_ide_package_.com.corestack.khidmatai.core.domain.model.AdminState.Success(updated)
+                _detailState.value = AdminState.Success(updated)
                 loadAll()
             } catch (e: Exception) {
-                _detailState.value = _root_ide_package_.com.corestack.khidmatai.core.domain.model.AdminState.Error(e.message ?: "Failed to cancel booking")
+                _detailState.value = AdminState.Error(e.message ?: "Failed to cancel booking")
             }
         }
     }

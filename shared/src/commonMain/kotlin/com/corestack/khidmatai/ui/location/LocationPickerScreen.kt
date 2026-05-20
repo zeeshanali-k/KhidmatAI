@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -38,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.corestack.khidmatai.core.domain.model.LocationPermissionStatus
 import com.corestack.khidmatai.ui.theme.AppTypography
@@ -281,7 +283,7 @@ private fun DetectLocationRow(
             CircularProgressIndicator(
                 strokeWidth = MaterialTheme.spacing.extraSmall / 2,
                 color = Primary,
-                modifier = Modifier.height(MaterialTheme.spacing.medium),
+                modifier = Modifier.size(28.dp),
             )
         } else if (!isDenied) {
             Text(text = "→", style = AppTypography.labelMedium, color = Primary)
