@@ -199,6 +199,9 @@ fun App() {
                             navController.navigate(ServiceResultUnavailable) {
                                 popUpTo(Home) { inclusive = false }
                             }
+                        },
+                        onNavigateBack = {
+                            navController.popBackStack()
                         }
                     )
                 }
@@ -241,13 +244,8 @@ fun App() {
 
                 composable<BookingDetail> { backStackEntry ->
                     val bookingDetail = backStackEntry.toRoute<BookingDetail>()
-                    val homeEntry = remember(navController) {
-                        navController.getBackStackEntry<Home>()
-                    }
-                    val homeViewModel: ServiceRequestViewModel = koinViewModel(viewModelStoreOwner = homeEntry)
                     BookingDetailScreen(
                         bookingId = bookingDetail.bookingId,
-                        viewModel = homeViewModel,
                         onBack = {
                             navController.popBackStack()
                         }
@@ -255,12 +253,7 @@ fun App() {
                 }
 
                 composable<Bookings> { bookingsEntry ->
-                    val homeEntry = remember(navController) {
-                        navController.getBackStackEntry<Home>()
-                    }
-                    val homeViewModel: ServiceRequestViewModel = koinViewModel(viewModelStoreOwner = homeEntry)
                     BookingsScreen(
-                        viewModel = homeViewModel,
                         onNavigate = { route ->
                             when (route) {
                                 "home" -> navController.navigate(Home) { popUpTo(0) }

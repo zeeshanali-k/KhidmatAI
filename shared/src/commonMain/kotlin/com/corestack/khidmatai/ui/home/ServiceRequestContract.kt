@@ -9,7 +9,8 @@ data class ServiceRequestState(
     val location: String = "G-13, Islamabad",
     val urgency: String = "medium",
     val selectedLanguage: String = "EN",
-    val requestState: RequestState = RequestState.Idle
+    val requestState: RequestState = RequestState.Idle,
+    val activeRequestId: String? = null
 )
 
 sealed interface ServiceRequestIntent {
@@ -18,5 +19,6 @@ sealed interface ServiceRequestIntent {
     data class UpdateUrgency(val urgency: String) : ServiceRequestIntent
     data class UpdateLanguage(val language: String) : ServiceRequestIntent
     data object SubmitRequest : ServiceRequestIntent
+    data object CancelRequest : ServiceRequestIntent
     data object Reset : ServiceRequestIntent
 }

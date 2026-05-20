@@ -54,3 +54,18 @@ data class AdminRequestDto(
     val trace: List<com.corestack.khidmatai.core.data.dto.ApiTrace> = emptyList(),
     @SerialName("created_at") val createdAt: String
 )
+
+@Serializable
+data class AdminApiResponse<T>(
+    val success: Boolean,
+    val message: String,
+    val data: T? = null,
+    val error: AdminErrorDetail? = null
+)
+
+@Serializable
+data class AdminErrorDetail(
+    val type: String,
+    val details: kotlinx.serialization.json.JsonElement? = null
+)
+

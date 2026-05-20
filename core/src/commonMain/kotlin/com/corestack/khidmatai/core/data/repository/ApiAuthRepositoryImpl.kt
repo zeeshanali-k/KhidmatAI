@@ -1,17 +1,26 @@
 package com.corestack.khidmatai.core.data.repository
 
+import com.corestack.khidmatai.core.data.dto.AuthErrorResponse
+import com.corestack.khidmatai.core.data.dto.RegisterRequest
+import com.corestack.khidmatai.core.data.dto.TokenResponseDto
+import com.corestack.khidmatai.core.domain.model.AuthResult
+import com.corestack.khidmatai.core.domain.model.AuthUser
 import com.corestack.khidmatai.core.domain.preferences.AppPreferences
 import com.corestack.khidmatai.core.domain.repository.AuthRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.forms.submitForm
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
+import io.ktor.http.parameters
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import com.corestack.khidmatai.core.util.getApiBaseUrl
 
-private const val BASE_URL = "http://10.0.2.2:8000"
+private val BASE_URL get() = getApiBaseUrl()
 
 class ApiAuthRepositoryImpl(
     private val httpClient: HttpClient,
@@ -21,62 +30,83 @@ class ApiAuthRepositoryImpl(
     override fun getLastEmail(): String = appPreferences.lastEmail
     override fun isLoggedIn(): Boolean = appPreferences.isLoggedIn
 
-    override fun login(email: String, password: String): Flow<com.corestack.khidmatai.core.domain.model.AuthResult> = flow {
+    override fun login(email: String, password: String): Flow<AuthResult> = flow {
         try {
-            val body = _root_ide_package_.com.corestack.khidmatai.core.data.dto.LoginRequest(
-                email,
-                password
+            val response: HttpResponse = httpClient.submitForm(
+                url = "$BASE_URL/token",
+                formParameters = parameters {
+                    append("username", email)
+                    append("password", password)
+                }
             )
-            val response: com.corestack.khidmatai.core.data.dto.AuthResponse = httpClient.post("${BASE_URL}/auth/login") {
-                contentType(ContentType.Application.Json)
-                setBody(body)
-            }.body()
 
-            if (response.success && response.data != null) {
-                val user = _root_ide_package_.com.corestack.khidmatai.core.domain.model.AuthUser(
-                    response.data.id,
-                    response.data.name,
-                    response.data.email,
-                    response.data.token
+            if (response.status.value in 200..299) {
+                val tokenResponse = response.body<TokenResponseDto>()
+                val parsedName = email.substringBefore("@")
+                    .replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+                
+                val user = AuthUser(
+                    id = email,
+                    name = parsedName,
+                    email = email,
+                    token = tokenResponse.accessToken
                 )
                 appPreferences.authToken = user.token
                 appPreferences.lastEmail = user.email
-                emit(com.corestack.khidmatai.core.domain.model.AuthResult.Success(user))
+                emit(AuthResult.Success(user))
             } else {
-                emit(com.corestack.khidmatai.core.domain.model.AuthResult.Error(response.error ?: "Login failed"))
+                val errorMsg = runCatching {
+                    response.body<AuthErrorResponse>().detail
+                }.getOrElse { "Invalid credentials" }
+                emit(AuthResult.Error(errorMsg))
             }
         } catch (e: Exception) {
-            emit(com.corestack.khidmatai.core.domain.model.AuthResult.Error(e.message ?: "Network error. Please check your connection."))
+            emit(AuthResult.Error(e.message ?: "Network error. Please check your connection."))
         }
     }
 
-    override fun register(name: String, email: String, password: String): Flow<com.corestack.khidmatai.core.domain.model.AuthResult> = flow {
+    override fun register(name: String, email: String, password: String): Flow<AuthResult> = flow {
         try {
-            val body = _root_ide_package_.com.corestack.khidmatai.core.data.dto.RegisterRequest(
-                name,
-                email,
-                password
-            )
-            val response: com.corestack.khidmatai.core.data.dto.AuthResponse = httpClient.post("${BASE_URL}/auth/register") {
+            val response: HttpResponse = httpClient.post("$BASE_URL/register") {
                 contentType(ContentType.Application.Json)
-                setBody(body)
-            }.body()
+                setBody(RegisterRequest(name = name, email = email, password = password))
+            }
 
-            if (response.success && response.data != null) {
-                val user = _root_ide_package_.com.corestack.khidmatai.core.domain.model.AuthUser(
-                    response.data.id,
-                    response.data.name,
-                    response.data.email,
-                    response.data.token
+            if (response.status.value in 200..299) {
+                // Sequentially trigger login (fetch JWT token)
+                val loginResponse: HttpResponse = httpClient.submitForm(
+                    url = "$BASE_URL/token",
+                    formParameters = parameters {
+                        append("username", email)
+                        append("password", password)
+                    }
                 )
-                appPreferences.authToken = user.token
-                appPreferences.lastEmail = user.email
-                emit(com.corestack.khidmatai.core.domain.model.AuthResult.Success(user))
+
+                if (loginResponse.status.value in 200..299) {
+                    val tokenResponse = loginResponse.body<TokenResponseDto>()
+                    val user = AuthUser(
+                        id = email,
+                        name = name,
+                        email = email,
+                        token = tokenResponse.accessToken
+                    )
+                    appPreferences.authToken = user.token
+                    appPreferences.lastEmail = user.email
+                    emit(AuthResult.Success(user))
+                } else {
+                    val errorMsg = runCatching {
+                        loginResponse.body<AuthErrorResponse>().detail
+                    }.getOrElse { "Registration succeeded, but login failed. Please login manually." }
+                    emit(AuthResult.Error(errorMsg))
+                }
             } else {
-                emit(com.corestack.khidmatai.core.domain.model.AuthResult.Error(response.error ?: "Registration failed"))
+                val errorMsg = runCatching {
+                    response.body<AuthErrorResponse>().detail
+                }.getOrElse { "Email already exists" }
+                emit(AuthResult.Error(errorMsg))
             }
         } catch (e: Exception) {
-            emit(com.corestack.khidmatai.core.domain.model.AuthResult.Error(e.message ?: "Network error. Please check your connection."))
+            emit(AuthResult.Error(e.message ?: "Network error. Please check your connection."))
         }
     }
 }

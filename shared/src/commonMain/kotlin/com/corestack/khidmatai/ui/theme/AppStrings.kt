@@ -45,6 +45,7 @@ data class AppStrings(
     val processingTitle: String,
     val processingEmergencyTitle: String,
     val processingDesc: String,
+    val processingBtnCancel: String,
     // Result Success
     val resultSuccessEmergency: String,
     val resultSuccessTitle: String,
@@ -179,6 +180,7 @@ val EnglishStrings = AppStrings(
     processingTitle = "Agent is running...",
     processingEmergencyTitle = "Emergency Request — Priority Processing 🚨",
     processingDesc = "AI is orchestrating your request",
+    processingBtnCancel = "✕ Cancel Request",
     resultSuccessEmergency = "EMERGENCY BOOKING",
     resultSuccessTitle = "Booking Confirmed!",
     resultSuccessAiDecision = "🤖 Why selected? (AI Decision)",
@@ -301,6 +303,7 @@ val UrduStrings = AppStrings(
     processingTitle = "ایجنٹ کام کر رہا ہے...",
     processingEmergencyTitle = "ایمرجنسی درخواست — فوری پروسیسنگ 🚨",
     processingDesc = "AI آپ کی درخواست پر کام کر رہا ہے",
+    processingBtnCancel = "✕ درخواست منسوخ کریں",
     resultSuccessEmergency = "ایمرجنسی بکنگ",
     resultSuccessTitle = "بکنگ کنفرم ہو گئی!",
     resultSuccessAiDecision = "🤖 کیوں چنا؟ (AI فیصلہ)",

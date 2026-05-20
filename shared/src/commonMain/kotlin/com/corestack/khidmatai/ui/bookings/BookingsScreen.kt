@@ -13,24 +13,35 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.corestack.khidmatai.core.domain.model.RequestState
 import com.corestack.khidmatai.ui.components.BadgeVariant
 import com.corestack.khidmatai.ui.components.BottomNavBar
 import com.corestack.khidmatai.ui.components.StatusBadge
-import com.corestack.khidmatai.ui.home.ServiceRequestViewModel
 import com.corestack.khidmatai.ui.theme.*
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun BookingsScreen(
-    viewModel: ServiceRequestViewModel = koinViewModel(),
+    viewModel: BookingsViewModel = koinViewModel(),
     onNavigate: (String) -> Unit,
     onBookingClick: (String) -> Unit
 ) {
     val s = LocalAppStrings.current
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    val activeResult = (state.requestState as? RequestState.Success)?.result
     var selectedFilter by remember { mutableStateOf("all") }
+
+    LaunchedEffect(Unit) {
+        viewModel.onAction(BookingsIntent.LoadBookings)
+    }
+
+    val filteredBookings = remember(state.bookings, selectedFilter) {
+        state.bookings.filter { booking ->
+            when (selectedFilter) {
+                "upcoming" -> booking.status.lowercase() in listOf("confirmed", "pending", "upcoming")
+                "completed" -> booking.status.lowercase() in listOf("completed", "done")
+                else -> true
+            }
+        }
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.systemBars),
@@ -62,22 +73,55 @@ fun BookingsScreen(
 
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
 
-            LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                if (activeResult != null) {
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(bottom = MaterialTheme.spacing.medium)
+            ) {
+                if (state.isLoading) {
                     item {
-                        BookingListItem(
-                            service = activeResult.detectedService
-                                ?.replace("_", " ")
-                                ?.replaceFirstChar { it.uppercase() } ?: "Service",
-                            providerName = activeResult.provider?.name ?: "Unknown",
-                            rating = activeResult.provider?.rating ?: 0f,
-                            time = activeResult.appointment?.timeDisplay ?: "",
-                            location = activeResult.appointment?.address ?: "",
-                            status = BadgeVariant.UPCOMING,
-                            onClick = { activeResult.bookingId?.let { onBookingClick(it) } }
-                        )
+                        Box(modifier = Modifier.fillMaxWidth().padding(MaterialTheme.spacing.extraLarge), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator(color = Primary)
+                        }
                     }
-                } else {
+                } else if (state.error != null) {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(MaterialTheme.spacing.medium),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Card(
+                                shape = RoundedCornerShape(MaterialTheme.spacing.mediumSmall),
+                                colors = CardDefaults.cardColors(containerColor = ErrorLight),
+                                border = BorderStroke(MaterialTheme.spacing.extraSmall / 4, Error),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Column(
+                                    modifier = Modifier.padding(MaterialTheme.spacing.medium),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Text("⚠️", style = AppTypography.displayLarge)
+                                    Spacer(modifier = Modifier.height(MaterialTheme.spacing.small))
+                                    Text(
+                                        text = state.error ?: "An unexpected error occurred",
+                                        style = AppTypography.titleLarge,
+                                        color = Error,
+                                        modifier = Modifier.padding(horizontal = MaterialTheme.spacing.small)
+                                    )
+                                    Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
+                                    Button(
+                                        onClick = { viewModel.onAction(BookingsIntent.LoadBookings) },
+                                        colors = ButtonDefaults.buttonColors(containerColor = Error),
+                                        shape = RoundedCornerShape(MaterialTheme.spacing.mediumSmall)
+                                    ) {
+                                        Text("Retry", color = Surface, style = AppTypography.labelMedium)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else if (filteredBookings.isEmpty()) {
                     item {
                         Box(
                             modifier = Modifier
@@ -100,6 +144,29 @@ fun BookingsScreen(
                                 }
                             }
                         }
+                    }
+                } else {
+                    items(filteredBookings.size) { index ->
+                        val booking = filteredBookings[index]
+                        val serviceName = booking.serviceType
+                            .replace("_", " ")
+                            .replaceFirstChar { it.uppercase() }
+                        val statusBadge = when (booking.status.lowercase()) {
+                            "completed", "done" -> BadgeVariant.COMPLETED
+                            "cancelled" -> BadgeVariant.FAILED
+                            else -> BadgeVariant.UPCOMING
+                        }
+                        val providerName = if (booking.providerId == "p1") "Kamran Khan" else "Verified Provider"
+
+                        BookingListItem(
+                            service = serviceName,
+                            providerName = providerName,
+                            rating = 4.7f,
+                            time = booking.scheduledAt,
+                            location = booking.address,
+                            status = statusBadge,
+                            onClick = { onBookingClick(booking.id) }
+                        )
                     }
                 }
             }

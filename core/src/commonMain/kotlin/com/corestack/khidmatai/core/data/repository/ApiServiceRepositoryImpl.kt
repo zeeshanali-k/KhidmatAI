@@ -1,77 +1,302 @@
 package com.corestack.khidmatai.core.data.repository
 
+import com.corestack.khidmatai.core.data.dto.ApiLocation
+import com.corestack.khidmatai.core.data.dto.LocationBody
+import com.corestack.khidmatai.core.data.dto.ServiceCategoryDto
+import com.corestack.khidmatai.core.data.dto.ServiceRequestBody
+import com.corestack.khidmatai.core.data.dto.UserApiResponse
+import com.corestack.khidmatai.core.data.dto.UserBookingDto
+import com.corestack.khidmatai.core.data.dto.UserProviderDto
+import com.corestack.khidmatai.core.data.dto.ApiTrace
+import com.corestack.khidmatai.core.data.dto.ApiResponse
+import com.corestack.khidmatai.core.domain.model.Appointment
+import com.corestack.khidmatai.core.domain.model.Booking
+import com.corestack.khidmatai.core.domain.model.Provider
+import com.corestack.khidmatai.core.domain.model.RequestState
+import com.corestack.khidmatai.core.domain.model.ServiceCategory
+import com.corestack.khidmatai.core.domain.model.ServiceResult
+import com.corestack.khidmatai.core.domain.model.TraceItem
+import com.corestack.khidmatai.core.domain.repository.ServiceRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.get
 import io.ktor.client.request.post
+import io.ktor.client.request.preparePost
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsChannel
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
+import io.ktor.utils.io.readUTF8Line
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import com.corestack.khidmatai.core.domain.preferences.AppPreferences
+import com.corestack.khidmatai.core.util.getApiBaseUrl
 
-// 10.0.2.2 maps to host machine's localhost when running on an Android emulator.
-// For a physical device on the same LAN, replace with your machine's local IP (e.g. 192.168.1.x).
-private const val BASE_URL = "http://10.0.2.2:8000"
+private val BASE_URL get() = getApiBaseUrl()
 
-// Default coordinates for G-13 Islamabad; used when no GPS is available.
 private const val DEFAULT_LAT = 33.6333
 private const val DEFAULT_LNG = 72.9667
 
 class ApiServiceRepositoryImpl(
-    private val httpClient: HttpClient
-) : com.corestack.khidmatai.core.domain.repository.ServiceRepository {
+    private val httpClient: HttpClient,
+    private val appPreferences: AppPreferences
+) : ServiceRepository {
 
-    override fun submitRequest(query: String, location: String, urgency: String): Flow<com.corestack.khidmatai.core.domain.model.RequestState> = flow {
-        emit(_root_ide_package_.com.corestack.khidmatai.core.domain.model.RequestState.Processing(emptyList()))
+    private fun getUserId(): String {
+        val email = appPreferences.lastEmail
+        return email.ifBlank { "user_001" }
+    }
+
+    private fun <T> UserApiResponse<T>.unwrap(): T {
+        if (!success) {
+            val errType = error?.type ?: "UnknownError"
+            throw Exception("$errType: $message")
+        }
+        return data ?: throw Exception("Response data is null")
+    }
+
+    override fun submitRequest(query: String, location: String, urgency: String): Flow<RequestState> = flow {
+        emit(RequestState.Processing(emptyList()))
 
         try {
-            val body = _root_ide_package_.com.corestack.khidmatai.core.data.dto.ServiceRequestBody(
-                userId = "user_001",
+            val body = ServiceRequestBody(
+                userId = getUserId(),
                 rawQuery = query,
                 urgency = urgency,
-                location = _root_ide_package_.com.corestack.khidmatai.core.data.dto.LocationBody(
+                location = LocationBody(
                     address = location,
-                    lat = _root_ide_package_.com.corestack.khidmatai.core.data.repository.DEFAULT_LAT,
-                    lng = _root_ide_package_.com.corestack.khidmatai.core.data.repository.DEFAULT_LNG
+                    lat = DEFAULT_LAT,
+                    lng = DEFAULT_LNG
                 )
             )
 
-            val response: com.corestack.khidmatai.core.data.dto.ApiResponse = httpClient.post("${_root_ide_package_.com.corestack.khidmatai.core.data.repository.BASE_URL}/requests/") {
+            val response: ApiResponse = httpClient.post("$BASE_URL/requests/") {
                 contentType(ContentType.Application.Json)
                 setBody(body)
             }.body()
 
-            // Replay trace items with staggered delays to drive the ProcessingScreen animation
             val stageDelayMs = if (urgency == "emergency") 150L else 350L
-            val accumulatedTraces = mutableListOf<com.corestack.khidmatai.core.domain.model.TraceItem>()
+            val accumulatedTraces = mutableListOf<TraceItem>()
             for (t in response.data.trace) {
-                accumulatedTraces.add(
-                    _root_ide_package_.com.corestack.khidmatai.core.domain.model.TraceItem(
-                        t.stage,
-                        t.message,
-                        t.status
-                    )
-                )
-                emit(_root_ide_package_.com.corestack.khidmatai.core.domain.model.RequestState.Processing(accumulatedTraces.toList()))
+                accumulatedTraces.add(TraceItem(t.stage, t.message, t.status))
+                emit(RequestState.Processing(accumulatedTraces.toList()))
                 delay(stageDelayMs)
             }
 
             val result = mapToServiceResult(response)
             if (response.success) {
-                emit(_root_ide_package_.com.corestack.khidmatai.core.domain.model.RequestState.Success(result))
+                emit(RequestState.Success(result))
             } else {
-                emit(_root_ide_package_.com.corestack.khidmatai.core.domain.model.RequestState.Unavailable(result))
+                emit(RequestState.Unavailable(result))
             }
         } catch (e: Exception) {
-            emit(_root_ide_package_.com.corestack.khidmatai.core.domain.model.RequestState.Error(e.message ?: "Network error. Please check your connection."))
+            emit(RequestState.Error(e.message ?: "Network error. Please check your connection."))
         }
     }
 
-    private fun mapToServiceResult(response: com.corestack.khidmatai.core.data.dto.ApiResponse): com.corestack.khidmatai.core.domain.model.ServiceResult {
+    override fun submitRequestStream(query: String, location: String, urgency: String): Flow<RequestState> = flow {
+        emit(RequestState.Processing(emptyList()))
+
+        try {
+            val body = ServiceRequestBody(
+                userId = getUserId(),
+                rawQuery = query,
+                urgency = urgency,
+                location = LocationBody(address = location, lat = DEFAULT_LAT, lng = DEFAULT_LNG)
+            )
+
+            val accumulatedTraces = mutableListOf<TraceItem>()
+            var planMessage: String? = null
+            var connectedRequestId: String? = null
+            var bookingId: String? = null
+            var errorOccurred = false
+
+            httpClient.preparePost("$BASE_URL/requests/stream") {
+                contentType(ContentType.Application.Json)
+                setBody(body)
+            }.execute { response ->
+                val channel = response.bodyAsChannel()
+                while (!channel.isClosedForRead) {
+                    val line = channel.readUTF8Line() ?: break
+                    if (!line.startsWith("data: ")) continue
+                    val rawData = line.substring(6).trim()
+                    if (rawData == "[DONE]") break
+
+                    val jsonObject = runCatching {
+                        Json.parseToJsonElement(rawData).jsonObject
+                    }.getOrNull() ?: continue
+
+                    when (jsonObject["event"]?.jsonPrimitive?.content) {
+                        "connected" -> {
+                            connectedRequestId = jsonObject["request_id"]?.jsonPrimitive?.content
+                        }
+                        "plan" -> {
+                            planMessage = jsonObject["message"]?.jsonPrimitive?.content
+                            val steps = jsonObject["steps"]?.jsonArray
+                            if (steps != null) {
+                                accumulatedTraces.clear()
+                                steps.forEachIndexed { index, stepElem ->
+                                    val stage = stepElem.jsonObject["stage"]?.jsonPrimitive?.content
+                                    if (stage != null) {
+                                        accumulatedTraces.add(
+                                            TraceItem(
+                                                stage = stage,
+                                                message = "",
+                                                status = "waiting",
+                                                // First item carries requestId so ViewModel can use it for cancel
+                                                requestId = if (index == 0) connectedRequestId else null
+                                            )
+                                        )
+                                    }
+                                }
+                                emit(RequestState.Processing(accumulatedTraces.toList(), planMessage))
+                            }
+                        }
+                        "step_start" -> {
+                            val stage = jsonObject["stage"]?.jsonPrimitive?.content
+                            if (stage != null) {
+                                val idx = accumulatedTraces.indexOfFirst { it.stage == stage }
+                                if (idx >= 0) {
+                                    accumulatedTraces[idx] = accumulatedTraces[idx].copy(status = "pending")
+                                    emit(RequestState.Processing(accumulatedTraces.toList(), planMessage))
+                                }
+                            }
+                        }
+                        "step_complete" -> {
+                            val stage = jsonObject["stage"]?.jsonPrimitive?.content
+                            val message = jsonObject["message"]?.jsonPrimitive?.content ?: ""
+                            if (stage != null) {
+                                val idx = accumulatedTraces.indexOfFirst { it.stage == stage }
+                                if (idx >= 0) {
+                                    accumulatedTraces[idx] = accumulatedTraces[idx].copy(
+                                        status = "completed",
+                                        message = message
+                                    )
+                                    emit(RequestState.Processing(accumulatedTraces.toList(), planMessage))
+                                }
+                            }
+                        }
+                        "booking_ready" -> {
+                            bookingId = jsonObject["booking_id"]?.jsonPrimitive?.content
+                        }
+                        "error" -> {
+                            val detail = jsonObject["detail"]?.jsonPrimitive?.content ?: "Unknown error"
+                            errorOccurred = true
+                            emit(RequestState.Error(detail))
+                            return@execute
+                        }
+                        else -> { /* connected, cancelled, unknown — ignore */ }
+                    }
+                }
+            }
+
+            if (!errorOccurred) {
+                val finalBookingId = bookingId
+                if (finalBookingId != null) {
+                    val bookingDetails = getBookingDetails(finalBookingId)
+                    val serviceResult = ServiceResult(
+                        success = true,
+                        status = bookingDetails.status,
+                        message = "Booking confirmed successfully",
+                        bookingId = bookingDetails.id,
+                        detectedService = bookingDetails.serviceType,
+                        detectedLanguage = "en",
+                        urgency = urgency,
+                        provider = Provider(
+                            id = bookingDetails.providerId,
+                            name = "Provider",
+                            phone = "",
+                            rating = 5.0f,
+                            distanceKm = 0.0f,
+                            experienceYears = 0,
+                            reasoning = "Assigned to provider"
+                        ),
+                        appointment = Appointment(
+                            bookingId = bookingDetails.id,
+                            timeDisplay = bookingDetails.scheduledAt,
+                            address = bookingDetails.address,
+                            costPerHour = bookingDetails.totalCost?.toInt() ?: 0,
+                            currency = "PKR"
+                        ),
+                        nextSteps = emptyList(),
+                        trace = accumulatedTraces.toList(),
+                        followup = null,
+                        error = null
+                    )
+                    emit(RequestState.Success(serviceResult))
+                } else {
+                    emit(RequestState.Unavailable(
+                        ServiceResult(
+                            success = false,
+                            status = "unavailable",
+                            message = "No provider available in your area right now.",
+                            bookingId = null,
+                            detectedService = null,
+                            detectedLanguage = "en",
+                            urgency = urgency,
+                            provider = null,
+                            appointment = null,
+                            nextSteps = emptyList(),
+                            trace = accumulatedTraces.toList(),
+                            followup = null,
+                            error = "No verified provider found nearby. Please try again later."
+                        )
+                    ))
+                }
+            }
+
+        } catch (e: Exception) {
+            emit(RequestState.Error(e.message ?: "Network error. Please check your connection."))
+        }
+    }
+
+    override suspend fun getServiceCategories(): List<ServiceCategory> =
+        httpClient.get("$BASE_URL/services/")
+            .body<UserApiResponse<List<ServiceCategoryDto>>>()
+            .unwrap()
+            .map { it.toDomain() }
+
+    override suspend fun getAvailableProviders(): List<Provider> =
+        httpClient.get("$BASE_URL/services/providers")
+            .body<UserApiResponse<List<UserProviderDto>>>()
+            .unwrap()
+            .map { it.toDomain() }
+
+    override suspend fun getBookingHistory(userId: String): List<Booking> =
+        httpClient.get("$BASE_URL/bookings/user/$userId")
+            .body<UserApiResponse<List<UserBookingDto>>>()
+            .unwrap()
+            .map { it.toDomain() }
+
+    override suspend fun getBookingDetails(bookingId: String): Booking =
+        httpClient.get("$BASE_URL/bookings/detail/$bookingId")
+            .body<UserApiResponse<UserBookingDto>>()
+            .unwrap()
+            .toDomain()
+
+    override suspend fun cancelBooking(bookingId: String): Booking =
+        httpClient.post("$BASE_URL/bookings/$bookingId/cancel")
+            .body<UserApiResponse<UserBookingDto>>()
+            .unwrap()
+            .toDomain()
+
+    override suspend fun completeBooking(bookingId: String): List<TraceItem> {
+        val response = httpClient.post("$BASE_URL/bookings/$bookingId/complete")
+            .body<UserApiResponse<Map<String, List<ApiTrace>>>>()
+            .unwrap()
+        val traceList = response["trace"] ?: emptyList()
+        return traceList.map { TraceItem(it.stage, it.message, it.status) }
+    }
+
+    private fun mapToServiceResult(response: ApiResponse): ServiceResult {
         val data = response.data
         val meta = response.meta
-        return _root_ide_package_.com.corestack.khidmatai.core.domain.model.ServiceResult(
+        return ServiceResult(
             success = response.success,
             status = data.status,
             message = data.message,
@@ -80,7 +305,7 @@ class ApiServiceRepositoryImpl(
             detectedLanguage = meta.detectedLanguage,
             urgency = meta.urgency,
             provider = data.provider?.let { p ->
-                _root_ide_package_.com.corestack.khidmatai.core.domain.model.Provider(
+                Provider(
                     id = p.id,
                     name = p.name,
                     phone = p.phone,
@@ -91,7 +316,7 @@ class ApiServiceRepositoryImpl(
                 )
             },
             appointment = data.appointment?.let { a ->
-                _root_ide_package_.com.corestack.khidmatai.core.domain.model.Appointment(
+                Appointment(
                     bookingId = a.bookingId,
                     timeDisplay = a.scheduledTimeDisplay,
                     address = a.location.address,
@@ -100,7 +325,7 @@ class ApiServiceRepositoryImpl(
                 )
             },
             nextSteps = data.nextSteps.map { s ->
-                _root_ide_package_.com.corestack.khidmatai.core.domain.model.NextStep(
+                com.corestack.khidmatai.core.domain.model.NextStep(
                     id = s.step,
                     title = s.title,
                     description = s.description,
@@ -110,14 +335,14 @@ class ApiServiceRepositoryImpl(
                 )
             },
             trace = data.trace.map { t ->
-                _root_ide_package_.com.corestack.khidmatai.core.domain.model.TraceItem(
+                TraceItem(
                     t.stage,
                     t.message,
                     t.status
                 )
             },
             followup = data.followup?.let { f ->
-                _root_ide_package_.com.corestack.khidmatai.core.domain.model.Followup(
+                com.corestack.khidmatai.core.domain.model.Followup(
                     f.reminderScheduled,
                     f.reminderTimeDisplay,
                     f.statusUpdate,
@@ -126,5 +351,46 @@ class ApiServiceRepositoryImpl(
             },
             error = data.error?.message
         )
+    }
+
+    private fun ServiceCategoryDto.toDomain() = ServiceCategory(
+        id = id,
+        value = value,
+        label = label
+    )
+
+    private fun UserProviderDto.toDomain() = Provider(
+        id = id,
+        name = name,
+        phone = phone,
+        rating = rating,
+        distanceKm = 0.0f,
+        experienceYears = experienceYears,
+        reasoning = "Provider available in catalog"
+    )
+
+    private fun UserBookingDto.toDomain() = Booking(
+        id = id,
+        userId = userId,
+        providerId = providerId,
+        serviceType = serviceType,
+        status = status,
+        scheduledAt = scheduledAt,
+        address = location.address,
+        lat = location.lat,
+        lng = location.lng,
+        totalCost = totalCost,
+        createdAt = createdAt,
+        updatedAt = updatedAt
+    )
+
+    override suspend fun cancelRequest(requestId: String): Boolean {
+        return try {
+            val response = httpClient.post("$BASE_URL/requests/$requestId/cancel")
+                .body<UserApiResponse<Map<String, String>>>()
+            response.success
+        } catch (e: Exception) {
+            false
+        }
     }
 }

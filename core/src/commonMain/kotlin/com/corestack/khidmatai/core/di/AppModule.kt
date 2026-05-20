@@ -4,26 +4,36 @@ import com.corestack.khidmatai.core.data.repository.ApiAuthRepositoryImpl
 import com.corestack.khidmatai.core.data.repository.ApiServiceRepositoryImpl
 import com.corestack.khidmatai.core.data.repository.MockAuthRepositoryImpl
 import com.corestack.khidmatai.core.data.repository.MockServiceRepositoryImpl
+import com.corestack.khidmatai.core.data.repository.SettingsRepository
+import com.corestack.khidmatai.core.domain.ACTIVE_ENV
 import com.corestack.khidmatai.core.domain.AppEnvironment
 import com.corestack.khidmatai.core.domain.preferences.AppPreferences
 import com.corestack.khidmatai.core.domain.repository.AuthRepository
 import com.corestack.khidmatai.core.domain.repository.ServiceRepository
 import io.ktor.client.HttpClient
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.logging.DEFAULT
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
+import com.corestack.khidmatai.core.util.ktorLogger
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import org.koin.core.annotation.Module
 import org.koin.core.annotation.Single
 
-@Module(includes = [CoreAppModule::class])
+@Module
 class AppModule {
 
     @Single
-    fun provideEnvironment(): AppEnvironment = AppEnvironment.DEV
+    fun provideEnvironment(): AppEnvironment = ACTIVE_ENV
+
+    @Single
+    fun provideAppPreferences(): AppPreferences = AppPreferences()
+
+    @Single
+    fun provideSettingsRepository(appPreferences: AppPreferences): SettingsRepository =
+        SettingsRepository(appPreferences)
 
     @Single
     fun provideHttpClient() : HttpClient = HttpClient {
@@ -35,8 +45,15 @@ class AppModule {
             })
         }
         install(Logging) {
-            logger = Logger.DEFAULT
-            level = LogLevel.INFO
+            logger = ktorLogger
+            level = LogLevel.ALL
+        }
+        // Ollama LLM inference (gemma3:12b) can take 30-60s before first token.
+        // Without these, the platform default (often 10s) kills the stream connection.
+        install(HttpTimeout) {
+            requestTimeoutMillis = 120_000L
+            connectTimeoutMillis = 30_000L
+            socketTimeoutMillis = 120_000L
         }
     }
 
@@ -44,11 +61,13 @@ class AppModule {
     fun provideServiceRepository(
         env: AppEnvironment,
         httpClient: HttpClient,
+        appPreferences: AppPreferences
     ): ServiceRepository {
         return when (env) {
             AppEnvironment.DEV -> MockServiceRepositoryImpl()
             AppEnvironment.PROD -> ApiServiceRepositoryImpl(
-                httpClient
+                httpClient,
+                appPreferences
             )
         }
     }

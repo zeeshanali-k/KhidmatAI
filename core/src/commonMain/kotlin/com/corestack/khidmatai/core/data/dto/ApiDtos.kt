@@ -8,7 +8,8 @@ data class ServiceRequestBody(
     @SerialName("user_id") val userId: String,
     @SerialName("raw_query") val rawQuery: String,
     val urgency: String,
-    val location: com.corestack.khidmatai.core.data.dto.LocationBody
+    val location: com.corestack.khidmatai.core.data.dto.LocationBody,
+    @SerialName("language_detected") val languageDetected: String? = null
 )
 
 @Serializable
@@ -76,9 +77,9 @@ data class ApiNextStep(
 
 @Serializable
 data class ApiTrace(
-    val stage: String,
-    val message: String,
-    val status: String
+    val stage: String = "",
+    val message: String = "",
+    val status: String = "unknown"
 )
 
 @Serializable
@@ -102,4 +103,52 @@ data class ApiError(
     val code: String? = null,
     val message: String? = null,
     val suggestion: String? = null
+)
+
+@Serializable
+data class UserApiResponse<T>(
+    val success: Boolean,
+    val message: String,
+    val data: T? = null,
+    val error: UserErrorDetail? = null
+)
+
+@Serializable
+data class UserErrorDetail(
+    val type: String,
+    val details: kotlinx.serialization.json.JsonElement? = null
+)
+
+@Serializable
+data class ServiceCategoryDto(
+    val id: String,
+    val value: String,
+    val label: String
+)
+
+@Serializable
+data class UserProviderDto(
+    val id: String,
+    val name: String,
+    @SerialName("service_type") val serviceType: String,
+    val rating: Float,
+    val location: ApiLocation,
+    val phone: String,
+    @SerialName("price_per_hour") val pricePerHour: Double,
+    @SerialName("experience_years") val experienceYears: Int,
+    val availability: Boolean = true
+)
+
+@Serializable
+data class UserBookingDto(
+    val id: String,
+    @SerialName("user_id") val userId: String,
+    @SerialName("provider_id") val providerId: String,
+    @SerialName("service_type") val serviceType: String,
+    val status: String,
+    @SerialName("scheduled_at") val scheduledAt: String,
+    val location: ApiLocation,
+    @SerialName("total_cost") val totalCost: Double? = null,
+    @SerialName("created_at") val createdAt: String,
+    @SerialName("updated_at") val updatedAt: String
 )
