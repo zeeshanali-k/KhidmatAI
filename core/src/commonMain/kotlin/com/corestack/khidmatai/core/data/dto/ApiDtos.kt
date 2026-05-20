@@ -77,9 +77,9 @@ data class ApiNextStep(
 
 @Serializable
 data class ApiTrace(
-    val stage: String,
-    val message: String,
-    val status: String
+    val stage: String = "",
+    val message: String = "",
+    val status: String = "unknown"
 )
 
 @Serializable

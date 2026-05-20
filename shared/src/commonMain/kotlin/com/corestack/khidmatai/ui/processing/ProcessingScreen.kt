@@ -44,14 +44,16 @@ fun ProcessingScreen(
     var showFlash by remember { mutableStateOf(false) }
 
     LaunchedEffect(requestState) {
-        if (requestState is RequestState.Success) {
-            showFlash = true
-            delay(600)
-            onNavigateToSuccess()
-        } else if (requestState is RequestState.Unavailable) {
-            onNavigateToUnavailable()
-        } else if (requestState is RequestState.Idle) {
-            onNavigateBack()
+        when (requestState) {
+            is RequestState.Success -> {
+                showFlash = true
+                delay(600)
+                onNavigateToSuccess()
+            }
+            is RequestState.Unavailable -> onNavigateToUnavailable()
+            is RequestState.Error       -> onNavigateToUnavailable()
+            is RequestState.Idle        -> onNavigateBack()
+            else -> Unit
         }
     }
 
@@ -82,7 +84,12 @@ fun ProcessingScreen(
                 color = if (isEmergency) Error else TextPrimary
             )
 
-            Text(text = s.processingDesc, style = AppTypography.bodySmall, color = TextSecondary)
+            val planMsg = (requestState as? RequestState.Processing)?.planMessage
+            Text(
+                text = planMsg ?: s.processingDesc,
+                style = AppTypography.bodySmall,
+                color = TextSecondary
+            )
 
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.extraLarge))
 

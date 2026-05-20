@@ -63,7 +63,10 @@ enum class AiOrbState {
 
 sealed class RequestState {
     data object Idle : RequestState()
-    data class Processing(val traces: List<com.corestack.khidmatai.core.domain.model.TraceItem>) : RequestState()
+    data class Processing(
+        val traces: List<com.corestack.khidmatai.core.domain.model.TraceItem>,
+        val planMessage: String? = null
+    ) : RequestState()
     data class Success(val result: com.corestack.khidmatai.core.domain.model.ServiceResult) : RequestState()
     data class Unavailable(val result: com.corestack.khidmatai.core.domain.model.ServiceResult) : RequestState()
     data class Error(val message: String) : RequestState()

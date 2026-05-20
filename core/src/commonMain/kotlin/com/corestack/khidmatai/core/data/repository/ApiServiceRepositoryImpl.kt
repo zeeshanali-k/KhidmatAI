@@ -107,15 +107,14 @@ class ApiServiceRepositoryImpl(
                 userId = getUserId(),
                 rawQuery = query,
                 urgency = urgency,
-                location = LocationBody(
-                    address = location,
-                    lat = DEFAULT_LAT,
-                    lng = DEFAULT_LNG
-                )
+                location = LocationBody(address = location, lat = DEFAULT_LAT, lng = DEFAULT_LNG)
             )
 
             val accumulatedTraces = mutableListOf<TraceItem>()
+            var planMessage: String? = null
+            var connectedRequestId: String? = null
             var bookingId: String? = null
+            var errorOccurred = false
 
             httpClient.preparePost("$BASE_URL/requests/stream") {
                 contentType(ContentType.Application.Json)
@@ -124,80 +123,131 @@ class ApiServiceRepositoryImpl(
                 val channel = response.bodyAsChannel()
                 while (!channel.isClosedForRead) {
                     val line = channel.readUTF8Line() ?: break
-                    if (line.startsWith("data: ")) {
-                        val rawData = line.substring(6).trim()
-                        if (rawData == "[DONE]") {
-                            break
-                        }
-                        
-                        val jsonElement = runCatching {
-                            Json.parseToJsonElement(rawData)
-                        }.getOrNull() ?: continue
+                    if (!line.startsWith("data: ")) continue
+                    val rawData = line.substring(6).trim()
+                    if (rawData == "[DONE]") break
 
-                        val jsonObject = jsonElement.jsonObject
-                        for (key in jsonObject.keys) {
-                            val stageObj = jsonObject[key]?.jsonObject ?: continue
-                            
-                            stageObj["trace"]?.jsonArray?.forEach { traceElem ->
-                                val tObj = traceElem.jsonObject
-                                val stage = tObj["stage"]?.jsonPrimitive?.content ?: ""
-                                val msg = tObj["message"]?.jsonPrimitive?.content ?: ""
-                                val status = tObj["status"]?.jsonPrimitive?.content ?: ""
-                                val reqId = tObj["request_id"]?.jsonPrimitive?.content
-                                
-                                val traceItem = TraceItem(stage, msg, status, reqId)
-                                if (!accumulatedTraces.any { it.stage == stage && it.message == msg }) {
-                                    accumulatedTraces.add(traceItem)
+                    val jsonObject = runCatching {
+                        Json.parseToJsonElement(rawData).jsonObject
+                    }.getOrNull() ?: continue
+
+                    when (jsonObject["event"]?.jsonPrimitive?.content) {
+                        "connected" -> {
+                            connectedRequestId = jsonObject["request_id"]?.jsonPrimitive?.content
+                        }
+                        "plan" -> {
+                            planMessage = jsonObject["message"]?.jsonPrimitive?.content
+                            val steps = jsonObject["steps"]?.jsonArray
+                            if (steps != null) {
+                                accumulatedTraces.clear()
+                                steps.forEachIndexed { index, stepElem ->
+                                    val stage = stepElem.jsonObject["stage"]?.jsonPrimitive?.content
+                                    if (stage != null) {
+                                        accumulatedTraces.add(
+                                            TraceItem(
+                                                stage = stage,
+                                                message = "",
+                                                status = "waiting",
+                                                // First item carries requestId so ViewModel can use it for cancel
+                                                requestId = if (index == 0) connectedRequestId else null
+                                            )
+                                        )
+                                    }
+                                }
+                                emit(RequestState.Processing(accumulatedTraces.toList(), planMessage))
+                            }
+                        }
+                        "step_start" -> {
+                            val stage = jsonObject["stage"]?.jsonPrimitive?.content
+                            if (stage != null) {
+                                val idx = accumulatedTraces.indexOfFirst { it.stage == stage }
+                                if (idx >= 0) {
+                                    accumulatedTraces[idx] = accumulatedTraces[idx].copy(status = "pending")
+                                    emit(RequestState.Processing(accumulatedTraces.toList(), planMessage))
                                 }
                             }
-                            
-                            stageObj["booking"]?.jsonObject?.let { bObj ->
-                                bookingId = bObj["id"]?.jsonPrimitive?.content
+                        }
+                        "step_complete" -> {
+                            val stage = jsonObject["stage"]?.jsonPrimitive?.content
+                            val message = jsonObject["message"]?.jsonPrimitive?.content ?: ""
+                            if (stage != null) {
+                                val idx = accumulatedTraces.indexOfFirst { it.stage == stage }
+                                if (idx >= 0) {
+                                    accumulatedTraces[idx] = accumulatedTraces[idx].copy(
+                                        status = "completed",
+                                        message = message
+                                    )
+                                    emit(RequestState.Processing(accumulatedTraces.toList(), planMessage))
+                                }
                             }
                         }
-
-                        if (accumulatedTraces.isNotEmpty()) {
-                            emit(RequestState.Processing(accumulatedTraces.toList()))
+                        "booking_ready" -> {
+                            bookingId = jsonObject["booking_id"]?.jsonPrimitive?.content
                         }
+                        "error" -> {
+                            val detail = jsonObject["detail"]?.jsonPrimitive?.content ?: "Unknown error"
+                            errorOccurred = true
+                            emit(RequestState.Error(detail))
+                            return@execute
+                        }
+                        else -> { /* connected, cancelled, unknown — ignore */ }
                     }
                 }
             }
 
-            val finalBookingId = bookingId
-            if (finalBookingId != null) {
-                val bookingDetails = getBookingDetails(finalBookingId)
-                val serviceResult = ServiceResult(
-                    success = true,
-                    status = bookingDetails.status,
-                    message = "Booking confirmed successfully",
-                    bookingId = bookingDetails.id,
-                    detectedService = bookingDetails.serviceType,
-                    detectedLanguage = "en",
-                    urgency = urgency,
-                    provider = Provider(
-                        id = bookingDetails.providerId,
-                        name = "Provider",
-                        phone = "",
-                        rating = 5.0f,
-                        distanceKm = 0.0f,
-                        experienceYears = 0,
-                        reasoning = "Assigned to provider"
-                    ),
-                    appointment = Appointment(
+            if (!errorOccurred) {
+                val finalBookingId = bookingId
+                if (finalBookingId != null) {
+                    val bookingDetails = getBookingDetails(finalBookingId)
+                    val serviceResult = ServiceResult(
+                        success = true,
+                        status = bookingDetails.status,
+                        message = "Booking confirmed successfully",
                         bookingId = bookingDetails.id,
-                        timeDisplay = bookingDetails.scheduledAt,
-                        address = bookingDetails.address,
-                        costPerHour = bookingDetails.totalCost?.toInt() ?: 0,
-                        currency = "PKR"
-                    ),
-                    nextSteps = emptyList(),
-                    trace = accumulatedTraces.toList(),
-                    followup = null,
-                    error = null
-                )
-                emit(RequestState.Success(serviceResult))
-            } else {
-                emit(RequestState.Error("No booking was executed."))
+                        detectedService = bookingDetails.serviceType,
+                        detectedLanguage = "en",
+                        urgency = urgency,
+                        provider = Provider(
+                            id = bookingDetails.providerId,
+                            name = "Provider",
+                            phone = "",
+                            rating = 5.0f,
+                            distanceKm = 0.0f,
+                            experienceYears = 0,
+                            reasoning = "Assigned to provider"
+                        ),
+                        appointment = Appointment(
+                            bookingId = bookingDetails.id,
+                            timeDisplay = bookingDetails.scheduledAt,
+                            address = bookingDetails.address,
+                            costPerHour = bookingDetails.totalCost?.toInt() ?: 0,
+                            currency = "PKR"
+                        ),
+                        nextSteps = emptyList(),
+                        trace = accumulatedTraces.toList(),
+                        followup = null,
+                        error = null
+                    )
+                    emit(RequestState.Success(serviceResult))
+                } else {
+                    emit(RequestState.Unavailable(
+                        ServiceResult(
+                            success = false,
+                            status = "unavailable",
+                            message = "No provider available in your area right now.",
+                            bookingId = null,
+                            detectedService = null,
+                            detectedLanguage = "en",
+                            urgency = urgency,
+                            provider = null,
+                            appointment = null,
+                            nextSteps = emptyList(),
+                            trace = accumulatedTraces.toList(),
+                            followup = null,
+                            error = "No verified provider found nearby. Please try again later."
+                        )
+                    ))
+                }
             }
 
         } catch (e: Exception) {

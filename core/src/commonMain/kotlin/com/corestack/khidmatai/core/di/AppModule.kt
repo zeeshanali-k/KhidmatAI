@@ -11,6 +11,7 @@ import com.corestack.khidmatai.core.domain.preferences.AppPreferences
 import com.corestack.khidmatai.core.domain.repository.AuthRepository
 import com.corestack.khidmatai.core.domain.repository.ServiceRepository
 import io.ktor.client.HttpClient
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
@@ -46,6 +47,13 @@ class AppModule {
         install(Logging) {
             logger = ktorLogger
             level = LogLevel.ALL
+        }
+        // Ollama LLM inference (gemma3:12b) can take 30-60s before first token.
+        // Without these, the platform default (often 10s) kills the stream connection.
+        install(HttpTimeout) {
+            requestTimeoutMillis = 120_000L
+            connectTimeoutMillis = 30_000L
+            socketTimeoutMillis = 120_000L
         }
     }
 
