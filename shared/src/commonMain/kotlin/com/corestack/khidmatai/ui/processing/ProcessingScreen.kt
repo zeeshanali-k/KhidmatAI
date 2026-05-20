@@ -5,19 +5,25 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.TextButton
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.shape.RoundedCornerShape
+import com.corestack.khidmatai.core.domain.model.ProviderOption
 import com.corestack.khidmatai.ui.home.ServiceRequestIntent
 import androidx.compose.runtime.*
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import com.corestack.khidmatai.core.domain.model.AiOrbState
 import com.corestack.khidmatai.core.domain.model.RequestState
 import com.corestack.khidmatai.ui.components.AiOrbView
@@ -93,8 +99,11 @@ fun ProcessingScreen(
 
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.extraLarge))
 
-            val traces =
-                if (requestState is RequestState.Processing) requestState.traces else emptyList()
+            val traces = when (requestState) {
+                is RequestState.Processing -> requestState.traces
+                is RequestState.AwaitingProviderSelection -> requestState.traces
+                else -> emptyList()
+            }
             val completedCount = traces.count { it.status == "completed" }
             val totalCount = traces.size
             val progress =
@@ -144,5 +153,100 @@ fun ProcessingScreen(
         AnimatedVisibility(visible = showFlash, enter = fadeIn(), exit = fadeOut()) {
             Box(modifier = Modifier.fillMaxSize().background(Success.copy(alpha = 0.8f)))
         }
+
+        if (requestState is RequestState.AwaitingProviderSelection) {
+            ProviderSelectionDialog(
+                providers = requestState.providers,
+                isEmergency = isEmergency,
+                onProviderSelected = { provider ->
+                    viewModel.onAction(ServiceRequestIntent.SelectProvider(provider.id))
+                }
+            )
+        }
     }
+}
+
+@Composable
+private fun ProviderSelectionDialog(
+    providers: List<ProviderOption>,
+    isEmergency: Boolean,
+    onProviderSelected: (ProviderOption) -> Unit
+) {
+    val s = LocalAppStrings.current
+    val accentColor = if (isEmergency) Error else Primary
+
+    AlertDialog(
+        onDismissRequest = {},
+        title = {
+            Text(
+                text = s.providerSelectionTitle,
+                style = AppTypography.titleLarge,
+                color = TextPrimary
+            )
+        },
+        text = {
+            Column {
+                Text(
+                    text = s.providerSelectionSubtitle,
+                    style = AppTypography.bodySmall,
+                    color = TextSecondary
+                )
+                Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
+                LazyColumn(
+                    modifier = Modifier.heightIn(max = MaterialTheme.spacing.xxl * 5),
+                    verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small)
+                ) {
+                    itemsIndexed(providers) { _, provider ->
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(containerColor = Surface),
+                            border = BorderStroke(MaterialTheme.spacing.extraSmall / 4, Border)
+                        ) {
+                            Column(modifier = Modifier.padding(MaterialTheme.spacing.medium)) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.Top
+                                ) {
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            text = provider.name,
+                                            style = AppTypography.bodyLarge,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = TextPrimary
+                                        )
+                                        Text(
+                                            text = "★ ${provider.rating}  •  ${provider.distanceKm} ${s.providerSelectionDistance}  •  PKR ${provider.pricePerHour.toInt()}${s.providerSelectionPerHour}",
+                                            style = AppTypography.bodySmall,
+                                            color = TextSecondary
+                                        )
+                                        Text(
+                                            text = "${s.providerSelectionScore} ${provider.score}",
+                                            style = AppTypography.bodySmall,
+                                            color = accentColor
+                                        )
+                                    }
+                                    TextButton(
+                                        onClick = { onProviderSelected(provider) },
+                                        colors = ButtonDefaults.textButtonColors(contentColor = accentColor)
+                                    ) {
+                                        Text(s.providerSelectionSelect, style = AppTypography.labelMedium, fontWeight = FontWeight.Bold)
+                                    }
+                                }
+                                if (provider.reasoning.isNotBlank()) {
+                                    Spacer(modifier = Modifier.height(MaterialTheme.spacing.extraSmall))
+                                    Text(
+                                        text = provider.reasoning,
+                                        style = AppTypography.bodySmall,
+                                        color = TextSecondary
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {}
+    )
 }

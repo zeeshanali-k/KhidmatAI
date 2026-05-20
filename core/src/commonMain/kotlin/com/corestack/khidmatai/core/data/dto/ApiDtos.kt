@@ -136,7 +136,21 @@ data class UserProviderDto(
     val phone: String,
     @SerialName("price_per_hour") val pricePerHour: Double,
     @SerialName("experience_years") val experienceYears: Int,
-    val availability: Boolean = true
+    val availability: Boolean = true,
+    @SerialName("range_km") val rangeKm: Double = 10.0
+)
+
+@Serializable
+data class ApiProviderOption(
+    val id: String,
+    val name: String,
+    @SerialName("service_type") val serviceType: String,
+    val rating: Float,
+    @SerialName("distance_km") val distanceKm: Float,
+    @SerialName("price_per_hour") val pricePerHour: Double,
+    @SerialName("experience_years") val experienceYears: Int,
+    val score: Double,
+    val reasoning: String = ""
 )
 
 @Serializable

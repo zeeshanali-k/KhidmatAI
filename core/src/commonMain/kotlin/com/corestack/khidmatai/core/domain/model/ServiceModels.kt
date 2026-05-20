@@ -23,6 +23,19 @@ data class Provider(
     val rating: Float,
     val distanceKm: Float,
     val experienceYears: Int,
+    val reasoning: String,
+    val rangeKm: Double = 10.0
+)
+
+data class ProviderOption(
+    val id: String,
+    val name: String,
+    val serviceType: String,
+    val rating: Float,
+    val distanceKm: Float,
+    val pricePerHour: Double,
+    val experienceYears: Int,
+    val score: Double,
     val reasoning: String
 )
 
@@ -66,6 +79,11 @@ sealed class RequestState {
     data class Processing(
         val traces: List<com.corestack.khidmatai.core.domain.model.TraceItem>,
         val planMessage: String? = null
+    ) : RequestState()
+    data class AwaitingProviderSelection(
+        val providers: List<com.corestack.khidmatai.core.domain.model.ProviderOption>,
+        val requestId: String,
+        val traces: List<com.corestack.khidmatai.core.domain.model.TraceItem>
     ) : RequestState()
     data class Success(val result: com.corestack.khidmatai.core.domain.model.ServiceResult) : RequestState()
     data class Unavailable(val result: com.corestack.khidmatai.core.domain.model.ServiceResult) : RequestState()

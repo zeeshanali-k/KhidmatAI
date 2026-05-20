@@ -1,6 +1,7 @@
 package com.corestack.khidmatai.core.data.repository
 
 import com.corestack.khidmatai.core.data.dto.ApiLocation
+import com.corestack.khidmatai.core.data.dto.ApiProviderOption
 import com.corestack.khidmatai.core.data.dto.LocationBody
 import com.corestack.khidmatai.core.data.dto.ServiceCategoryDto
 import com.corestack.khidmatai.core.data.dto.ServiceRequestBody
@@ -12,6 +13,7 @@ import com.corestack.khidmatai.core.data.dto.ApiResponse
 import com.corestack.khidmatai.core.domain.model.Appointment
 import com.corestack.khidmatai.core.domain.model.Booking
 import com.corestack.khidmatai.core.domain.model.Provider
+import com.corestack.khidmatai.core.domain.model.ProviderOption
 import com.corestack.khidmatai.core.domain.model.RequestState
 import com.corestack.khidmatai.core.domain.model.ServiceCategory
 import com.corestack.khidmatai.core.domain.model.ServiceResult
@@ -36,6 +38,9 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import com.corestack.khidmatai.core.domain.preferences.AppPreferences
 import com.corestack.khidmatai.core.util.getApiBaseUrl
+import kotlinx.serialization.json.double
+import kotlinx.serialization.json.float
+import kotlinx.serialization.json.int
 
 private val BASE_URL get() = getApiBaseUrl()
 
@@ -179,6 +184,33 @@ class ApiServiceRepositoryImpl(
                                     )
                                     emit(RequestState.Processing(accumulatedTraces.toList(), planMessage))
                                 }
+                            }
+                        }
+                        "provider_shortlist" -> {
+                            val rid = jsonObject["request_id"]?.jsonPrimitive?.content ?: connectedRequestId ?: ""
+                            val providersList = jsonObject["providers"]?.jsonArray
+                            if (providersList != null) {
+                                val options = providersList.mapNotNull { el ->
+                                    runCatching {
+                                        val o = el.jsonObject
+                                        ProviderOption(
+                                            id = o["id"]!!.jsonPrimitive.content,
+                                            name = o["name"]!!.jsonPrimitive.content,
+                                            serviceType = o["service_type"]!!.jsonPrimitive.content,
+                                            rating = o["rating"]!!.jsonPrimitive.float,
+                                            distanceKm = o["distance_km"]!!.jsonPrimitive.float,
+                                            pricePerHour = o["price_per_hour"]!!.jsonPrimitive.double,
+                                            experienceYears = o["experience_years"]!!.jsonPrimitive.int,
+                                            score = o["score"]!!.jsonPrimitive.double,
+                                            reasoning = o["reasoning"]?.jsonPrimitive?.content ?: ""
+                                        )
+                                    }.getOrNull()
+                                }
+                                emit(RequestState.AwaitingProviderSelection(
+                                    providers = options,
+                                    requestId = rid,
+                                    traces = accumulatedTraces.toList()
+                                ))
                             }
                         }
                         "booking_ready" -> {
@@ -366,7 +398,8 @@ class ApiServiceRepositoryImpl(
         rating = rating,
         distanceKm = 0.0f,
         experienceYears = experienceYears,
-        reasoning = "Provider available in catalog"
+        reasoning = "Provider available in catalog",
+        rangeKm = rangeKm
     )
 
     private fun UserBookingDto.toDomain() = Booking(
@@ -388,6 +421,18 @@ class ApiServiceRepositoryImpl(
         return try {
             val response = httpClient.post("$BASE_URL/requests/$requestId/cancel")
                 .body<UserApiResponse<Map<String, String>>>()
+            response.success
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    override suspend fun selectProvider(requestId: String, providerId: String): Boolean {
+        return try {
+            val response = httpClient.post("$BASE_URL/requests/$requestId/select") {
+                contentType(ContentType.Application.Json)
+                setBody(mapOf("provider_id" to providerId))
+            }.body<UserApiResponse<Map<String, String>>>()
             response.success
         } catch (e: Exception) {
             false
