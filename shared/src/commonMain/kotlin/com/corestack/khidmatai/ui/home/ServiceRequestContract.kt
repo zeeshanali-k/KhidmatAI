@@ -21,4 +21,5 @@ sealed interface ServiceRequestIntent {
     data object SubmitRequest : ServiceRequestIntent
     data object CancelRequest : ServiceRequestIntent
     data object Reset : ServiceRequestIntent
+    data class SelectProvider(val providerId: String) : ServiceRequestIntent
 }

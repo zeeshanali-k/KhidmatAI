@@ -166,4 +166,8 @@ class MockServiceRepositoryImpl : ServiceRepository {
     override suspend fun cancelRequest(requestId: String): Boolean {
         return true
     }
+
+    override suspend fun selectProvider(requestId: String, providerId: String): Boolean {
+        return true
+    }
 }

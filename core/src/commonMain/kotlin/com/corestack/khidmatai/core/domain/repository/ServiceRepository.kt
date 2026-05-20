@@ -25,4 +25,6 @@ interface ServiceRepository {
     suspend fun completeBooking(bookingId: String): List<TraceItem>
 
     suspend fun cancelRequest(requestId: String): Boolean
+
+    suspend fun selectProvider(requestId: String, providerId: String): Boolean
 }

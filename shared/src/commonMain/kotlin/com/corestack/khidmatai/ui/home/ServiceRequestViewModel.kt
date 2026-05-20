@@ -34,6 +34,18 @@ class ServiceRequestViewModel(
             ServiceRequestIntent.SubmitRequest -> submitRequest()
             ServiceRequestIntent.CancelRequest -> cancelActiveRequest()
             ServiceRequestIntent.Reset -> _uiState.update { it.copy(requestState = RequestState.Idle, activeRequestId = null) }
+            is ServiceRequestIntent.SelectProvider -> selectProvider(action.providerId)
+        }
+    }
+
+    private fun selectProvider(providerId: String) {
+        val current = _uiState.value.requestState
+        if (current !is RequestState.AwaitingProviderSelection) return
+        val traces = current.traces
+        val requestId = current.requestId
+        _uiState.update { it.copy(requestState = RequestState.Processing(traces)) }
+        viewModelScope.launch {
+            repository.selectProvider(requestId, providerId)
         }
     }
 
