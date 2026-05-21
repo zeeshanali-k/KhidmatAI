@@ -78,7 +78,7 @@ fun BookingDetailScreen(bookingId: String, navController: NavController) {
                                 onDismissRequest = { expanded = false },
                                 modifier = Modifier.background(MaterialTheme.colorScheme.tertiaryContainer)
                             ) {
-                                remember { BookingStatus.values }.forEach { status ->
+                                remember { BookingStatus.entries }.forEach { status ->
                                     DropdownMenuItem(
                                         text = { Text(status.title, color = TextPrimary) },
                                         onClick = {
@@ -95,27 +95,19 @@ fun BookingDetailScreen(bookingId: String, navController: NavController) {
         }
     }
 }
-
-sealed class BookingStatus(
+enum class BookingStatus(
     val value: String,
     val title: String,
 ) {
-    data object Pending : BookingStatus("pending", "Pending")
-
-    data object ProviderOnTheWay : BookingStatus("provider_on_the_way", "Provider on the way")
-    data object Arrived : BookingStatus("arrived", "Arrived")
-    data object Started : BookingStatus("started", "Started")
-    data object InProgress : BookingStatus("in_progress", "In Progress")
-    data object Completed : BookingStatus("completed", "Completed")
-    data object Cancelled : BookingStatus("cancelled", "Cancelled")
-
-    companion object {
-        val values = listOf(
-            Pending, ProviderOnTheWay, Arrived, Started, Completed, Cancelled
-        )
-    }
-
+    Pending("pending", "Pending"),
+    ProviderOnTheWay("provider_on_the_way", "Provider on the way"),
+    Arrived("arrived", "Arrived"),
+    Started("started", "Started"),
+    InProgress("in_progress", "In Progress"),
+    Completed("completed", "Completed"),
+    Cancelled("cancelled", "Cancelled")
 }
+
 
 @Composable
 private fun LabelValue(label: String, value: String) {
