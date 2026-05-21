@@ -59,6 +59,14 @@ class ApiAdminRepositoryImpl(
             .unwrap()
             .toDomain()
 
+    override suspend fun updateBookingStatus(bookingId: String, status: String): AdminBooking =
+        httpClient.patch("${BASE_URL}/admin/bookings/$bookingId/status") {
+            contentType(ContentType.Application.Json)
+            setBody(mapOf("status" to status))
+        }.body<AdminApiResponse<AdminBookingDto>>()
+            .unwrap()
+            .toDomain()
+
     override suspend fun getAllProviders(): List<AdminProvider> =
         httpClient.get("${BASE_URL}/admin/providers/")
             .body<AdminApiResponse<List<AdminProviderDto>>>()

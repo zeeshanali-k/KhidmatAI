@@ -50,6 +50,14 @@ class MockAdminRepositoryImpl : AdminRepository {
         return updated
     }
 
+    override suspend fun updateBookingStatus(bookingId: String, status: String): AdminBooking {
+        delay(500)
+        val index = mockBookings.indexOfFirst { it.id == bookingId }
+        val updated = mockBookings[index].copy(status = status)
+        mockBookings[index] = updated
+        return updated
+    }
+
     override suspend fun getAllProviders(): List<AdminProvider> {
         delay(1000)
         return mockProviders.toList()

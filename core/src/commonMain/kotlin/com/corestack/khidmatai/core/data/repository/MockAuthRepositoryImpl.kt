@@ -23,6 +23,10 @@ class MockAuthRepositoryImpl(
 
     override fun getUserEmail(): String = appPreferences.lastEmail
 
+    override suspend fun registerFcmToken(userId: String, fcmToken: String): Boolean {
+        return true
+    }
+
     override fun login(email: String, password: String): Flow<AuthResult> = flow {
         delay(1500)
         if (email.isNotBlank() && password.isNotBlank()) {

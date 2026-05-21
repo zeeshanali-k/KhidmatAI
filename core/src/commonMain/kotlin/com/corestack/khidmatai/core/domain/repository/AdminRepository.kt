@@ -10,6 +10,7 @@ interface AdminRepository {
     suspend fun getBookingById(bookingId: String): com.corestack.khidmatai.core.domain.model.AdminBooking
     suspend fun cancelBooking(bookingId: String): com.corestack.khidmatai.core.domain.model.AdminBooking
     suspend fun completeBooking(bookingId: String): com.corestack.khidmatai.core.domain.model.AdminBooking
+    suspend fun updateBookingStatus(bookingId: String, status: String): com.corestack.khidmatai.core.domain.model.AdminBooking
 
     // Providers
     suspend fun getAllProviders(): List<com.corestack.khidmatai.core.domain.model.AdminProvider>

@@ -148,6 +148,12 @@ data class AppStrings(
     val onboardingDetectingLocation: String,
     val onboardingPermissionDenied: String,
     val locationPermissionRequired: String,
+    // Onboarding notification step
+    val onboardingNotifTitle: String,
+    val onboardingNotifDesc: String,
+    val onboardingBtnNotification: String,
+    val onboardingNotifDenied: String,
+    val onboardingNotifGranted: String,
 )
 
 val EnglishStrings = AppStrings(
@@ -277,6 +283,11 @@ val EnglishStrings = AppStrings(
     onboardingDetectingLocation = "Getting your location...",
     onboardingPermissionDenied = "Location permission denied. Please enable in Settings.",
     locationPermissionRequired = "Grant Location Permission",
+    onboardingNotifTitle = "Stay updated",
+    onboardingNotifDesc = "Get notified when your service provider is on the way, booking reminders, and more.",
+    onboardingBtnNotification = "🔔 Allow Notifications",
+    onboardingNotifDenied = "Notification permission denied. You can enable it later in Settings.",
+    onboardingNotifGranted = "Notifications enabled!",
 )
 
 val UrduStrings = AppStrings(
@@ -406,6 +417,11 @@ val UrduStrings = AppStrings(
     onboardingDetectingLocation = "آپ کی لوکیشن معلوم ہو رہی ہے...",
     onboardingPermissionDenied = "لوکیشن کی اجازت نہیں ملی۔ سیٹنگز میں جا کر فعال کریں۔",
     locationPermissionRequired = "لوکیشن کی اجازت دیں",
+    onboardingNotifTitle = "اپ ڈیٹ رہیں",
+    onboardingNotifDesc = "جب آپ کا سروس پرووائیڈر آ رہا ہو، بکنگ کی یاد دہانی، اور بہت کچھ کے لیے نوٹیفکیشنز حاصل کریں۔",
+    onboardingBtnNotification = "🔔 نوٹیفکیشنز کی اجازت دیں",
+    onboardingNotifDenied = "نوٹیفکیشن کی اجازت نہیں ملی۔ آپ بعد میں سیٹنگز سے فعال کر سکتے ہیں۔",
+    onboardingNotifGranted = "نوٹیفکیشنز فعال ہو گئیں!",
 )
 
 val LocalAppStrings = compositionLocalOf { EnglishStrings }

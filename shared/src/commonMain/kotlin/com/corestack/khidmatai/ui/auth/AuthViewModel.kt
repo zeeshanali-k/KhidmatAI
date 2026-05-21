@@ -22,6 +22,10 @@ class AuthViewModel(
 
     val lastEmail: String get() = repository.getLastEmail()
 
+    private val pushNotificationService: com.corestack.khidmatai.core.domain.notifications.PushNotificationService? by lazy {
+        org.koin.core.context.GlobalContext.get().getOrNull()
+    }
+
     fun onAction(action: AuthIntent) {
         when (action) {
             is AuthIntent.Login -> login(action.email, action.password)
@@ -37,6 +41,13 @@ class AuthViewModel(
                 when (result) {
                     is AuthResult.Success -> {
                         _uiState.update { it.copy(authState = AuthState.Success(result.user)) }
+                        try {
+                            pushNotificationService?.getToken()?.let { token ->
+                                repository.registerFcmToken(result.user.id, token)
+                            }
+                        } catch (e: Exception) {
+                            // Ignore failure to register FCM token so login still succeeds
+                        }
                     }
                     is AuthResult.Error -> _uiState.update { it.copy(authState = AuthState.Error(result.message)) }
                 }
@@ -51,6 +62,13 @@ class AuthViewModel(
                 when (result) {
                     is AuthResult.Success -> {
                         _uiState.update { it.copy(authState = AuthState.Success(result.user)) }
+                        try {
+                            pushNotificationService?.getToken()?.let { token ->
+                                repository.registerFcmToken(result.user.id, token)
+                            }
+                        } catch (e: Exception) {
+                            // Ignore
+                        }
                     }
                     is AuthResult.Error -> _uiState.update { it.copy(authState = AuthState.Error(result.message)) }
                 }

@@ -12,61 +12,95 @@ import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
 
 @KoinViewModel
-class ProvidersViewModel(private val adminRepository: com.corestack.khidmatai.core.domain.repository.AdminRepository) : ViewModel() {
+class ProvidersViewModel(private val adminRepository: AdminRepository) :
+    ViewModel() {
 
-    private val _listState = MutableStateFlow<com.corestack.khidmatai.core.domain.model.AdminState<List<com.corestack.khidmatai.core.domain.model.AdminProvider>>>(
-        _root_ide_package_.com.corestack.khidmatai.core.domain.model.AdminState.Loading)
-    val listState: StateFlow<com.corestack.khidmatai.core.domain.model.AdminState<List<com.corestack.khidmatai.core.domain.model.AdminProvider>>> = _listState.asStateFlow()
+    private val _listState =
+        MutableStateFlow<AdminState<List<AdminProvider>>>(
+            AdminState.Loading
+        )
+    val listState: StateFlow<AdminState<List<AdminProvider>>> = _listState.asStateFlow()
 
-    private val _formState = MutableStateFlow<com.corestack.khidmatai.core.domain.model.AdminState<com.corestack.khidmatai.core.domain.model.AdminProvider?>>(
-        _root_ide_package_.com.corestack.khidmatai.core.domain.model.AdminState.Success(null))
-    val formState: StateFlow<com.corestack.khidmatai.core.domain.model.AdminState<com.corestack.khidmatai.core.domain.model.AdminProvider?>> = _formState.asStateFlow()
+    private val _formState =
+        MutableStateFlow<AdminState<AdminProvider?>>(
+            AdminState.Success(null)
+        )
+    val formState: StateFlow<AdminState<AdminProvider?>> =
+        _formState.asStateFlow()
 
-    init { loadAll() }
+    init {
+        loadAll()
+    }
 
     fun loadAll() {
-        _listState.value = _root_ide_package_.com.corestack.khidmatai.core.domain.model.AdminState.Loading
+        _listState.value =
+            AdminState.Loading
         viewModelScope.launch {
             try {
-                _listState.value = _root_ide_package_.com.corestack.khidmatai.core.domain.model.AdminState.Success(adminRepository.getAllProviders())
+                _listState.value =
+                    AdminState.Success(
+                        adminRepository.getAllProviders()
+                    )
             } catch (e: Exception) {
-                _listState.value = _root_ide_package_.com.corestack.khidmatai.core.domain.model.AdminState.Error(e.message ?: "Failed to load providers")
+                _listState.value =
+                    AdminState.Error(
+                        e.message ?: "Failed to load providers"
+                    )
             }
         }
     }
 
     fun loadForEdit(providerId: String) {
-        _formState.value = _root_ide_package_.com.corestack.khidmatai.core.domain.model.AdminState.Loading
+        _formState.value =
+            AdminState.Loading
         viewModelScope.launch {
             try {
                 val all = adminRepository.getAllProviders()
-                _formState.value = _root_ide_package_.com.corestack.khidmatai.core.domain.model.AdminState.Success(all.find { it.id == providerId })
+                _formState.value =
+                    AdminState.Success(
+                        all.find { it.id == providerId })
             } catch (e: Exception) {
-                _formState.value = _root_ide_package_.com.corestack.khidmatai.core.domain.model.AdminState.Error(e.message ?: "Failed to load provider")
+                _formState.value =
+                    AdminState.Error(
+                        e.message ?: "Failed to load provider"
+                    )
             }
         }
     }
 
-    fun create(provider: com.corestack.khidmatai.core.domain.model.AdminProvider, onSuccess: () -> Unit) {
+    fun create(
+        provider: AdminProvider,
+        onSuccess: () -> Unit
+    ) {
         viewModelScope.launch {
             try {
                 adminRepository.createProvider(provider)
                 loadAll()
                 onSuccess()
             } catch (e: Exception) {
-                _formState.value = _root_ide_package_.com.corestack.khidmatai.core.domain.model.AdminState.Error(e.message ?: "Failed to create provider")
+                _formState.value =
+                    AdminState.Error(
+                        e.message ?: "Failed to create provider"
+                    )
             }
         }
     }
 
-    fun update(providerId: String, provider: com.corestack.khidmatai.core.domain.model.AdminProvider, onSuccess: () -> Unit) {
+    fun update(
+        providerId: String,
+        provider: AdminProvider,
+        onSuccess: () -> Unit
+    ) {
         viewModelScope.launch {
             try {
                 adminRepository.updateProvider(providerId, provider)
                 loadAll()
                 onSuccess()
             } catch (e: Exception) {
-                _formState.value = _root_ide_package_.com.corestack.khidmatai.core.domain.model.AdminState.Error(e.message ?: "Failed to update provider")
+                _formState.value =
+                    AdminState.Error(
+                        e.message ?: "Failed to update provider"
+                    )
             }
         }
     }
@@ -77,7 +111,10 @@ class ProvidersViewModel(private val adminRepository: com.corestack.khidmatai.co
                 adminRepository.deleteProvider(providerId)
                 loadAll()
             } catch (e: Exception) {
-                _listState.value = _root_ide_package_.com.corestack.khidmatai.core.domain.model.AdminState.Error(e.message ?: "Failed to delete provider")
+                _listState.value =
+                    AdminState.Error(
+                        e.message ?: "Failed to delete provider"
+                    )
             }
         }
     }
@@ -88,7 +125,10 @@ class ProvidersViewModel(private val adminRepository: com.corestack.khidmatai.co
                 adminRepository.toggleProviderAvailability(providerId)
                 loadAll()
             } catch (e: Exception) {
-                _listState.value = _root_ide_package_.com.corestack.khidmatai.core.domain.model.AdminState.Error(e.message ?: "Failed to toggle availability")
+                _listState.value =
+                    AdminState.Error(
+                        e.message ?: "Failed to toggle availability"
+                    )
             }
         }
     }

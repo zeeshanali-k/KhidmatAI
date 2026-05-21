@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.corestack.khidmatai.core.domain.model.AdminRequest
 import com.corestack.khidmatai.core.domain.model.AdminState
-import com.corestack.khidmatai.core.domain.repository.AdminRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,34 +13,34 @@ import org.koin.core.annotation.KoinViewModel
 @KoinViewModel
 class RequestsViewModel(private val adminRepository: com.corestack.khidmatai.core.domain.repository.AdminRepository) : ViewModel() {
 
-    private val _listState = MutableStateFlow<com.corestack.khidmatai.core.domain.model.AdminState<List<com.corestack.khidmatai.core.domain.model.AdminRequest>>>(
-        _root_ide_package_.com.corestack.khidmatai.core.domain.model.AdminState.Loading)
-    val listState: StateFlow<com.corestack.khidmatai.core.domain.model.AdminState<List<com.corestack.khidmatai.core.domain.model.AdminRequest>>> = _listState.asStateFlow()
+    private val _listState = MutableStateFlow<AdminState<List<AdminRequest>>>(
+        AdminState.Loading)
+    val listState: StateFlow<AdminState<List<AdminRequest>>> = _listState.asStateFlow()
 
-    private val _detailState = MutableStateFlow<com.corestack.khidmatai.core.domain.model.AdminState<com.corestack.khidmatai.core.domain.model.AdminRequest>>(
-        _root_ide_package_.com.corestack.khidmatai.core.domain.model.AdminState.Loading)
-    val detailState: StateFlow<com.corestack.khidmatai.core.domain.model.AdminState<com.corestack.khidmatai.core.domain.model.AdminRequest>> = _detailState.asStateFlow()
+    private val _detailState = MutableStateFlow<AdminState<AdminRequest>>(
+        AdminState.Loading)
+    val detailState: StateFlow<AdminState<AdminRequest>> = _detailState.asStateFlow()
 
     init { loadAll() }
 
     fun loadAll() {
-        _listState.value = _root_ide_package_.com.corestack.khidmatai.core.domain.model.AdminState.Loading
+        _listState.value = AdminState.Loading
         viewModelScope.launch {
             try {
-                _listState.value = _root_ide_package_.com.corestack.khidmatai.core.domain.model.AdminState.Success(adminRepository.getAllRequests())
+                _listState.value = AdminState.Success(adminRepository.getAllRequests())
             } catch (e: Exception) {
-                _listState.value = _root_ide_package_.com.corestack.khidmatai.core.domain.model.AdminState.Error(e.message ?: "Failed to load requests")
+                _listState.value = AdminState.Error(e.message ?: "Failed to load requests")
             }
         }
     }
 
     fun loadDetail(requestId: String) {
-        _detailState.value = _root_ide_package_.com.corestack.khidmatai.core.domain.model.AdminState.Loading
+        _detailState.value = AdminState.Loading
         viewModelScope.launch {
             try {
-                _detailState.value = _root_ide_package_.com.corestack.khidmatai.core.domain.model.AdminState.Success(adminRepository.getRequestById(requestId))
+                _detailState.value = AdminState.Success(adminRepository.getRequestById(requestId))
             } catch (e: Exception) {
-                _detailState.value = _root_ide_package_.com.corestack.khidmatai.core.domain.model.AdminState.Error(e.message ?: "Failed to load request")
+                _detailState.value = AdminState.Error(e.message ?: "Failed to load request")
             }
         }
     }

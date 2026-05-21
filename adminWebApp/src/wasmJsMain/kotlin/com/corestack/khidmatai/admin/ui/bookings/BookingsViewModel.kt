@@ -58,6 +58,18 @@ class BookingsViewModel(private val adminRepository: AdminRepository) : ViewMode
         }
     }
 
+    fun updateStatus(bookingId: String, newStatus: String) {
+        viewModelScope.launch {
+            try {
+                val updated = adminRepository.updateBookingStatus(bookingId, newStatus)
+                _detailState.value = AdminState.Success(updated)
+                loadAll()
+            } catch (e: Exception) {
+                _detailState.value = AdminState.Error(e.message ?: "Failed to update booking status")
+            }
+        }
+    }
+
     fun cancel(bookingId: String) {
         viewModelScope.launch {
             try {

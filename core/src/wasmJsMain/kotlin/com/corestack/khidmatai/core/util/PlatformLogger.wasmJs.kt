@@ -2,8 +2,10 @@ package com.corestack.khidmatai.core.util
 
 import io.ktor.client.plugins.logging.Logger
 
-actual val ktorLogger: Logger = object : Logger {
+private class WasmLogger : Logger {
     override fun log(message: String) {
         println("KtorHttpClient: $message")
     }
 }
+
+actual val ktorLogger: Logger = WasmLogger()

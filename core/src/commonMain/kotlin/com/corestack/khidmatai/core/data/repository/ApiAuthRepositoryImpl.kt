@@ -116,4 +116,16 @@ class ApiAuthRepositoryImpl(
             emit(AuthResult.Error(e.message ?: "Network error. Please check your connection."))
         }
     }
+
+    override suspend fun registerFcmToken(userId: String, fcmToken: String): Boolean {
+        return try {
+            val response: HttpResponse = httpClient.post("$BASE_URL/notifications/register") {
+                contentType(ContentType.Application.Json)
+                setBody(mapOf("user_id" to userId, "fcm_token" to fcmToken))
+            }
+            response.status.value in 200..299
+        } catch (e: Exception) {
+            false
+        }
+    }
 }

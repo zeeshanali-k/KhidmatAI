@@ -10,4 +10,5 @@ interface AuthRepository {
     fun logout()
     fun getUserName(): String
     fun getUserEmail(): String
+    suspend fun registerFcmToken(userId: String, fcmToken: String): Boolean
 }

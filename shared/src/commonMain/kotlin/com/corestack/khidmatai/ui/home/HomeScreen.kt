@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import com.corestack.khidmatai.core.domain.model.AiOrbState
 import com.corestack.khidmatai.core.domain.model.RequestState
 import com.corestack.khidmatai.ui.components.AiOrbView
@@ -174,7 +175,12 @@ fun HomeScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("📍 ${state.location}", style = AppTypography.bodyLarge)
+                Text(
+                    "📍 ${state.location}", style = AppTypography.bodyLarge,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f)
+                )
                 Text(
                     s.homeChangeLocation,
                     color = Primary,
