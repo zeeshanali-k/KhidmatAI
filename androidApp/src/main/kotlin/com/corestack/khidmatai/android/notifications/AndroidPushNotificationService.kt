@@ -5,7 +5,7 @@ import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.tasks.await
 import org.koin.core.annotation.Single
 
-@Single
+@Single(binds = [PushNotificationService::class])
 class AndroidPushNotificationService : PushNotificationService {
     override suspend fun getToken(): String? {
         return try {

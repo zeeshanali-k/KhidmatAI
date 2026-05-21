@@ -4,6 +4,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.EaseOutBack
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,7 +39,10 @@ import com.corestack.khidmatai.ui.theme.PrimaryDark
 import com.corestack.khidmatai.ui.theme.PrimaryLight
 import com.corestack.khidmatai.ui.theme.Surface
 import com.corestack.khidmatai.ui.theme.spacing
+import khidmatai.shared.generated.resources.Res
+import khidmatai.shared.generated.resources.logo
 import kotlinx.coroutines.delay
+import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 
 @Composable
@@ -112,14 +116,10 @@ fun SplashScreen(
                 modifier = Modifier
                     .size(96.dp)
                     .scale(logoScale.value)
-                    .clip(CircleShape)
-                    .background(Surface.copy(alpha = 0.2f)),
+                    .clip(CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "🤝",
-                    style = AppTypography.displayLarge
-                )
+                Image(painterResource(Res.drawable.logo), "")
             }
 
             Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
