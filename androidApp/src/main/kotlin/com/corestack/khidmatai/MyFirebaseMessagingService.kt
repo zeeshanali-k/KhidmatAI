@@ -1,5 +1,6 @@
 package com.corestack.khidmatai
 
+import android.util.Log
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -7,9 +8,12 @@ import kotlinx.coroutines.launch
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
+    private val TAG = "MyFirebaseMessagingService"
+
     @OptIn(DelicateCoroutinesApi::class)
     override fun onNewToken(token: String) {
         super.onNewToken(token)
+        Log.d(TAG, "onNewToken-> $token")
         try {
             val koin = org.koin.core.context.GlobalContext.get()
             val authRepo = koin.get<com.corestack.khidmatai.core.domain.repository.AuthRepository>()
@@ -28,12 +32,20 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
+        Log.d(TAG, "onMessageReceived-> ${message.notification}")
         val data = message.data
         if (data.containsKey("followup_actions")) {
             val followupJson = data["followup_actions"]
-            sendNotification(message.notification?.title ?: "Update", message.notification?.body ?: "You have a new update", followupJson)
+            sendNotification(
+                message.notification?.title ?: "Update",
+                message.notification?.body ?: "You have a new update",
+                followupJson
+            )
         } else {
-            sendNotification(message.notification?.title ?: "Notification", message.notification?.body ?: "")
+            sendNotification(
+                message.notification?.title ?: "Notification",
+                message.notification?.body ?: ""
+            )
         }
     }
 
@@ -53,10 +65,15 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             .setContentText(body)
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
-        
-        val notificationManager = getSystemService(android.content.Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+
+        val notificationManager =
+            getSystemService(android.content.Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            val channel = android.app.NotificationChannel(channelId, "KhidmatAI Updates", android.app.NotificationManager.IMPORTANCE_DEFAULT)
+            val channel = android.app.NotificationChannel(
+                channelId,
+                "KhidmatAI Updates",
+                android.app.NotificationManager.IMPORTANCE_DEFAULT
+            )
             notificationManager.createNotificationChannel(channel)
         }
         notificationManager.notify(0, builder.build())

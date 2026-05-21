@@ -82,7 +82,7 @@ class AppModule {
     fun provideAuthRepository(
         env: AppEnvironment,
         httpClient: HttpClient,
-        appPreferences: AppPreferences
+        appPreferences: AppPreferences,
     ): AuthRepository {
         return when (env) {
             AppEnvironment.DEV -> MockAuthRepositoryImpl(
@@ -90,7 +90,7 @@ class AppModule {
             )
             AppEnvironment.PROD -> ApiAuthRepositoryImpl(
                 httpClient,
-                appPreferences
+                appPreferences,
             )
         }
     }

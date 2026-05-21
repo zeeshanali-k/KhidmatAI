@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.flow
 
 class ApiAuthRepositoryImpl(
     private val httpClient: HttpClient,
-    private val appPreferences: AppPreferences
+    private val appPreferences: AppPreferences,
 ) : AuthRepository {
 
     override fun getLastEmail(): String = appPreferences.lastEmail
@@ -49,7 +49,7 @@ class ApiAuthRepositoryImpl(
                 val tokenResponse = response.body<TokenResponseDto>()
                 val parsedName = email.substringBefore("@")
                     .replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
-                
+
                 val user = AuthUser(
                     id = email,
                     name = parsedName,
