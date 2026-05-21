@@ -295,3 +295,29 @@ Defined in `.github/workflows/deploy.yml`, triggered on every push to `main`:
 | Result — Unavailable | `ResultUnavailableScreen` | Empty state, retry options |
 | Booking Detail | `BookingDetailScreen` | Full detail + collapsible agent trace accordion |
 | My Bookings | `BookingsScreen` | Filtered list (All / Upcoming / Completed / Cancelled) |
+
+
+---
+
+
+## Assumptions & Limitations
+
+This section explains the assumptions and limitations of the current system.
+
+**Assumptions**
+- Provider data is statically pre-seeded and limited to mock entries in the system
+- Location permission is assumed to be granted by the user prior to submitting a request
+- Gemini API is assumed to be available with no rate-limit or connectivity issues
+- Pricing is limited to PKR only and does not support multi-currency
+- User queries are assumed to be short (1–3 sentences); multi-intent queries are not fully supported
+- Backend URL is fixed at build time and requires a rebuild to switch environments
+
+**Limitations**
+- Payment system is not implemented; pricing is display-only and does not support transactio
+- Voice input is a UI prototype and does not include speech-to-text integration
+- Admin panel does not include authentication or access control for `/admin/*` endpoint
+- AI does not include fallback or retry mechanisms in case of Gemini API failure
+- AI requests are stateless and do not maintain context between sessions
+- iOS support depends on Compose Multiplatform for iOS, which is not yet production-stable
+- Backend does not include rate limiting, load balancing, or request queuing
+- System does not include logging or monitoring for debugging or performance tracking
